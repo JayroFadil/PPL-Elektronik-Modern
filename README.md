@@ -20,7 +20,7 @@ Ikuti urutan perintah ini di terminal Anda:
 
 ### 1. Ambil Project
 ```bash
-git clone https://github.com/muhammadainulfuady/elektronik-modern.git
+git clone https://github.com/JayroFadil/test.git
 cd elektronik-modern
 ```
 
