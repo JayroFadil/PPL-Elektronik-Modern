@@ -61,7 +61,7 @@
                                 <th class="bg-g50 py-3.5 px-6 text-xs font-extrabold text-g500 uppercase tracking-widest border-b border-g200">No. Resi</th>
                                 <th class="bg-g50 py-3.5 px-6 text-xs font-extrabold text-g500 uppercase tracking-widest border-b border-g200">Pelanggan</th>
                                 <th class="bg-g50 py-3.5 px-6 text-xs font-extrabold text-g500 uppercase tracking-widest border-b border-g200">Total</th>
-                                <th class="bg-g50 py-3.5 px-6 text-xs font-extrabold text-g500 uppercase tracking-widest border-b border-g200">Bukti Bayar</th>
+                                <th class="bg-g50 py-3.5 px-6 text-xs font-extrabold text-g500 uppercase tracking-widest border-b border-g200">Pembayaran</th>
                                 <th class="bg-g50 py-3.5 px-6 text-xs font-extrabold text-g500 uppercase tracking-widest border-b border-g200">Status</th>
                                 <th class="bg-g50 py-3.5 px-6 text-xs font-extrabold text-g500 uppercase tracking-widest border-b border-g200">Update Status</th>
                             </tr>
@@ -81,11 +81,10 @@
                                         'selesai'  => 'bg-green-50 text-green-600 border-green-200',
                                         default    => 'bg-orange-50 text-orange-600 border-orange-200',
                                     };
-                                    $buktiAda = !empty($pesanan->pembayaran?->bukti_bayar);
                                     $paymentStatus = (int) ($pesanan->pembayaran?->status_konfirmasi ?? 0);
                                     $paymentLabel = match ($paymentStatus) {
-                                        1 => 'Terverifikasi',
-                                        2 => 'Ditolak',
+                                        1 => 'Lunas',
+                                        2 => 'Gagal',
                                         default => 'Menunggu',
                                     };
                                     $paymentClass = match ($paymentStatus) {
@@ -93,7 +92,6 @@
                                         2 => 'bg-red-50 text-red-600 border-red-200',
                                         default => 'bg-orange-50 text-orange-600 border-orange-200',
                                     };
-                                    $buktiExt = $buktiAda ? strtolower(pathinfo($pesanan->pembayaran->bukti_bayar, PATHINFO_EXTENSION)) : '';
                                 @endphp
                                 <tr class="group hover:bg-g50/50 transition-colors">
                                     <td class="py-4 px-6 border-b border-g100 group-last:border-none">
@@ -116,21 +114,17 @@
                                         </div>
                                     </td>
                                     <td class="py-4 px-6 border-b border-g100 group-last:border-none">
-                                        @if ($buktiAda)
-                                            <div class="flex flex-col gap-2 items-start">
-                                                @if ($buktiExt === 'pdf')
-                                                    <a href="{{ asset('storage/payments/' . $pesanan->pembayaran->bukti_bayar) }}" target="_blank" class="inline-flex items-center gap-1.5 bg-blue-50 text-blue-600 border border-blue-200 py-1 px-2.5 rounded-lg text-[11px] font-extrabold tracking-widest uppercase hover:bg-blue-100 transition-colors">
-                                                        <i class="fi fi-rr-document"></i> PDF
-                                                    </a>
-                                                @else
-                                                    <a href="{{ asset('storage/payments/' . $pesanan->pembayaran->bukti_bayar) }}" target="_blank" title="Lihat Bukti Bayar" class="block overflow-hidden rounded-lg border-2 border-green-200 hover:border-green-400 transition-colors">
-                                                        <img src="{{ asset('storage/payments/' . $pesanan->pembayaran->bukti_bayar) }}" alt="Bukti Bayar" class="w-12 h-12 object-cover" loading="lazy" decoding="async">
-                                                    </a>
+                                        <div class="flex flex-col gap-1.5 items-start">
+                                            <span class="inline-flex items-center {{ $paymentClass }} border py-1 px-2 rounded text-[10px] font-bold tracking-wider">{{ $paymentLabel }}</span>
+                                            @if ($pesanan->pembayaran?->midtrans_order_id)
+                                                <span class="text-[11px] font-semibold text-g500">{{ $pesanan->pembayaran->payment_type ?? 'Midtrans Snap' }}</span>
+                                                @if ($pesanan->pembayaran->transaction_status)
+                                                    <span class="text-[10px] text-g400">{{ ucfirst($pesanan->pembayaran->transaction_status) }}</span>
                                                 @endif
-                                                <span class="inline-flex items-center {{ $paymentClass }} border py-1 px-2 rounded text-[10px] font-bold tracking-wider">{{ $paymentLabel }}</span>
-
+                                            @elseif ($pesanan->pembayaran?->bukti_bayar)
+                                                <a href="{{ asset('storage/payments/' . $pesanan->pembayaran->bukti_bayar) }}" target="_blank" rel="noopener" class="text-[11px] text-primary underline">Lihat bukti pembayaran lama</a>
                                                 @if ($paymentStatus === 1)
-                                                    <div class="text-[10px] font-bold text-g500 uppercase tracking-widest flex items-center gap-1 mt-1"><i class="fi fi-rr-check"></i> Final</div>
+                                                    <span class="text-[10px] font-bold text-g500">Sudah diverifikasi</span>
                                                 @else
                                                     <div class="flex gap-2 mt-1">
                                                         <form method="POST" action="{{ route('admin.orders.updatePayment', $pesanan) }}" class="m-0">
@@ -145,12 +139,10 @@
                                                         </form>
                                                     </div>
                                                 @endif
-                                            </div>
-                                        @else
-                                            <div class="w-12 h-12 rounded-lg bg-orange-50 border-2 border-orange-200 flex items-center justify-center text-orange-400 text-sm font-extrabold" title="Belum Dibayar">
-                                                404
-                                            </div>
-                                        @endif
+                                            @else
+                                                <span class="text-[11px] text-g400">Menunggu pembayaran</span>
+                                            @endif
+                                        </div>
                                     </td>
                                     <td class="py-4 px-6 border-b border-g100 group-last:border-none">
                                         <span class="inline-flex items-center {{ $statusClass }} border py-1 px-2.5 rounded text-[11px] font-extrabold tracking-widest uppercase">

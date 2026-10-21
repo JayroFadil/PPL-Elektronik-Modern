@@ -15,6 +15,17 @@ class Pembayaran extends Model
         'metode_pembayaran',
         'bukti_bayar',
         'status_konfirmasi',
+        'midtrans_order_id',
+        'snap_token',
+        'transaction_id',
+        'transaction_status',
+        'payment_type',
+        'fraud_status',
+        'paid_at',
+    ];
+
+    protected $casts = [
+        'paid_at' => 'datetime',
     ];
 
     public function pesanan(): BelongsTo

@@ -86,7 +86,7 @@ class UserController extends Controller
 
         $pesananTerbaru = Pesanan::with([
             'user:id_users,nama,email',
-            'pembayaran:id_pembayaran,id_pesanan,bukti_bayar,status_konfirmasi',
+            'pembayaran:id_pembayaran,id_pesanan,status_konfirmasi,transaction_status,payment_type',
             'detailPesanans.produk:id_produk,nama_produk'
         ])
             ->select('id_pesanan', 'id_users', 'no_resi', 'tanggal_pesan', 'status_pesanan', 'total_bayar')

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\KategoriController;
+use App\Http\Controllers\MidtransNotificationController;
 use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\PesananController;
 use App\Http\Controllers\ProdukController;
@@ -47,6 +48,8 @@ Route::get('/products/{produk}', [ProdukController::class, 'show'])->name('produ
 
 // Cart count (AJAX, publik)
 Route::get('/cart/count', [CartController::class, 'count'])->name('cart.count');
+Route::post('/midtrans/notification', [MidtransNotificationController::class, 'handle'])
+    ->name('midtrans.notification');
 
 /*
 |--------------------------------------------------------------------------
@@ -89,6 +92,7 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     Route::put('/profile/alamat/{alamatUser}', [UserController::class, 'updateAlamat'])->name('customer.alamat.update');
     Route::delete('/profile/alamat/{alamatUser}', [UserController::class, 'destroyAlamat'])->name('customer.alamat.destroy');
     Route::get('/my-orders', [PesananController::class, 'customerOrders'])->name('customer.orders');
+    Route::post('/my-orders/{pesanan}/payment', [PesananController::class, 'startPayment'])->name('customer.orders.payment');
     Route::post('/my-orders/{pesanan}/complete', [PesananController::class, 'completeOrder'])->name('customer.orders.complete');
     Route::get('/checkout', [PesananController::class, 'checkout'])->name('customer.checkout');
     Route::post('/buy-now', [PesananController::class, 'buyNow'])->name('customer.buyNow');
