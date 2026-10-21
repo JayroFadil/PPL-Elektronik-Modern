@@ -49,6 +49,14 @@
                         'selesai'  => 'Selesai',
                         default    => ucfirst($pesanan->status_pesanan),
                     };
+                    $paymentStatus = (int) ($pesanan->pembayaran?->status_konfirmasi ?? 0);
+                    $transactionStatus = $pesanan->pembayaran?->transaction_status;
+                    $paymentLabel = match (true) {
+                        $paymentStatus === 1 => 'Lunas',
+                        $paymentStatus === 2 => 'Pembayaran gagal',
+                        $transactionStatus === 'pending' => 'Menunggu pembayaran',
+                        default => 'Belum dibayar',
+                    };
                 @endphp
                 <div class="bg-white rounded-2xl shadow-sm border border-g100 overflow-hidden transition-all hover:shadow-card group">
                     <div class="flex items-center justify-between py-4 px-6 border-b border-g100 flex-wrap gap-3 bg-white">
@@ -131,6 +139,22 @@
                         <div class="text-right">
                             <div class="text-xs font-bold text-g500 uppercase tracking-widest mb-1">Total Bayar</div>
                             <div class="font-heading text-xl font-extrabold text-primary mb-2">Rp {{ number_format($pesanan->total_bayar, 0, ',', '.') }}</div>
+
+                            <div class="text-xs font-semibold text-g500 mb-3">
+                                Pembayaran: <span class="{{ $paymentStatus === 1 ? 'text-green-600' : ($paymentStatus === 2 ? 'text-red-600' : 'text-orange-600') }}">{{ $paymentLabel }}</span>
+                                @if ($pesanan->pembayaran?->payment_type)
+                                    · {{ ucfirst(str_replace('_', ' ', $pesanan->pembayaran->payment_type)) }}
+                                @endif
+                            </div>
+
+                            @if ($paymentStatus !== 1 && $pesanan->status_pesanan === 'menunggu')
+                                <form action="{{ route('customer.orders.payment', $pesanan) }}" method="POST" class="mb-3">
+                                    @csrf
+                                    <button type="submit" class="inline-flex items-center gap-2 py-2 px-4 rounded-xl font-bold text-[13px] bg-primary text-white shadow-sm hover:bg-primary-dark transition-all">
+                                        <i class="fi fi-rr-credit-card"></i> Pilih Metode Pembayaran
+                                    </button>
+                                </form>
+                            @endif
                             
                             @if ($pesanan->status_pesanan === 'dikirim')
                                 <form action="{{ route('customer.orders.complete', $pesanan) }}" method="POST" onsubmit="event.preventDefault(); window.confirmCompleteOrder(this);">
@@ -164,4 +188,26 @@
             @endif
         </div>
     </section>
+
+    @if (config('services.midtrans.client_key'))
+        @php
+            $snapScriptHost = config('services.midtrans.is_production')
+                ? 'https://app.midtrans.com'
+                : 'https://app.sandbox.midtrans.com';
+        @endphp
+        @push('scripts')
+            <script src="{{ $snapScriptHost }}/snap/snap.js?client-key={{ urlencode(config('services.midtrans.client_key')) }}"></script>
+            @if (session('snap_token'))
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        window.snap.pay(@json(session('snap_token')), {
+                            onSuccess: () => window.location.reload(),
+                            onPending: () => window.location.reload(),
+                            onError: () => window.location.reload()
+                        });
+                    });
+                </script>
+            @endif
+        @endpush
+    @endif
 @endsection

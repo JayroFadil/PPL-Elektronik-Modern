@@ -11,10 +11,15 @@ use App\Models\Notifikasi;
 use App\Models\Pembayaran;
 use App\Models\Promo;
 use App\Models\Keranjang;
+use App\Services\MidtransPaymentService;
 use App\Traits\OrderStats;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use RuntimeException;
 
 class PesananController extends Controller
 {
@@ -32,7 +37,7 @@ class PesananController extends Controller
     {
         $pesanans = Pesanan::with([
                 'user:id_users,nama,email',
-                'pembayaran:id_pembayaran,id_pesanan,metode_pembayaran,status_konfirmasi,bukti_bayar',
+                'pembayaran:id_pembayaran,id_pesanan,metode_pembayaran,bukti_bayar,status_konfirmasi,transaction_status,payment_type,midtrans_order_id',
                 'ekspedisi:id_ekspedisi,nama_ekspedisi,biaya_pengiriman',
                 'detailPesanans.produk:id_produk,nama_produk,gambar,harga',
                 'promo',
@@ -84,7 +89,7 @@ class PesananController extends Controller
         if ($data['status_pesanan'] === 'diproses' && (int) ($pesanan->pembayaran?->status_konfirmasi ?? 0) !== 1) {
             return redirect()
                 ->route('admin.orders.index')
-                ->with('error', 'Pembayaran harus diverifikasi oleh admin sebelum pesanan dapat diproses.');
+                ->with('error', 'Pembayaran belum dilakukan oleh pembeli, jadi pesanan belum dapat diproses.');
         }
 
         DB::transaction(function () use ($pesanan, $data) {
@@ -139,7 +144,7 @@ class PesananController extends Controller
         $pesanans = Pesanan::with([
                 'detailPesanans.produk:id_produk,nama_produk,gambar,harga',
                 'ekspedisi:id_ekspedisi,nama_ekspedisi,biaya_pengiriman',
-                'pembayaran:id_pembayaran,id_pesanan,metode_pembayaran,status_konfirmasi',
+                'pembayaran:id_pembayaran,id_pesanan,metode_pembayaran,status_konfirmasi,transaction_status,payment_type',
                 'promo',
             ])
             ->select('id_pesanan','id_users','id_ekspedisi','id_promo','id_alamat','no_resi','tanggal_pesan',
@@ -237,22 +242,19 @@ class PesananController extends Controller
     /**
      * Customer: proses pesanan.
      */
-    public function placeOrder(Request $request)
+    public function placeOrder(Request $request, MidtransPaymentService $midtrans)
     {
         $request->validate([
             'id_alamat' => ['required', 'exists:alamat_users,id_alamat'],
             'id_ekspedisi' => ['required', 'exists:ekspedisis,id_ekspedisi'],
-            'metode_pembayaran' => ['required', 'string', 'in:Transfer Bank,E-Wallet'],
-            'bukti_bayar' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ], [
             'id_alamat.required' => 'Silakan pilih alamat pengiriman.',
             'id_ekspedisi.required' => 'Silakan pilih ekspedisi pengiriman.',
-            'metode_pembayaran.required' => 'Silakan pilih metode pembayaran.',
-            'metode_pembayaran.in' => 'Metode pembayaran tidak valid.',
-            'bukti_bayar.required' => 'Bukti pembayaran wajib diunggah.',
-            'bukti_bayar.mimes' => 'Format bukti bayar harus berupa JPG, PNG, atau PDF.',
-            'bukti_bayar.max' => 'Ukuran file bukti bayar maksimal 5MB.',
         ]);
+
+        if (!$midtrans->isConfigured()) {
+            return back()->with('error', 'Konfigurasi Midtrans belum lengkap. Silakan hubungi administrator.');
+        }
 
         $alamatMilikUser = AlamatUser::where('id_users', Auth::id())
             ->where('id_alamat', $request->id_alamat)
@@ -318,6 +320,9 @@ class PesananController extends Controller
         $discount = $appliedPromo ? $this->calculateDiscount($appliedPromo, $subtotal) : 0;
         $promo = $appliedPromo ?: $this->defaultPromo();
         $totalBayar = max(0, $subtotal - $discount) + $ongkir;
+        if ($totalBayar <= 0) {
+            return back()->with('error', 'Total pembayaran harus lebih dari Rp0 untuk diproses oleh Midtrans.');
+        }
 
         $createdPesanan = DB::transaction(function () use ($request, $subtotal, $discount, $ongkir, $totalBayar, $orderItems, $promo, $appliedPromo) {
             $pesanan = Pesanan::create([
@@ -336,17 +341,10 @@ class PesananController extends Controller
 
             $pesanan->update(['no_resi' => 'RESI-' . $pesanan->id_pesanan]);
 
-            $buktiFileName = null;
-            if ($request->hasFile('bukti_bayar')) {
-                $file = $request->file('bukti_bayar');
-                $buktiFileName = 'pay-' . $pesanan->id_pesanan . '-' . time() . '.' . $file->getClientOriginalExtension();
-                $file->storeAs('payments', $buktiFileName, 'public');
-            }
-
-            \App\Models\Pembayaran::create([
+            Pembayaran::create([
                 'id_pesanan' => $pesanan->id_pesanan,
-                'metode_pembayaran' => $request->metode_pembayaran,
-                'bukti_bayar' => $buktiFileName,
+                'metode_pembayaran' => 'Midtrans Snap',
+                'bukti_bayar' => '',
                 'status_konfirmasi' => 0,
             ]);
 
@@ -373,7 +371,7 @@ class PesananController extends Controller
         $this->notifyCustomer(
             Auth::id(),
             'Pesanan Berhasil Dibuat',
-            'Pesanan ' . $createdPesanan->no_resi . ' sudah diterima dan menunggu verifikasi pembayaran admin.'
+            'Pesanan ' . $createdPesanan->no_resi . ' berhasil dibuat dan menunggu pembayaran.'
         );
 
         // Kosongkan keranjang di database (jika bukan buy now)
@@ -384,7 +382,64 @@ class PesananController extends Controller
         }
         session()->forget('applied_promo_id');
 
-        return redirect()->route('customer.orders')->with('status', 'Pesanan berhasil dibuat! Pembayaran Anda akan segera diverifikasi oleh admin.');
+        try {
+            $snapToken = $midtrans->createSnapToken(
+                $createdPesanan->load(['user', 'pembayaran']),
+                $createdPesanan->pembayaran
+            );
+        } catch (ConnectionException|RequestException|RuntimeException $exception) {
+            Log::error('Midtrans Snap token request failed.', [
+                'pesanan_id' => $createdPesanan->id_pesanan,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return redirect()->route('customer.orders')->with(
+                'error',
+                'Pesanan berhasil dibuat, tetapi pembayaran belum dapat dibuka. Silakan coba tombol Bayar pada pesanan Anda.'
+            );
+        }
+
+        return redirect()
+            ->route('customer.orders')
+            ->with('status', 'Pesanan berhasil dibuat. Selesaikan pembayaran melalui Midtrans.')
+            ->with('snap_token', $snapToken);
+    }
+
+    public function startPayment(Pesanan $pesanan, MidtransPaymentService $midtrans)
+    {
+        if ((int) $pesanan->id_users !== (int) Auth::id()) {
+            abort(403);
+        }
+
+        $pembayaran = $pesanan->pembayaran;
+        if (!$pembayaran) {
+            return redirect()->route('customer.orders')->with('error', 'Data pembayaran pesanan tidak ditemukan.');
+        }
+
+        if ((int) $pembayaran->status_konfirmasi === 1) {
+            return redirect()->route('customer.orders')->with('error', 'Pesanan ini sudah dibayar.');
+        }
+
+        if (!$midtrans->isConfigured()) {
+            return redirect()->route('customer.orders')->with('error', 'Konfigurasi Midtrans belum lengkap.');
+        }
+
+        try {
+            $snapToken = $midtrans->createSnapToken(
+                $pesanan->load('user'),
+                $pembayaran,
+                in_array($pembayaran->transaction_status, ['deny', 'cancel', 'expire', 'failure'], true)
+            );
+        } catch (ConnectionException|RequestException|RuntimeException $exception) {
+            Log::error('Midtrans Snap retry request failed.', [
+                'pesanan_id' => $pesanan->id_pesanan,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return redirect()->route('customer.orders')->with('error', 'Pembayaran belum dapat dibuka. Silakan coba kembali.');
+        }
+
+        return redirect()->route('customer.orders')->with('snap_token', $snapToken);
     }
 
     public function updatePayment(Request $request, Pesanan $pesanan)
@@ -393,20 +448,23 @@ class PesananController extends Controller
             'status_konfirmasi' => ['required', 'integer', 'in:0,1,2'],
         ]);
 
-        if (!$pesanan->pembayaran) {
-            return redirect()
-                ->route('admin.orders.index')
-                ->with('error', 'Data pembayaran untuk pesanan ini belum tersedia.');
+        $pembayaran = $pesanan->pembayaran;
+        if (!$pembayaran || filled($pembayaran->midtrans_order_id) || blank($pembayaran->bukti_bayar)) {
+            return redirect()->route('admin.orders.index')->with(
+                'error',
+                'Pembayaran Midtrans tidak dapat diverifikasi manual.'
+            );
         }
 
-        if ((int) $pesanan->pembayaran->status_konfirmasi === 1) {
-            return redirect()
-                ->route('admin.orders.index')
-                ->with('error', 'Pembayaran yang sudah diverifikasi tidak dapat diubah kembali.');
+        if ((int) $pembayaran->status_konfirmasi === 1) {
+            return redirect()->route('admin.orders.index')->with(
+                'error',
+                'Pembayaran yang sudah diverifikasi tidak dapat diubah kembali.'
+            );
         }
 
-        DB::transaction(function () use ($pesanan, $data) {
-            $pesanan->pembayaran->update($data);
+        DB::transaction(function () use ($pesanan, $pembayaran, $data) {
+            $pembayaran->update($data);
 
             if ((int) $data['status_konfirmasi'] === 1 && $pesanan->status_pesanan === 'menunggu') {
                 $pesanan->update(['status_pesanan' => 'diproses']);
@@ -419,14 +477,15 @@ class PesananController extends Controller
                 $this->notifyCustomer(
                     $pesanan->id_users,
                     'Pembayaran Ditolak',
-                    'Bukti pembayaran untuk pesanan ' . $pesanan->no_resi . ' ditolak. <a href="https://wa.me/6281234567890" target="_blank" class="text-primary font-bold hover:underline">Hubungi Admin via WA</a>'
+                    'Bukti pembayaran untuk pesanan ' . $pesanan->no_resi . ' ditolak.'
                 );
             }
         });
 
-        return redirect()
-            ->route('admin.orders.index')
-            ->with('status', 'Status pembayaran pesanan ' . $pesanan->no_resi . ' berhasil diperbarui.');
+        return redirect()->route('admin.orders.index')->with(
+            'status',
+            'Status pembayaran pesanan ' . $pesanan->no_resi . ' berhasil diperbarui.'
+        );
     }
 
     private function appliedPromo(): ?Promo

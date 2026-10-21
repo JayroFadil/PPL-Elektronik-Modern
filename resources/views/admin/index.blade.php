@@ -139,7 +139,7 @@
                                 <th class="bg-g50 py-3.5 px-6 text-xs font-extrabold text-g500 uppercase tracking-widest border-b border-g200">No. Resi</th>
                                 <th class="bg-g50 py-3.5 px-6 text-xs font-extrabold text-g500 uppercase tracking-widest border-b border-g200">Pelanggan</th>
                                 <th class="bg-g50 py-3.5 px-6 text-xs font-extrabold text-g500 uppercase tracking-widest border-b border-g200">Total</th>
-                                <th class="bg-g50 py-3.5 px-6 text-xs font-extrabold text-g500 uppercase tracking-widest border-b border-g200">Bukti</th>
+                                <th class="bg-g50 py-3.5 px-6 text-xs font-extrabold text-g500 uppercase tracking-widest border-b border-g200">Pembayaran</th>
                                 <th class="bg-g50 py-3.5 px-6 text-xs font-extrabold text-g500 uppercase tracking-widest border-b border-g200">Status</th>
                                 <th class="bg-g50 py-3.5 px-6 text-xs font-extrabold text-g500 uppercase tracking-widest border-b border-g200">Aksi</th>
                             </tr>
@@ -159,11 +159,10 @@
                                         'selesai'  => 'bg-green-50 text-green-600 border-green-200',
                                         default    => 'bg-orange-50 text-orange-600 border-orange-200',
                                     };
-                                    $buktiAda = !empty($pesanan->pembayaran?->bukti_bayar);
                                     $paymentStatus = (int) ($pesanan->pembayaran?->status_konfirmasi ?? 0);
                                     $paymentLabel = match ($paymentStatus) {
-                                        1 => 'Terverifikasi',
-                                        2 => 'Ditolak',
+                                        1 => 'Lunas',
+                                        2 => 'Gagal',
                                         default => 'Menunggu',
                                     };
                                     $paymentClass = match ($paymentStatus) {
@@ -171,7 +170,6 @@
                                         2 => 'bg-red-50 text-red-600 border-red-200',
                                         default => 'bg-orange-50 text-orange-600 border-orange-200',
                                     };
-                                    $buktiExt = $buktiAda ? strtolower(pathinfo($pesanan->pembayaran->bukti_bayar, PATHINFO_EXTENSION)) : '';
                                 @endphp
                                 <tr class="group hover:bg-g50/50 transition-colors">
                                     <td class="py-4 px-6 border-b border-g100 group-last:border-none">
@@ -194,11 +192,12 @@
                                         </div>
                                     </td>
                                     <td class="py-4 px-6 border-b border-g100 group-last:border-none">
-                                        @if ($buktiAda)
+                                        <div class="flex flex-col items-start gap-1">
                                             <span class="inline-flex items-center {{ $paymentClass }} border py-0.5 px-2 rounded text-[9px] font-bold tracking-wider whitespace-nowrap">{{ $paymentLabel }}</span>
-                                        @else
-                                            <span class="text-[10px] font-bold text-orange-400 bg-orange-50 px-2 py-0.5 rounded border border-orange-100">Belum Bayar</span>
-                                        @endif
+                                            @if ($pesanan->pembayaran?->transaction_status)
+                                                <span class="text-[9px] text-g400">{{ ucfirst($pesanan->pembayaran->transaction_status) }}</span>
+                                            @endif
+                                        </div>
                                     </td>
                                     <td class="py-4 px-6 border-b border-g100 group-last:border-none">
                                         <span class="inline-flex items-center {{ $statusClass }} border py-1 px-2.5 rounded text-[11px] font-extrabold tracking-widest uppercase whitespace-nowrap">
