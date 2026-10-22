@@ -154,9 +154,9 @@
                                         </span>
                                     </td>
                                     <td class="py-4 px-6 border-b border-g100 group-last:border-none">
-                                        <span class="inline-flex items-center gap-1.5 {{ $produk->stok > 0 ? 'text-green-600' : 'text-red-500' }} text-[12px] font-bold">
-                                            <span class="w-2 h-2 rounded-full {{ $produk->stok > 0 ? 'bg-green-500' : 'bg-red-500' }}"></span>
-                                            {{ $produk->stok > 0 ? 'Aktif' : 'Habis' }}
+                                        <span class="inline-flex items-center gap-1.5 {{ $produk->stok < 5 ? 'text-red-500' : 'text-green-600' }} text-[12px] font-bold">
+                                            <span class="w-2 h-2 rounded-full {{ $produk->stok < 5 ? 'bg-red-500' : 'bg-green-500' }}"></span>
+                                            {{ $produk->stok < 5 ? 'Lakukan Stok Ulang' : 'Stok Mencukupi' }}
                                         </span>
                                     </td>
                                     <td class="py-4 px-6 border-b border-g100 group-last:border-none text-right">
