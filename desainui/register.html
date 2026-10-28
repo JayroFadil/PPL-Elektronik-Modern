@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Daftar – Elektronik Modern</title>
+    <link rel="stylesheet" href="shared.css" />
+    <style>
+      /* ===== AUTH PAGE (matching Laravel blade) ===== */
+      .auth-page {
+        min-height: 100vh;
+        background: var(--g50);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .auth-card-modern {
+        background: #fff;
+        border-radius: 24px;
+        padding: 32px;
+        width: 100%;
+        max-width: 460px;
+        box-shadow: 0 20px 60px rgba(10,15,30,.18);
+        border: 1px solid var(--g200);
+        position: relative;
+      }
+      @media(min-width:768px) {
+        .auth-card-modern { padding: 40px; }
+      }
+      .back-btn {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--g50);
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--g500);
+        font-size: 20px;
+        cursor: pointer;
+        transition: .2s;
+        text-decoration: none;
+      }
+      .back-btn:hover {
+        color: var(--blue);
+        background: var(--blue-l);
+      }
+
+      /* Robot Mascot */
+      .robot-container {
+        width: 128px;
+        height: 128px;
+        margin: 0 auto 24px;
+        animation: floating 3s ease-in-out infinite;
+      }
+      @keyframes floating {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+      }
+      @keyframes blink {
+        0%, 96%, 100% { transform: scaleY(1); }
+        98% { transform: scaleY(0.1); }
+      }
+      .eye-group {
+        animation: blink 5s infinite;
+        transform-origin: center 72px;
+      }
+      .peek-a-boo .arm-left {
+        transform: rotate(145deg) translate(25px, -70px);
+      }
+      .peek-a-boo .arm-right {
+        transform: rotate(-145deg) translate(-25px, -70px);
+      }
+      .peek-a-boo .hand-left, .peek-a-boo .hand-right { opacity: 0; }
+      .peek-a-boo .eye-white-el, .peek-a-boo .pupil { display: none; }
+      .peek-a-boo .eye-closed-path { display: block !important; }
+      .peek-a-boo .eye-group { animation: none; }
+      .arm-left, .arm-right { transition: all 0.5s; }
+      .hand-left, .hand-right { transition: all 0.5s; }
+
+      .auth-title-modern {
+        font-family: var(--font-h);
+        font-size: 24px;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 6px;
+        color: var(--g900);
+      }
+      .auth-sub-modern {
+        text-align: center;
+        color: var(--g500);
+        font-size: 14px;
+        margin-bottom: 32px;
+      }
+
+      /* Form elements matching blade components */
+      .form-label {
+        display: block;
+        font-size: 11px;
+        font-weight: 800;
+        color: var(--g700);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      .form-input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1.5px solid var(--g200);
+        background: var(--g50);
+        border-radius: 12px;
+        font-family: var(--font);
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--g800);
+        outline: none;
+        transition: all .2s;
+      }
+      .form-input:focus {
+        border-color: var(--blue);
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(26,92,255,.1);
+      }
+      .form-group-modern { margin-bottom: 16px; }
+      .password-wrap {
+        position: relative;
+      }
+      .password-wrap .form-input {
+        padding-right: 48px;
+      }
+      .toggle-pw {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--g400);
+        font-size: 18px;
+        transition: .2s;
+        padding: 0;
+        line-height: 1;
+      }
+      .toggle-pw:hover { color: var(--blue); }
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      @media(max-width:500px) {
+        .grid-2 { grid-template-columns: 1fr; }
+      }
+      .terms-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+      .terms-row input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        margin-top: 2px;
+        accent-color: var(--blue);
+        flex-shrink: 0;
+        cursor: pointer;
+      }
+      .terms-row label {
+        font-size: 13px;
+        color: var(--g600);
+        line-height: 1.6;
+        cursor: pointer;
+      }
+      .terms-row label a {
+        color: var(--blue);
+        font-weight: 700;
+        text-decoration: none;
+      }
+      .terms-row label a:hover { text-decoration: underline; }
+      .btn-submit {
+        width: 100%;
+        padding: 14px;
+        border-radius: 12px;
+        background: var(--blue);
+        color: #fff;
+        font-family: var(--font);
+        font-size: 15px;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(26,92,255,.3);
+        transition: .2s;
+      }
+      .btn-submit:hover {
+        background: var(--blue-d);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(26,92,255,.4);
+      }
+      .auth-divider {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 24px 0;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--g400);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        text-align: center;
+      }
+      .auth-divider::before, .auth-divider::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: var(--g200);
+      }
+      .auth-link {
+        text-align: center;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--g500);
+      }
+      .auth-link a {
+        color: var(--blue);
+        font-weight: 800;
+        text-decoration: none;
+      }
+      .auth-link a:hover { text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <div class="auth-page">
+      <div class="auth-card-modern">
+        <!-- Back Button -->
+        <a href="index.html" class="back-btn" title="Kembali ke Beranda">‹</a>
+
+        <!-- Robot Mascot -->
+        <div class="robot-container" id="robot-container">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <!-- Body -->
+            <rect x="60" y="100" width="80" height="70" rx="30" fill="#3B82F6" stroke="#1E3A8A" stroke-width="4"/>
+            <rect x="80" y="120" width="40" height="25" rx="5" fill="#FBBF24" stroke="#1E3A8A" stroke-width="3"/>
+            <circle cx="85" cy="155" r="3" fill="#1E3A8A"/>
+            <circle cx="100" cy="155" r="3" fill="#1E3A8A"/>
+            <circle cx="115" cy="155" r="3" fill="#1E3A8A"/>
+            <!-- Neck -->
+            <rect x="90" y="90" width="20" height="15" fill="#1E3A8A"/>
+            <!-- Arms -->
+            <path d="M60 120 Q 40 120 35 150" stroke="#3B82F6" stroke-width="10" fill="none" stroke-linecap="round" class="arm-left"/>
+            <path d="M140 120 Q 160 120 165 150" stroke="#3B82F6" stroke-width="10" fill="none" stroke-linecap="round" class="arm-right"/>
+            <!-- Hands -->
+            <path d="M30 150 A 10 10 0 0 0 45 150" stroke="#1E3A8A" stroke-width="4" fill="none" class="hand-left"/>
+            <path d="M155 150 A 10 10 0 0 0 170 150" stroke="#1E3A8A" stroke-width="4" fill="none" class="hand-right"/>
+            <!-- Head -->
+            <rect x="55" y="40" width="90" height="65" rx="15" fill="#60A5FA" stroke="#1E3A8A" stroke-width="4"/>
+            <!-- Ears -->
+            <rect x="40" y="60" width="15" height="25" rx="5" fill="#EF4444" stroke="#1E3A8A" stroke-width="3"/>
+            <rect x="145" y="60" width="15" height="25" rx="5" fill="#EF4444" stroke="#1E3A8A" stroke-width="3"/>
+            <!-- Antenna -->
+            <line x1="100" y1="40" x2="100" y2="25" stroke="#1E3A8A" stroke-width="3"/>
+            <circle cx="100" cy="20" r="6" fill="#EF4444" stroke="#1E3A8A" stroke-width="2"/>
+            <!-- Eyes -->
+            <g class="eye-group">
+              <circle cx="82" cy="72" r="14" fill="white" stroke="#1E3A8A" stroke-width="2" class="eye-white-el"/>
+              <circle id="pupil-l" cx="82" cy="72" r="6" fill="#1E3A8A" class="pupil"/>
+              <path d="M72 72 Q 82 82 92 72" stroke="#1E3A8A" stroke-width="3" fill="none" stroke-linecap="round" class="eye-closed-path" style="display:none"/>
+            </g>
+            <g class="eye-group">
+              <circle cx="118" cy="72" r="14" fill="white" stroke="#1E3A8A" stroke-width="2" class="eye-white-el"/>
+              <circle id="pupil-r" cx="118" cy="72" r="6" fill="#1E3A8A" class="pupil"/>
+              <path d="M108 72 Q 118 82 128 72" stroke="#1E3A8A" stroke-width="3" fill="none" stroke-linecap="round" class="eye-closed-path" style="display:none"/>
+            </g>
+            <!-- Mouth -->
+            <path d="M85 88 Q 100 98 115 88" stroke="#1E3A8A" stroke-width="3" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+
+        <h1 class="auth-title-modern">Buat Akun Baru</h1>
+        <p class="auth-sub-modern">Bergabung dengan Elektronik Modern — gratis!</p>
+
+        <form onsubmit="event.preventDefault(); window.location.href='index.html'">
+          <!-- Nama Lengkap -->
+          <div class="form-group-modern">
+            <label class="form-label" for="nama">Nama Lengkap</label>
+            <input class="form-input" type="text" id="nama" name="nama" placeholder="Masukkan nama lengkap..." required autofocus />
+          </div>
+
+          <!-- Email -->
+          <div class="form-group-modern">
+            <label class="form-label" for="email">Email</label>
+            <input class="form-input" type="email" id="email" name="email" placeholder="nama@email.com" required />
+          </div>
+
+          <!-- Password + Konfirmasi (side by side) -->
+          <div class="grid-2" style="margin-bottom:20px">
+            <div>
+              <label class="form-label" for="password">Password</label>
+              <div class="password-wrap">
+                <input class="form-input" type="password" id="password" name="password" placeholder="Min. 8 karakter" required />
+                <button type="button" class="toggle-pw" onclick="togglePassword('password', this)"><i class="fi fi-rr-eye-crossed"></i></button>
+              </div>
+            </div>
+            <div>
+              <label class="form-label" for="password_confirmation">Konfirmasi</label>
+              <div class="password-wrap">
+                <input class="form-input" type="password" id="password_confirmation" name="password_confirmation" placeholder="Ulangi..." required />
+                <button type="button" class="toggle-pw" onclick="togglePassword('password_confirmation', this)"><i class="fi fi-rr-eye-crossed"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Terms & Conditions -->
+          <div class="terms-row">
+            <input type="checkbox" id="terms" required />
+            <label for="terms">
+              Saya menyetujui <a href="#">Syarat & Ketentuan</a>
+              dan <a href="#">Kebijakan Privasi</a>
+            </label>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" class="btn-submit">
+            <i class="fi fi-rr-document-signed" style="margin-right:6px"></i> Daftar Sekarang
+          </button>
+        </form>
+
+        <!-- Divider -->
+        <div class="auth-divider">atau</div>
+
+        <!-- Login Link -->
+        <div class="auth-link">
+          Sudah punya akun? <a href="login.html">Masuk di sini</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Toggle password visibility
+      function togglePassword(inputId, btn) {
+        const input = document.getElementById(inputId);
+        if (input.type === 'password') {
+          input.type = 'text';
+          btn.innerHTML = '<i class="fi fi-rr-eye"></i>';
+        } else {
+          input.type = 'password';
+          btn.innerHTML = '<i class="fi fi-rr-eye-crossed"></i>';
+        }
+        checkPeekABoo();
+      }
+
+      // Robot peek-a-boo (closes eyes when password is visible)
+      function checkPeekABoo() {
+        const container = document.getElementById('robot-container');
+        const pwInputs = document.querySelectorAll('input[name*="password"]');
+        const anyVisible = Array.from(pwInputs).some(i => i.type === 'text');
+        if (anyVisible) {
+          container.classList.add('peek-a-boo');
+        } else {
+          container.classList.remove('peek-a-boo');
+        }
+      }
+
+      // Robot eyes follow cursor
+      document.addEventListener('mousemove', function(e) {
+        if (document.querySelector('.peek-a-boo')) return;
+        const pupils = [document.getElementById('pupil-l'), document.getElementById('pupil-r')];
+        const container = document.getElementById('robot-container');
+        if (!container) return;
+        const rect = container.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const angle = Math.atan2(e.clientY - cy, e.clientX - cx);
+        const dist = Math.min(6, Math.hypot(e.clientX - cx, e.clientY - cy) / 40);
+        const x = Math.cos(angle) * dist;
+        const y = Math.sin(angle) * dist;
+        pupils.forEach(p => { if (p) p.setAttribute('transform', `translate(${x}, ${y})`); });
+      });
+    </script>
+  </body>
+</html>

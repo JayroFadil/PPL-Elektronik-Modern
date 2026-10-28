@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Samsung Smart TV 43" – Elektronik Modern</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+.detail-layout{display:grid;grid-template-columns:1fr 1fr;gap:48px;padding:32px 0 64px;align-items:start}
+.gallery{position:sticky;top:84px}
+.gallery-main{width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--rxl);background:var(--g100);margin-bottom:12px;box-shadow:var(--sh-md)}
+.gallery-thumbs{display:flex;gap:10px}
+.g-thumb{width:72px;height:72px;border-radius:var(--radius);object-fit:cover;border:2px solid transparent;cursor:pointer;transition:.2s;background:var(--g100)}
+.g-thumb.active,.g-thumb:hover{border-color:var(--blue)}
+.detail-brand{font-size:12px;font-weight:700;color:var(--blue);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.detail-title{font-family:'Syne',sans-serif;font-size:30px;font-weight:800;line-height:1.2;margin-bottom:12px;color:var(--g900)}
+.stars-row{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.stars{color:#F59E0B;font-size:17px}
+.rating-count{font-size:13px;color:var(--g500)}
+.price-box{background:var(--g50);border-radius:var(--rlg);padding:20px;margin-bottom:20px;border:1px solid var(--g200)}
+.detail-price{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--blue);margin-bottom:4px}
+.detail-old{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--g400)}
+.detail-old s{font-size:16px}
+.qty-row{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.qty-ctrl{display:flex;align-items:center;border:2px solid var(--g200);border-radius:var(--radius);overflow:hidden;width:fit-content}
+.q-btn{width:44px;height:44px;border:none;background:var(--g50);cursor:pointer;font-size:20px;font-weight:700;display:flex;align-items:center;justify-content:center;color:var(--g700);transition:.15s}
+.q-btn:hover{background:var(--blue-l);color:var(--blue)}
+.q-input{width:60px;text-align:center;font-weight:800;font-size:16px;border:none;border-left:2px solid var(--g200);border-right:2px solid var(--g200);outline:none;font-family:'Plus Jakarta Sans',sans-serif;padding:0}
+.detail-actions{display:flex;gap:12px;margin-bottom:24px}
+.spec-box{background:#fff;border-radius:var(--rlg);border:1px solid var(--g200);overflow:hidden}
+.spec-title{padding:16px 20px;font-weight:800;font-size:14px;background:var(--g50);border-bottom:1px solid var(--g200)}
+.spec-grid{display:grid;grid-template-columns:1fr 1fr}
+.spec-row{padding:12px 20px;border-bottom:1px solid var(--g100);display:flex;flex-direction:column}
+.spec-row:nth-child(odd){background:var(--g50)}
+.spec-key{font-size:11px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.spec-val{font-size:14px;font-weight:600;color:var(--g800)}
+.info-strip{background:var(--g50);border-radius:var(--rlg);padding:16px 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-bottom:20px;border:1px solid var(--g100)}
+.info-item{display:flex;align-items:center;gap:10px;padding:0 12px;border-right:1px solid var(--g200)}
+.info-item:first-child{padding-left:0}
+.info-item:last-child{border-right:none}
+.info-icon{font-size:22px}
+.info-label{font-size:11px;color:var(--g500);font-weight:600}
+.info-val{font-size:13px;font-weight:800;color:var(--g800)}
+</style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button type="button" class="burger-btn" id="mobileMenuBtn">
+          <i class="fi fi-rr-menu-burger" id="mobileMenuIcon"></i>
+        </button>
+        <a href="index.html" class="nav-logo">
+          <i class="fi fi-rr-bolt"></i>
+          <span>Elektronik<span>Modern</span></span>
+        </a>
+      </div>
+
+      <div class="nav-search">
+        <span class="search-icon"><i class="fi fi-rr-search"></i></span>
+        <input type="text" placeholder="Cari produk elektronik..." onkeydown="handleSearch(this, event)" />
+      </div>
+
+      <!-- Mobile Search Slide Panel -->
+      <div id="mobileSearchBar" class="mobile-search-bar">
+        <button onclick="toggleMobileSearch()" class="nav-icon-btn" style="background:none"><i class="fi fi-rr-angle-small-left"></i></button>
+        <div style="flex:1;position:relative">
+          <span class="search-icon" style="left:12px"><i class="fi fi-rr-search"></i></span>
+          <input type="text" placeholder="Cari produk..." id="mobileSearchInput" onkeydown="handleSearch(this, event)" style="padding-left:40px">
+        </div>
+      </div>
+
+      <div class="nav-right">
+        <button class="nav-icon-btn mobile-search-trigger" onclick="toggleMobileSearch()" style="display:none">
+          <i class="fi fi-rr-search"></i>
+        </button>
+        <button class="nav-icon-btn" onclick="toggleNotifPanel()" title="Notifikasi">
+          <i class="fi fi-rr-bell"></i>
+          <span class="notif-badge" id="notifBadgeNav">2</span>
+        </button>
+        <a href="cart.html" class="nav-icon-btn" title="Keranjang">
+          <i class="fi fi-rr-shopping-cart"></i>
+          <span class="cart-badge" id="cartBadgeNav">0</span>
+        </a>
+        <a href="orders.html" class="nav-icon-btn desktop-only" title="Pesanan Saya">
+          <i class="fi fi-rr-box"></i>
+        </a>
+        <a href="profile.html" class="nav-icon-btn desktop-only" title="Profil Saya">
+          <i class="fi fi-rr-user"></i>
+        </a>
+        <div class="desktop-only" style="display:flex;gap:8px">
+          <a href="login.html" class="btn btn-outline btn-sm">Masuk</a>
+          <a href="register.html" class="btn btn-primary btn-sm">Daftar</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- NOTIFICATION DROPDOWN PANEL -->
+    <div class="notif-overlay" id="notifOverlay" onclick="closeNotifPanel()"></div>
+    <div class="notif-panel" id="notifPanel">
+      <div class="notif-pheader">
+        <div>
+          <h4 style="font-weight:800;font-size:15px;color:var(--g900)">Notifikasi</h4>
+          <p style="font-size:11px;color:var(--g400);font-weight:600;margin-top:2px">Info terbaru akun Anda</p>
+        </div>
+        <button class="notif-mark" onclick="markNotificationsRead()">Tandai Dibaca</button>
+      </div>
+      <div class="notif-list" id="notifList"></div>
+    </div>
+
+    <!-- MOBILE DRAWER SIDEBAR -->
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay" onclick="toggleMobileMenu()"></div>
+    <div id="mobileMenu" class="mobile-menu">
+      <div class="mobile-menu-header">
+        <a href="index.html" class="nav-logo" style="font-size:18px">
+          <i class="fi fi-rr-bolt"></i>
+          <span>Elektronik<span>Modern</span></span>
+        </a>
+        <button onclick="toggleMobileMenu()" style="background:none;border:none;font-size:20px;color:var(--g400);cursor:pointer">✕</button>
+      </div>
+      <div class="mobile-menu-user">
+        <div class="m-avatar">BS</div>
+        <div class="m-user-info">
+          <div class="m-user-name">Budi Santoso</div>
+          <div class="m-user-email">budi.s@email.com</div>
+        </div>
+      </div>
+      <div class="m-group-title">Menu Utama</div>
+      <div class="mobile-menu-list">
+        <a href="index.html" class="m-item"><i class="fi fi-rr-home"></i> Beranda</a>
+        <a href="products.html" class="m-item"><i class="fi fi-rr-shopping-bag"></i> Katalog Produk</a>
+      </div>
+      <div class="m-group-title">Akun Saya</div>
+      <div class="mobile-menu-list">
+        <a href="profile.html" class="m-item"><i class="fi fi-rr-user"></i> Profil Saya</a>
+        <a href="orders.html" class="m-item"><i class="fi fi-rr-box"></i> Pesanan Saya</a>
+        <a href="#" class="m-item"><i class="fi fi-rr-heart"></i> Wishlist</a>
+      </div>
+      <div style="border-top:1px solid var(--g100);padding-top:16px;margin-top:16px">
+        <a href="login.html" class="m-item" style="color:var(--danger)"><i class="fi fi-rr-sign-out-alt"></i> Keluar Akun</a>
+      </div>
+    </div>
+
+<section class="py-8 md:py-[72px] bg-white min-h-[calc(100vh-68px)] px-4 md:px-8" style="padding: 32px 16px 64px; background: #fff; min-h: calc(100vh - 68px)">
+  <div class="max-w-[1280px] mx-auto" style="max-width: 1280px; margin: 0 auto">
+    
+    <!-- Breadcrumbs -->
+    <div class="flex items-center gap-1.5 mb-8 text-[13px]" style="display: flex; align-items: center; gap: 6px; margin-bottom: 32px; font-size: 13px">
+        <a href="index.html" class="text-g500 hover:text-primary transition-colors flex items-center gap-1.5" style="color: var(--g500); text-decoration: none; display: flex; align-items: center; gap: 6px"><i class="fi fi-rr-home"></i> Beranda</a> 
+        <i class="fi fi-rr-angle-small-right text-g400" style="color: var(--g400)"></i> 
+        <a href="products.html" class="text-g500 hover:text-primary transition-colors" style="color: var(--g500); text-decoration: none">Katalog</a>
+        <i class="fi fi-rr-angle-small-right text-g400" style="color: var(--g400)"></i>
+        <span class="text-g800 font-semibold" style="color: var(--g800); font-weight: 600">Samsung Smart TV 43" 4K UHD</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start" style="display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start">
+        <!-- Product Image -->
+        <div class="bg-g50 rounded-[32px] overflow-hidden aspect-square relative border border-g100 flex items-center justify-center p-8" style="background: var(--g50); border-radius: 32px; overflow: hidden; aspect-ratio: 1; border: 1px solid var(--g100); display: flex; align-items: center; justify-content: center; padding: 32px; position: relative">
+            <img src="https://images.unsplash.com/photo-1593784991095-a205069470b6?w=700&q=85" alt="Samsung Smart TV 43\" 4K UHD" class="w-full h-full object-contain mix-blend-multiply" style="width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply">
+        </div>
+
+        <!-- Product Info -->
+        <div>
+            <span class="badge badge-info" style="margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700; font-size: 11px">Smart TV</span>
+            <h1 class="font-heading text-[28px] md:text-[36px] font-extrabold text-g900 mb-3 leading-[1.3]" style="font-family: var(--font-h); font-size: 30px; font-weight: 800; color: var(--g900); margin-bottom: 12px; line-height: 1.3">Samsung Smart TV 43" 4K UHD</h1>
+            <div class="font-heading text-[32px] md:text-[40px] font-extrabold text-primary mb-6" style="font-family: var(--font-h); font-size: 36px; font-weight: 800; color: var(--blue); margin-bottom: 24px">Rp 6.499.000</div>
+
+            <!-- Stock availability badge -->
+            <div class="mb-6" style="margin-bottom: 24px">
+                <span class="badge badge-success" style="padding: 6px 14px; border-radius: 50px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px">
+                    <i class="fi fi-rr-check-circle"></i> Stok Tersedia
+                </span>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-8 border-t border-b border-g100 py-6" style="border-top: 1px solid var(--g100); border-bottom: 1px solid var(--g100); padding: 24px 0; margin-bottom: 32px">
+                <h3 class="text-[15px] font-extrabold text-g800 mb-2.5" style="font-size: 15px; font-weight: 800; color: var(--g800); margin-bottom: 10px">Deskripsi Produk</h3>
+                <p class="text-sm text-g600 leading-[1.8] whitespace-pre-wrap" style="font-size: 14px; color: var(--g600); line-height: 1.8; white-space: pre-wrap">Samsung Smart TV 43" 4K UHD dengan teknologi Crystal Processor 4K menghadirkan gambar yang jernih and tajam. Dilengkapi sistem operasi Tizen OS untuk akses Netflix, YouTube, Disney+, dan streaming lainnya langsung dari TV.</p>
+            </div>
+
+            <!-- Quantity selector -->
+            <div class="flex items-center gap-0 border-[1.5px] border-g200 rounded-xl overflow-hidden w-fit mb-6 bg-white shadow-sm" style="display: flex; align-items: center; border: 1.5px solid var(--g200); border-radius: var(--radius); overflow: hidden; width: fit-content; margin-bottom: 24px; background: #fff; box-shadow: var(--sh)">
+                <button type="button" onclick="changeQty(-1)" class="w-11 h-11 border-none bg-g50 text-g700 text-xl font-bold flex items-center justify-center cursor-pointer hover:bg-primary-light hover:text-primary transition-colors" style="width: 44px; height: 44px; border: none; background: var(--g50); color: var(--g700); font-size: 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center">−</button>
+                <input type="number" id="qtyInput" value="1" min="1" max="12" readonly class="w-14 text-center font-bold text-base border-none border-x-[1.5px] border-g200 outline-none bg-white h-11 p-0 m-0 focus:ring-0" style="width: 56px; text-align: center; font-weight: 700; font-size: 16px; border: none; border-left: 1.5px solid var(--g200); border-right: 1.5px solid var(--g200); outline: none; background: #fff; height: 44px; padding: 0; margin: 0">
+                <button type="button" onclick="changeQty(1)" class="w-11 h-11 border-none bg-g50 text-g700 text-xl font-bold flex items-center justify-center cursor-pointer hover:bg-primary-light hover:text-primary transition-colors" style="width: 44px; height: 44px; border: none; background: var(--g50); color: var(--g700); font-size: 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center">+</button>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="flex flex-wrap gap-3" style="display: flex; flex-wrap: wrap; gap: 12px">
+                <button class="btn btn-primary" style="padding: 14px 28px; border-radius: var(--radius); display: inline-flex; align-items: center; gap: 8px" onclick="addToCart(1, parseInt(document.getElementById('qtyInput').value))">
+                    <i class="fi fi-rr-shopping-cart-add"></i> Tambah ke Keranjang
+                </button>
+
+                <a href="checkout.html" class="btn" style="padding: 14px 28px; background: #14B8A6; color: #fff; border: none; border-radius: var(--radius); box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3); display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 700">
+                    <i class="fi fi-rr-shopping-bag"></i> Beli Sekarang
+                </a>
+
+                <button class="btn btn-outline" style="padding: 14px 28px; border-radius: var(--radius); display: inline-flex; align-items: center; gap: 8px" onclick="this.classList.toggle('active'); const icon = this.querySelector('i'); const text = this.querySelector('.wishlist-text'); if(this.classList.contains('active')){ icon.className = 'fi fi-sr-heart'; icon.style.color = '#dc2626'; text.textContent = 'Hapus dari Wishlist'; } else { icon.className = 'fi fi-rr-heart'; icon.style.color = ''; text.textContent = 'Tambah ke Wishlist'; }">
+                    <i class="fi fi-rr-heart"></i> <span class="wishlist-text">Tambah ke Wishlist</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Products -->
+    <div class="mt-16 pt-16 border-t border-g100" style="margin-top: 64px; padding-top: 64px; border-top: 1px solid var(--g100)">
+        <h2 class="font-heading text-[24px] font-extrabold text-g900 mb-6 flex items-center gap-2" style="font-family: var(--font-h); font-size: 24px; font-weight: 800; color: var(--g900); margin-bottom: 24px; display: flex; align-items: center; gap: 8px">
+            <i class="fi fi-rr-boxes" style="color: var(--blue)"></i> Produk Terkait
+        </h2>
+        <div class="prod-grid-4" id="relatedProductsGrid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px">
+            <!-- Dynamically populated -->
+        </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-grid">
+    <div><div class="footer-brand"><i class="fi fi-rr-bolt" style="margin-right:6px"></i> Elektronik Modern</div><p class="footer-desc">Platform belanja elektronik terpercaya.</p></div>
+    <div><h4>Belanja</h4><a href="products.html">Semua Produk</a></div>
+    <div><h4>Bantuan</h4><a href="orders.html">Riwayat Pesanan</a></div>
+    <div><h4>Perusahaan</h4><a href="#">Tentang Kami</a></div>
+  </div>
+  <div class="footer-bottom"><span>© 2024 Elektronik Modern – Kelompok 2 IF4E UTM</span></div>
+</footer>
+<div class="cart-toast" id="cart-toast"></div>
+<script src="shared.js"></script>
+<script>
+function changeQty(d){const i=document.getElementById('qtyInput');const v=Math.max(1,parseInt(i.value)+d);i.value=v;}
+
+function renderRelated() {
+  const grid = document.getElementById("relatedProductsGrid");
+  if (!grid) return;
+  
+  const related = PRODUCTS.filter(p => p.cat === 'Smart TV' && p.id !== 1).slice(0, 4);
+  
+  if (related.length < 4) {
+    const ids = new Set(related.map(p => p.id));
+    ids.add(1);
+    for (const p of PRODUCTS) {
+      if (related.length >= 4) break;
+      if (!ids.has(p.id)) {
+        related.push(p);
+        ids.add(p.id);
+      }
+    }
+  }
+
+  function prodCard(p) {
+    const stockBadge = p.stock < 5 && p.stock > 0 
+      ? `<div style="position:absolute;top:12px;left:12px;z-index:10;font-size:11px;font-weight:800;background:#ffedd5;color:#ea580c;padding:4px 10px;border-radius:8px">Sisa ${p.stock}</div>`
+      : (p.stock === 0 ? `<div style="position:absolute;top:12px;left:12px;z-index:10;font-size:11px;font-weight:800;background:#fee2e2;color:#dc2626;padding:4px 10px;border-radius:8px">Habis</div>` : '');
+    
+    return `<div class="prod-card" onclick="window.location='product-detail.html'">
+      ${stockBadge}
+      <button type="button" class="prod-wishlist" onclick="event.stopPropagation();this.classList.toggle('active');this.innerHTML=this.classList.contains('active')?'<i class=\\'fi fi-sr-heart text-red-500\\'></i>':'<i class=\\'fi fi-rr-heart\\'></i>'" style="display:flex;align-items:center;justify-content:center;opacity:1;background:rgba(255,255,255,0.9)">
+        <i class="fi fi-rr-heart"></i>
+      </button>
+      <div class="prod-img-wrap" style="aspect-ratio:1">
+        <img src="${p.img}" alt="${p.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+      </div>
+      <div class="prod-body">
+        <div class="prod-cat" style="color:var(--blue);font-weight:700;font-size:11px;letter-spacing:0.04em;text-transform:uppercase">${p.cat}</div>
+        <div class="prod-name" style="font-weight:700;font-size:14px;color:var(--g800);margin:6px 0;line-height:1.4">${p.name}</div>
+        <div class="prod-price-row" style="margin-bottom:8px">
+          <span class="prod-price" style="font-size:17px;font-weight:800;color:var(--blue)">${fmt(p.price)}</span>
+        </div>
+        <div class="prod-footer" style="display:flex;justify-content:space-between;align-items:center;margin-top:auto">
+          <span class="prod-stock" style="font-size:11px;color:var(--g500)"><i class="fi fi-rr-box"></i> Stok ${p.stock}</span>
+          <button class="add-cart-btn" onclick="event.stopPropagation();addToCart(${p.id})" style="border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center" title="Tambah ke keranjang">
+            <i class="fi fi-rr-shopping-cart-add"></i>
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  grid.innerHTML = related.map(p => prodCard(p)).join("");
+}
+
+document.addEventListener("DOMContentLoaded", renderRelated);
+</script>
+</body>
+</html>

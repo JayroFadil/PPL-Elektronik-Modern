@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Kelola Pesanan – Admin Elektronik Modern</title>
+<link rel="stylesheet" href="shared.css">
+</head>
+<body>
+<div class="admin-layout">
+  <div class="sidebar">
+    <div class="sidebar-brand"><div class="sidebar-brand-name"><i class="fi fi-rr-bolt" style="color:var(--blue)"></i> Elektronik Modern</div><div class="sidebar-brand-role">Panel Admin</div></div>
+    <div class="s-group">Menu Utama</div>
+    <a href="admin-dashboard.html" class="s-item"><span class="si"><i class="fi fi-rr-chart-pie"></i></span> Dashboard</a>
+    <a href="admin-products.html" class="s-item"><span class="si"><i class="fi fi-rr-box"></i></span> Kelola Produk</a>
+    <a href="admin-categories.html" class="s-item"><span class="si"><i class="fi fi-rr-apps"></i></span> Kelola Kategori</a>
+    <a href="admin-promos.html" class="s-item"><span class="si"><i class="fi fi-rr-ticket"></i></span> Kelola Promo</a>
+    <a href="admin-orders.html" class="s-item active"><span class="si"><i class="fi fi-rr-receipt"></i></span> Kelola Pesanan</a>
+    <a href="admin-users.html" class="s-item"><span class="si"><i class="fi fi-rr-users"></i></span> Kelola Customer</a>
+    <div class="s-group">Akun</div>
+    <a href="login.html" class="s-item"><span class="si"><i class="fi fi-rr-sign-out-alt"></i></span> Keluar</a>
+  </div>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div class="page-title">Kelola Pesanan</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-ico blue"><i class="fi fi-rr-clock-three"></i></div><div><div class="stat-label">Menunggu</div><div class="stat-val">14</div></div></div>
+      <div class="stat-card"><div class="stat-ico blue"><i class="fi fi-rr-settings"></i></div><div><div class="stat-label">Diproses</div><div class="stat-val">22</div></div></div>
+      <div class="stat-card"><div class="stat-ico teal"><i class="fi fi-rr-truck"></i></div><div><div class="stat-label">Dikirim</div><div class="stat-val">31</div></div></div>
+      <div class="stat-card"><div class="stat-ico green"><i class="fi fi-rr-checkbox"></i></div><div><div class="stat-label">Selesai</div><div class="stat-val">156</div></div></div>
+    </div>
+
+    <!-- Orders Table -->
+    <div class="data-card">
+      <div class="data-card-head">
+        <h3><i class="fi fi-rr-receipt" style="margin-right:8px;color:var(--blue)"></i>Daftar Pesanan</h3>
+      </div>
+      <table>
+        <thead><tr><th>No. Resi</th><th>Pelanggan</th><th>Total</th><th>Bukti Bayar</th><th>Status</th><th>Update Status</th></tr></thead>
+        <tbody>
+          <!-- Order 1: Menunggu, bukti belum ada -->
+          <tr>
+            <td style="font-weight:800;font-size:14px">#ORD-001</td>
+            <td>
+              <div style="font-weight:700;font-size:13px">Budi Santoso</div>
+              <div style="font-size:11px;color:var(--g400)">06 Des 2024, 10:30</div>
+              <div style="font-size:11px;color:var(--g500);margin-top:4px">— Samsung TV 43" (x1)</div>
+            </td>
+            <td style="font-weight:800;color:var(--blue);font-family:'Syne',sans-serif;font-size:15px">Rp 6.499.000</td>
+            <td>
+              <div style="width:48px;height:48px;border-radius:8px;background:var(--wl);border:2px solid #fde68a;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--warn)">404</div>
+            </td>
+            <td><span class="badge badge-warn" style="padding:4px 10px;font-size:10px;letter-spacing:.05em;text-transform:uppercase">Menunggu</span></td>
+            <td>
+              <button class="btn-edit" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:10px;font-size:12px"><i class="fi fi-rr-settings" style="margin-right:4px"></i> Proses</button>
+            </td>
+          </tr>
+          <!-- Order 2: Diproses, bukti verified -->
+          <tr>
+            <td style="font-weight:800;font-size:14px">#ORD-002</td>
+            <td>
+              <div style="font-weight:700;font-size:13px">Siti Rahayu</div>
+              <div style="font-size:11px;color:var(--g400)">05 Des 2024, 14:22</div>
+              <div style="font-size:11px;color:var(--g500);margin-top:4px">— LG Kulkas 380L (x1)<br>— Daikin AC 1PK (x1)</div>
+            </td>
+            <td style="font-weight:800;color:var(--blue);font-family:'Syne',sans-serif;font-size:15px">Rp 12.899.000</td>
+            <td>
+              <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-start">
+                <div style="width:48px;height:48px;border-radius:8px;overflow:hidden;border:2px solid #bbf7d0"><img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=60&q=60" style="width:100%;height:100%;object-fit:cover"></div>
+                <span class="badge badge-success" style="font-size:10px;padding:3px 8px;letter-spacing:.05em">Terverifikasi</span>
+                <div style="font-size:10px;font-weight:700;color:var(--g500);letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:4px"><i class="fi fi-rr-check"></i> Final</div>
+              </div>
+            </td>
+            <td><span class="badge badge-info" style="padding:4px 10px;font-size:10px;letter-spacing:.05em;text-transform:uppercase">Diproses</span></td>
+            <td>
+              <button class="btn-edit" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:10px;font-size:12px"><i class="fi fi-rr-truck" style="margin-right:4px"></i> Kirim</button>
+            </td>
+          </tr>
+          <!-- Order 3: Dikirim, bukti verified -->
+          <tr>
+            <td style="font-weight:800;font-size:14px">#ORD-003</td>
+            <td>
+              <div style="font-weight:700;font-size:13px">Ahmad Fauzi</div>
+              <div style="font-size:11px;color:var(--g400)">04 Des 2024, 09:15</div>
+              <div style="font-size:11px;color:var(--g500);margin-top:4px">— Daikin AC 1PK (x2)</div>
+            </td>
+            <td style="font-weight:800;color:var(--blue);font-family:'Syne',sans-serif;font-size:15px">Rp 7.700.000</td>
+            <td>
+              <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-start">
+                <div style="width:48px;height:48px;border-radius:8px;overflow:hidden;border:2px solid #bbf7d0"><img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=60&q=60" style="width:100%;height:100%;object-fit:cover"></div>
+                <span class="badge badge-success" style="font-size:10px;padding:3px 8px;letter-spacing:.05em">Terverifikasi</span>
+              </div>
+            </td>
+            <td><span class="badge badge-pend" style="padding:4px 10px;font-size:10px;letter-spacing:.05em;text-transform:uppercase">Dikirim</span></td>
+            <td>
+              <button disabled style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:10px;font-size:12px;background:var(--g100);color:var(--g400);border:1px solid var(--g200);cursor:not-allowed;font-family:var(--font);font-weight:700" title="Hanya customer yang dapat menyelesaikan pesanan"><i class="fi fi-rr-checkbox" style="margin-right:4px"></i> Selesai</button>
+            </td>
+          </tr>
+          <!-- Order 4: Menunggu, bukti pending verification -->
+          <tr>
+            <td style="font-weight:800;font-size:14px">#ORD-005</td>
+            <td>
+              <div style="font-weight:700;font-size:13px">Rina Marlina</div>
+              <div style="font-size:11px;color:var(--g400)">06 Des 2024, 16:45</div>
+              <div style="font-size:11px;color:var(--g500);margin-top:4px">— Sony BRAVIA 55" (x1)</div>
+            </td>
+            <td style="font-weight:800;color:var(--blue);font-family:'Syne',sans-serif;font-size:15px">Rp 14.999.000</td>
+            <td>
+              <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-start">
+                <div style="width:48px;height:48px;border-radius:8px;overflow:hidden;border:2px solid #fde68a"><img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=60&q=60" style="width:100%;height:100%;object-fit:cover"></div>
+                <span class="badge badge-warn" style="font-size:10px;padding:3px 8px;letter-spacing:.05em">Menunggu</span>
+                <div style="display:flex;gap:6px;margin-top:2px">
+                  <button style="padding:4px 8px;background:var(--sl);color:var(--success);border:1px solid #bbf7d0;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font)">Verifikasi</button>
+                  <button style="padding:4px 8px;background:var(--dl);color:var(--danger);border:1px solid #fca5a5;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font)">Tolak</button>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge badge-warn" style="padding:4px 10px;font-size:10px;letter-spacing:.05em;text-transform:uppercase">Menunggu</span></td>
+            <td>
+              <button class="btn-edit" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:10px;font-size:12px"><i class="fi fi-rr-settings" style="margin-right:4px"></i> Proses</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>

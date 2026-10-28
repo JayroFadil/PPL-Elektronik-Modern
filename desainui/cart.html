@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Keranjang Belanja – Elektronik Modern</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  .cart-layout {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 24px;
+    padding: 24px 0 64px;
+    align-items: start;
+  }
+  .summary-card {
+    background: #fff;
+    border-radius: var(--rxl);
+    box-shadow: var(--sh);
+    padding: 32px;
+    position: sticky;
+    top: 84px;
+    border: 1px solid var(--g100);
+  }
+  .sum-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    margin-bottom: 12px;
+    color: var(--g600);
+  }
+  .sum-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 24px;
+    margin-top: 24px;
+    border-top: 2px dashed var(--g100);
+  }
+  .sum-total span:first-child {
+    font-size: 16px;
+    font-weight: 750;
+    color: var(--g800);
+  }
+  .sum-total span:last-child {
+    font-family: var(--font);
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--blue);
+  }
+  
+  /* Voucher panel */
+  .voucher-input-group {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .voucher-list {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .voucher-badge-item {
+    background: var(--g50);
+    border: 1.5px dashed var(--g200);
+    border-radius: 12px;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: .2s;
+  }
+  .voucher-badge-item:hover {
+    border-color: var(--blue);
+    background: var(--blue-l);
+  }
+  .v-code {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--blue);
+    text-transform: uppercase;
+  }
+  .v-desc {
+    font-size: 11px;
+    color: var(--g500);
+    font-weight: 600;
+  }
+  
+  /* Responsive */
+  @media(max-width: 992px) {
+    .cart-layout { grid-template-columns: 1fr; }
+    .desktop-table-wrap { display: none !important; }
+    .mobile-cards-wrap { display: flex !important; flex-direction: column; gap: 16px; }
+  }
+</style>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button type="button" class="burger-btn" id="mobileMenuBtn">
+        <i class="fi fi-rr-menu-burger" id="mobileMenuIcon"></i>
+      </button>
+      <a href="index.html" class="nav-logo">
+        <i class="fi fi-rr-bolt"></i>
+        <span>Elektronik<span>Modern</span></span>
+      </a>
+    </div>
+
+    <div class="nav-search">
+      <span class="search-icon"><i class="fi fi-rr-search"></i></span>
+      <input type="text" placeholder="Cari produk elektronik..." onkeydown="handleSearch(this, event)" />
+    </div>
+
+    <!-- Mobile Search Slide Panel -->
+    <div id="mobileSearchBar" class="mobile-search-bar">
+      <button onclick="toggleMobileSearch()" class="nav-icon-btn" style="background:none"><i class="fi fi-rr-angle-small-left"></i></button>
+      <div style="flex:1;position:relative">
+        <span class="search-icon" style="left:12px"><i class="fi fi-rr-search"></i></span>
+        <input type="text" placeholder="Cari produk..." id="mobileSearchInput" onkeydown="handleSearch(this, event)" style="padding-left:40px">
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <button class="nav-icon-btn mobile-search-trigger" onclick="toggleMobileSearch()" style="display:none">
+        <i class="fi fi-rr-search"></i>
+      </button>
+      <button class="nav-icon-btn" onclick="toggleNotifPanel()" title="Notifikasi">
+        <i class="fi fi-rr-bell"></i>
+        <span class="notif-badge" id="notifBadgeNav">2</span>
+      </button>
+      <a href="cart.html" class="nav-icon-btn" title="Keranjang">
+        <i class="fi fi-rr-shopping-cart"></i>
+        <span class="cart-badge" id="cartBadgeNav">0</span>
+      </a>
+      <a href="orders.html" class="nav-icon-btn desktop-only" title="Pesanan Saya">
+        <i class="fi fi-rr-box"></i>
+      </a>
+      <a href="profile.html" class="nav-icon-btn desktop-only" title="Profil Saya">
+        <i class="fi fi-rr-user"></i>
+      </a>
+      <div class="desktop-only" style="display:flex;gap:8px">
+        <a href="login.html" class="btn btn-outline btn-sm">Masuk</a>
+        <a href="register.html" class="btn btn-primary btn-sm">Daftar</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- NOTIFICATION DROPDOWN PANEL -->
+  <div class="notif-overlay" id="notifOverlay" onclick="closeNotifPanel()"></div>
+  <div class="notif-panel" id="notifPanel">
+    <div class="notif-pheader">
+      <div>
+        <h4 style="font-weight:800;font-size:15px;color:var(--g900)">Notifikasi</h4>
+        <p style="font-size:11px;color:var(--g400);font-weight:600;margin-top:2px">Info terbaru akun Anda</p>
+      </div>
+      <button class="notif-mark" onclick="markNotificationsRead()">Tandai Dibaca</button>
+    </div>
+    <div class="notif-list" id="notifList"></div>
+  </div>
+
+  <!-- MOBILE DRAWER SIDEBAR -->
+  <div id="mobileMenuOverlay" class="mobile-menu-overlay" onclick="toggleMobileMenu()"></div>
+  <div id="mobileMenu" class="mobile-menu">
+    <div class="mobile-menu-header">
+      <a href="index.html" class="nav-logo" style="font-size:18px">
+        <i class="fi fi-rr-bolt"></i>
+        <span>Elektronik<span>Modern</span></span>
+      </a>
+      <button onclick="toggleMobileMenu()" style="background:none;border:none;font-size:20px;color:var(--g400);cursor:pointer">✕</button>
+    </div>
+    <div class="mobile-menu-user">
+      <div class="m-avatar">BS</div>
+      <div class="m-user-info">
+        <div class="m-user-name">Budi Santoso</div>
+        <div class="m-user-email">budi.s@email.com</div>
+      </div>
+    </div>
+    <div class="m-group-title">Menu Utama</div>
+    <div class="mobile-menu-list">
+      <a href="index.html" class="m-item"><i class="fi fi-rr-home"></i> Beranda</a>
+      <a href="products.html" class="m-item"><i class="fi fi-rr-shopping-bag"></i> Katalog Produk</a>
+    </div>
+    <div class="m-group-title">Akun Saya</div>
+    <div class="mobile-menu-list">
+      <a href="profile.html" class="m-item"><i class="fi fi-rr-user"></i> Profil Saya</a>
+      <a href="orders.html" class="m-item"><i class="fi fi-rr-box"></i> Pesanan Saya</a>
+      <a href="#" class="m-item"><i class="fi fi-rr-heart"></i> Wishlist</a>
+    </div>
+    <div style="border-top:1px solid var(--g100);padding-top:16px;margin-top:16px">
+      <a href="login.html" class="m-item" style="color:var(--danger)"><i class="fi fi-rr-sign-out-alt"></i> Keluar Akun</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Breadcrumbs -->
+    <div class="flex items-center gap-1.5 mb-6 text-[13px]" style="display:flex; align-items:center; gap:6px; margin-bottom:24px; font-size:13px">
+        <a href="index.html" class="text-g500 hover:text-primary transition-colors flex items-center gap-1.5" style="color:var(--g500); text-decoration:none; display:flex; align-items:center; gap:6px"><i class="fi fi-rr-home"></i> Beranda</a> 
+        <i class="fi fi-rr-angle-small-right text-g400" style="color:var(--g400)"></i> 
+        <span class="text-g800 font-semibold" style="color:var(--g800); font-weight:600">Keranjang</span>
+    </div>
+
+    <div style="margin-bottom:24px">
+      <h1 class="section-title" style="font-size:32px;display:flex;align-items:center;gap:12px">
+        <i class="fi fi-rr-shopping-cart text-primary"></i> Keranjang Belanja
+      </h1>
+      <p style="color: var(--g500); font-size:15px" id="cartHeaderQty">0 produk di keranjang Anda</p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="card" style="padding:60px 40px;text-align:center;margin-top:20px;border-radius:32px;display:none;border:1px solid var(--g100)" id="emptyState">
+      <div style="font-size:64px;color:var(--g300);margin-bottom:16px"><i class="fi fi-rr-shopping-cart"></i></div>
+      <h3 style="font-weight:800;font-size:20px;color:var(--g900);margin-bottom:8px">Keranjang Kosong</h3>
+      <p style="color:var(--g500);font-size:14px;max-width:320px;margin:0 auto 24px">Yuk tambahkan produk favorit kamu ke keranjang dan mulai berbelanja!</p>
+      <a href="products.html" class="btn btn-primary" style="padding:12px 28px"><i class="fi fi-rr-shopping-bag"></i> Belanja Sekarang</a>
+    </div>
+
+    <!-- CART CONTAINER -->
+    <div class="cart-layout" id="cartLayout">
+      <!-- Cart Items Section -->
+      <div style="width:100%">
+        <!-- Desktop Table (md and above) -->
+        <div class="cart-table-wrap desktop-table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="padding:16px 24px">Produk</th>
+                <th style="padding:16px 24px">Harga</th>
+                <th style="padding:16px 24px;text-align:center">Jumlah</th>
+                <th style="padding:16px 24px">Subtotal</th>
+                <th style="padding:16px 24px;width:60px"></th>
+              </tr>
+            </thead>
+            <tbody id="cartTableBody" class="divide-y divide-g100"></tbody>
+          </table>
+        </div>
+
+        <!-- Mobile cards list (hidden on desktop) -->
+        <div class="mobile-cards-wrap" style="display:none" id="cartMobileList"></div>
+      </div>
+
+      <!-- Summary Card Section -->
+      <div>
+        <div class="summary-card">
+          <h3 style="font-weight:800;font-size:18px;color:var(--g900);margin-bottom:24px">Ringkasan Belanja</h3>
+          
+          <div class="sum-row">
+            <span id="sumQtyLabel">Subtotal (0 produk)</span>
+            <span style="font-weight:700;color:var(--g900)" id="sumSubtotal">Rp 0</span>
+          </div>
+
+          <!-- Voucher Row -->
+          <div class="sum-row" id="sumVoucherRow" style="display:none; justify-content:space-between; align-items:center">
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="color:var(--success);font-weight:700"><i class="fi fi-rr-ticket"></i> Voucher (<span id="activeVCode"></span>)</span>
+              <button onclick="removeVoucher()" style="background:none;border:none;color:var(--danger);font-size:11px;font-weight:700;cursor:pointer;text-decoration:underline;padding:0;font-family:var(--font)">Hapus</button>
+            </div>
+            <span style="color:var(--success);font-weight:700">- Rp <span id="activeVDisc">0</span></span>
+          </div>
+
+          <!-- Voucher Apply Form -->
+          <div class="voucher-panel">
+            <div class="voucher-list-title">Voucher Tersedia</div>
+            <div class="voucher-list" id="voucherList">
+              <div class="voucher-badge-item" onclick="applyVoucher('VCHR100K', 100000)">
+                <div>
+                  <div class="v-code">VCHR100K</div>
+                  <div class="v-desc">Potongan Rp 100.000</div>
+                </div>
+                <i class="fi fi-rr-angle-small-right text-g400"></i>
+              </div>
+              <div class="voucher-badge-item" onclick="applyVoucher('VCHR50K', 50000)">
+                <div>
+                  <div class="v-code">VCHR50K</div>
+                  <div class="v-desc">Potongan Rp 50.000</div>
+                </div>
+                <i class="fi fi-rr-angle-small-right text-g400"></i>
+              </div>
+            </div>
+            
+            <div class="voucher-input-group">
+              <input type="text" placeholder="Masukkan kode..." id="voucherInput" style="font-size:12px;padding:8px 12px;border-radius:8px">
+              <button class="btn btn-outline btn-sm" onclick="applyInputVoucher()" style="border-radius:8px">Pakai</button>
+            </div>
+          </div>
+
+          <!-- Total Bayar -->
+          <div class="sum-total">
+            <span>Total</span>
+            <span id="sumTotal">Rp 0</span>
+          </div>
+
+          <div style="margin-top:24px;display:flex;flex-direction:column;gap:10px">
+            <a href="payment-midtrans-rajaongkir.html" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;font-size:15px;background:linear-gradient(135deg,#1A5CFF 0%,#00458E 100%);box-shadow:0 6px 20px rgba(26,92,255,0.35)">
+              <i class="fi fi-rr-lock" style="margin-right:6px"></i> Checkout (Midtrans &amp; RajaOngkir) <i class="fi fi-rr-arrow-right ml-2"></i>
+            </a>
+            <a href="checkout.html" class="btn btn-outline" style="width:100%;justify-content:center;padding:10px;font-size:13px;font-weight:700;color:var(--g600);border-color:var(--g300)">
+              Checkout Reguler / Manual
+            </a>
+            <a href="products.html" class="btn btn-outline" style="width:100%;justify-content:center;padding:12px;font-size:14px;font-weight:700;color:var(--g700)">Lanjut Belanja</a>
+          </div>
+
+          <div style="margin-top:16px;text-align:center;font-size:10px;font-weight:800;color:var(--g400);text-transform:uppercase;letter-spacing:0.05em">
+            <i class="fi fi-rr-lock" style="font-size:11px"></i> 100% Secure Checkout
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand"><i class="fi fi-rr-bolt" style="color:var(--blue)"></i> Elektronik Modern</div>
+        <p class="footer-desc">
+          Platform belanja elektronik rumah tangga terpercaya. Produk original, harga bersaing, pengiriman cepat ke seluruh Indonesia.
+        </p>
+      </div>
+      <div>
+        <h4>Belanja</h4>
+        <a href="products.html">Smart TV</a>
+        <a href="products.html">Kulkas</a>
+        <a href="products.html">AC & Pendingin</a>
+        <a href="products.html">Mesin Cuci</a>
+        <a href="products.html">Dapur</a>
+      </div>
+      <div>
+        <h4>Bantuan</h4>
+        <a href="#">Cara Pemesanan</a>
+        <a href="checkout.html">Konfirmasi Bayar</a>
+        <a href="orders.html">Lacak Pesanan</a>
+        <a href="#">Kebijakan Retur</a>
+      </div>
+      <div>
+        <h4>Perusahaan</h4>
+        <a href="#">Tentang Kami</a>
+        <a href="#">Kontak</a>
+        <a href="#">Karir</a>
+        <a href="#">Syarat & Ketentuan</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Elektronik Modern – Kelompok 2 IF4E Universitas Trunojoyo Madura</span>
+      <span>Rekayasa Perangkat Lunak</span>
+    </div>
+  </footer>
+
+  <div class="cart-toast" id="cart-toast"></div>
+
+  <script src="shared.js"></script>
+  <script>
+    // Seed cart if empty for presentation
+    if(!CART.length) {
+      CART.push(
+        { id: 1, name: 'Samsung Smart TV 43" 4K UHD', cat: 'Smart TV', price: 6499000, img: 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=400&q=80', qty: 1 },
+        { id: 2, name: 'LG Kulkas 2 Pintu 380L Inverter', cat: 'Kulkas', price: 5199000, img: 'https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?w=400&q=80', qty: 1 }
+      );
+      saveCart();
+    }
+
+    function renderPageCart() {
+      updateCartBadge();
+      
+      const count = CART.length;
+      document.getElementById('cartHeaderQty').textContent = `${count} produk di keranjang Anda`;
+      document.getElementById('sumQtyLabel').textContent = `Subtotal (${count} produk)`;
+
+      const emptyState = document.getElementById('emptyState');
+      const cartLayout = document.getElementById('cartLayout');
+
+      if (count === 0) {
+        emptyState.style.display = 'block';
+        cartLayout.style.display = 'none';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      cartLayout.style.display = 'grid';
+
+      // 1. Render Desktop Table Body
+      const tableBody = document.getElementById('cartTableBody');
+      tableBody.innerHTML = CART.map(item => `
+        <tr class="group hover:bg-g50/50 transition-colors">
+          <td style="padding:20px 24px">
+            <div style="display:flex;align-items:center;gap:16px">
+              <div style="width:80px;height:80px;border-radius:16px;background:var(--g50);border:1px solid var(--g100);padding:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <img src="${item.img}" alt="${item.name}" style="max-width:100%;max-height:100%;object-fit:contain">
+              </div>
+              <div style="min-width:0">
+                <div style="font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px">${item.cat}</div>
+                <div style="font-size:14px;font-weight:700;color:var(--g900);line-height:1.4">${item.name}</div>
+              </div>
+            </div>
+          </td>
+          <td style="padding:20px 24px">
+            <div style="font-family:var(--font);font-weight:800;color:var(--g900)">${fmt(item.price)}</div>
+          </td>
+          <td style="padding:20px 24px">
+            <div class="qty-wrap" style="margin:0 auto">
+              <button class="qty-action" onclick="updateQty(${item.id}, -1)">−</button>
+              <span class="qty-val" style="display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">${item.qty}</span>
+              <button class="qty-action" onclick="updateQty(${item.id}, 1)">+</button>
+            </div>
+          </td>
+          <td style="padding:20px 24px">
+            <div style="font-family:var(--font);font-weight:800;color:var(--blue);font-size:16px">${fmt(item.price * item.qty)}</div>
+          </td>
+          <td style="padding:20px 24px;text-align:right">
+            <button class="btn-remove-circle" onclick="removeFromCart(${item.id})">
+              <i class="fi fi-rr-trash" style="font-size:14px"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      // 2. Render Mobile Cards list
+      const mobileList = document.getElementById('cartMobileList');
+      mobileList.innerHTML = CART.map(item => `
+        <div class="card" style="padding:20px;border:1px solid var(--g100);display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;gap:12px">
+            <div style="width:80px;height:80px;border-radius:16px;background:var(--g50);border:1px solid var(--g100);padding:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <img src="${item.img}" alt="${item.name}" style="max-width:100%;max-height:100%;object-fit:contain">
+            </div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px">${item.cat}</div>
+              <div style="font-size:14px;font-weight:700;color:var(--g900);line-height:1.3;margin-bottom:6px">${item.name}</div>
+              <div style="font-family:var(--font);font-weight:800;color:var(--blue);font-size:15px">${fmt(item.price * item.qty)}</div>
+              <div style="font-size:11px;color:var(--g400);margin-top:2px">@ ${fmt(item.price)}</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--g100);padding-top:12px;margin-top:4px">
+            <div class="qty-wrap">
+              <button class="qty-action" onclick="updateQty(${item.id}, -1)" style="width:32px;height:32px">−</button>
+              <span class="qty-val" style="width:32px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px">${item.qty}</span>
+              <button class="qty-action" onclick="updateQty(${item.id}, 1)" style="width:32px;height:32px">+</button>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="removeFromCart(${item.id})" style="border-radius:10px;color:var(--danger);border-color:var(--dl);background:var(--dl)">
+              <i class="fi fi-rr-trash"></i> Hapus
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      // 3. Update summary
+      loadAppliedVoucher();
+      const subtotal = cartTotal();
+      document.getElementById('sumSubtotal').textContent = fmt(subtotal);
+
+      // Voucher rules
+      const voucherRow = document.getElementById('sumVoucherRow');
+      if (appliedVoucherCode) {
+        voucherRow.style.display = 'flex';
+        document.getElementById('activeVCode').textContent = appliedVoucherCode;
+        document.getElementById('activeVDisc').textContent = appliedVoucherDiscount.toLocaleString('id-ID');
+      } else {
+        voucherRow.style.display = 'none';
+      }
+
+      const total = Math.max(0, subtotal - appliedVoucherDiscount);
+      document.getElementById('sumTotal').textContent = fmt(total);
+
+      renderVouchers();
+    }
+
+    let appliedVoucherCode = null;
+    let appliedVoucherDiscount = 0;
+
+    function loadAppliedVoucher() {
+      const saved = localStorage.getItem('eh_applied_voucher');
+      if (saved) {
+        const v = JSON.parse(saved);
+        appliedVoucherCode = v.code;
+        const subtotal = cartTotal();
+        if (v.type === 'persen') {
+          appliedVoucherDiscount = Math.floor(subtotal * (v.value / 100));
+        } else {
+          appliedVoucherDiscount = v.value;
+        }
+      } else {
+        appliedVoucherCode = null;
+        appliedVoucherDiscount = 0;
+      }
+    }
+
+    function renderVouchers() {
+      const listEl = document.getElementById('voucherList');
+      if (!listEl) return;
+
+      const promos = getPromos();
+      const now = new Date();
+      
+      const activePromos = promos.filter(p => {
+        const start = new Date(p.start);
+        const end = new Date(p.end);
+        return p.quota > 0 && now >= start && now <= end;
+      });
+
+      if (activePromos.length === 0) {
+        listEl.innerHTML = '<div style="font-size:12px;color:var(--g400);text-align:center;padding:12px 0">Tidak ada voucher tersedia</div>';
+        return;
+      }
+
+      listEl.innerHTML = activePromos.map(p => {
+        const discDesc = p.type === 'persen' ? `Potongan ${p.value}%` : `Potongan ${fmt(p.value)}`;
+        return `
+          <div class="voucher-badge-item" onclick="applyVoucherByCode('${p.code}')" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border:1px solid var(--g200);border-radius:12px;cursor:pointer;margin-bottom:8px;transition:0.2s">
+            <div>
+              <div class="v-code" style="font-family:var(--font-h);font-weight:800;font-size:12px;color:var(--blue)">${p.code}</div>
+              <div class="v-desc" style="font-size:11px;color:var(--g500)">${discDesc} (Kuota: ${p.quota})</div>
+            </div>
+            <i class="fi fi-rr-angle-small-right text-g400"></i>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function showVoucherError(msg) {
+      if(typeof Swal !== 'undefined') {
+        Swal.fire({
+          icon: 'error',
+          title: 'Voucher Gagal',
+          text: msg,
+          confirmButtonColor: '#1A5CFF'
+        });
+      } else {
+        alert(msg);
+      }
+    }
+
+    function applyVoucherByCode(code) {
+      const promos = getPromos();
+      const promo = promos.find(p => p.code === code.trim().toUpperCase());
+      if (!promo) {
+        showVoucherError('Kode voucher tidak valid!');
+        return;
+      }
+
+      const now = new Date();
+      const start = new Date(promo.start);
+      const end = new Date(promo.end);
+      if (now < start || now > end) {
+        showVoucherError('Voucher sudah kedaluwarsa atau belum aktif!');
+        return;
+      }
+
+      if (promo.quota <= 0) {
+        showVoucherError('Kuota voucher sudah habis!');
+        return;
+      }
+
+      // Save applied voucher to localStorage
+      localStorage.setItem('eh_applied_voucher', JSON.stringify({
+        code: promo.code,
+        type: promo.type,
+        value: promo.value
+      }));
+
+      loadAppliedVoucher();
+      renderPageCart();
+
+      const msg = promo.type === 'persen' ? `${promo.value}%` : fmt(promo.value);
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          icon: 'success',
+          title: 'Voucher Berhasil Dipakai',
+          text: `Selamat, Anda mendapatkan potongan ${msg}!`,
+          confirmButtonColor: '#1A5CFF'
+        });
+      } else {
+        alert(`Voucher ${promo.code} berhasil digunakan! Potongan ${msg}.`);
+      }
+    }
+
+    function removeVoucher() {
+      localStorage.removeItem('eh_applied_voucher');
+      loadAppliedVoucher();
+      renderPageCart();
+    }
+
+    function applyInputVoucher() {
+      const code = document.getElementById('voucherInput').value.trim().toUpperCase();
+      if (!code) return;
+      applyVoucherByCode(code);
+      document.getElementById('voucherInput').value = '';
+    }
+
+    renderPageCart();
+
+    // Dummy sidebar cart handler callback
+    function renderCart() {
+      updateCartBadge();
+    }
+  </script>
+</body>
+</html>

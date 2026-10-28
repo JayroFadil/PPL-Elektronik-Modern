@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Kelola Kategori - Admin Elektronik Modern</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  /* Sidebar scroll support */
+  .sidebar {
+    height: 100vh;
+    position: sticky;
+    top: 0;
+  }
+</style>
+</head>
+<body>
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-name"><i class="fi fi-rr-bolt" style="color:var(--blue)"></i> Elektronik Modern</div>
+      <div class="sidebar-brand-role">Panel Admin</div>
+    </div>
+    <div class="s-group">Menu Utama</div>
+    <a href="admin-dashboard.html" class="s-item"><span class="si"><i class="fi fi-rr-chart-pie"></i></span> Dashboard</a>
+    <a href="admin-products.html" class="s-item"><span class="si"><i class="fi fi-rr-box"></i></span> Kelola Produk</a>
+    <a href="admin-categories.html" class="s-item active"><span class="si"><i class="fi fi-rr-apps"></i></span> Kelola Kategori</a>
+    <a href="admin-promos.html" class="s-item"><span class="si"><i class="fi fi-rr-ticket"></i></span> Kelola Promo</a>
+    <a href="admin-orders.html" class="s-item"><span class="si"><i class="fi fi-rr-receipt"></i></span> Kelola Pesanan</a>
+    <a href="admin-users.html" class="s-item"><span class="si"><i class="fi fi-rr-users"></i></span> Kelola Customer</a>
+    <div class="s-group">Akun</div>
+    <a href="login.html" class="s-item"><span class="si"><i class="fi fi-rr-sign-out-alt"></i></span> Keluar</a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div>
+        <div class="page-title">Kelola Kategori</div>
+      </div>
+    </div>
+
+    <!-- Tambah Kategori -->
+    <div class="card" style="margin-bottom: 28px; border: 1px solid var(--g100)">
+      <div class="data-card-head">
+        <h3 style="display:flex;align-items:center;gap:8px"><i class="fi fi-rr-layer-plus text-primary"></i> Tambah Kategori</h3>
+      </div>
+      <form onsubmit="addCategory(event)" style="padding: 24px">
+        <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 16px; align-items: flex-end">
+          <div>
+            <label style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:0.04em">Nama Kategori</label>
+            <input type="text" id="newCatName" required style="font-size: 13px; font-weight: 600">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:0.04em">Ikon Kategori (SVG/PNG)</label>
+            <input type="file" id="newCatIcon" accept="image/*,.svg" style="font-size: 12px; font-weight: 600">
+          </div>
+          <button type="submit" class="btn btn-primary" style="height: 42px; border-radius: 8px"><i class="fi fi-rr-disk"></i> Simpan</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Daftar Kategori -->
+    <div class="card" style="border: 1px solid var(--g100)">
+      <div class="data-card-head">
+        <h3 style="display:flex;align-items:center;gap:8px"><i class="fi fi-rr-tags text-primary"></i> Daftar Kategori</h3>
+        <span class="badge badge-info" id="catCountBadge" style="text-transform:uppercase;letter-spacing:0.04em">0 Kategori</span>
+      </div>
+      <div style="overflow-x: auto">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 80px">ID</th>
+              <th style="width: 35%">Kategori</th>
+              <th>Ikon</th>
+              <th>Jumlah Produk</th>
+              <th style="text-align: right">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="catTableBody">
+            <!-- Dynamic Category List -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+  let CATEGORIES = getCategories();
+
+  // Helper to read file to Base64
+  function getBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+  }
+
+  // Get dynamic product counts per category
+  function getProductCount(catName) {
+    return PRODUCTS.filter(p => p.cat === catName).length;
+  }
+
+  function getIconHtml(icon, name) {
+    const isCustom = icon && (icon.startsWith('data:image/') || icon.includes('/') || icon.includes('.'));
+    if (isCustom) {
+      return `
+        <div style="width:40px;height:40px;border-radius:8px;background:#fff;border:1px solid var(--g100);padding:2px;display:flex;align-items:center;justify-content:center">
+          <img src="${icon}" alt="${name}" style="max-width:100%;max-height:100%;object-fit:contain">
+        </div>
+        <span class="badge badge-info" style="font-size:10px;font-weight:700">custom_ikon.png</span>
+      `;
+    }
+    return `
+      <div style="width:40px;height:40px;border-radius:8px;background:var(--g50);border:1px solid var(--g100);display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:20px">
+        <i class="fi ${icon || 'fi-rr-box'}"></i>
+      </div>
+      <span class="badge badge-info" style="font-size:10px;text-transform:lowercase;font-weight:700">${icon || 'fi-rr-box'}</span>
+    `;
+  }
+
+  function renderCategories() {
+    CATEGORIES = getCategories();
+    document.getElementById('catCountBadge').textContent = `${CATEGORIES.length} KATEGORI`;
+    const tbody = document.getElementById('catTableBody');
+
+    if (!CATEGORIES.length) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--g400)">Belum ada kategori terdaftar.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = CATEGORIES.map((cat, index) => {
+      const idFormatted = '#K' + String(cat.id).padStart(3, '0');
+      const prodQty = getProductCount(cat.name);
+      const iconMarkup = getIconHtml(cat.icon, cat.name);
+      
+      return `
+        <tr class="group hover:bg-g50/50 transition-colors">
+          <td style="padding:16px 20px"><div style="font-weight:700;color:var(--g400);font-size:12px">${idFormatted}</div></td>
+          <td style="padding:16px 20px">
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <input type="text" id="cat-name-${cat.id}" value="${cat.name}" style="font-size:13px;font-weight:600;padding:8px 12px;width:100%" required>
+              <input type="file" id="cat-file-${cat.id}" accept="image/*,.svg" style="font-size:11px;padding:6px 12px;width:100%">
+            </div>
+          </td>
+          <td style="padding:16px 20px">
+            <div style="display:flex;align-items:center;gap:10px">
+              ${iconMarkup}
+            </div>
+          </td>
+          <td style="padding:16px 20px"><div style="font-size:13px;font-weight:600;color:var(--g600)"><strong style="color:var(--g900)">${prodQty}</strong> produk</div></td>
+          <td style="padding:16px 20px;text-align:right">
+            <div style="display:flex;justify-content:flex-end;gap:8px">
+              <button onclick="updateCategory(${cat.id})" class="btn-edit" style="display:inline-flex;align-items:center;gap:4px"><i class="fi fi-rr-disk"></i> Simpan</button>
+              <button onclick="deleteCategory(${cat.id})" class="btn-del" style="display:inline-flex;align-items:center;gap:4px"><i class="fi fi-rr-trash"></i> Hapus</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  async function addCategory(e) {
+    e.preventDefault();
+    const nameInput = document.getElementById('newCatName');
+    const name = nameInput.value.trim();
+    if (!name) return;
+
+    const fileInput = document.getElementById('newCatIcon');
+    let iconVal = 'fi-rr-box'; // fallback
+
+    if (fileInput && fileInput.files && fileInput.files[0]) {
+      try {
+        iconVal = await getBase64(fileInput.files[0]);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    const newId = CATEGORIES.length ? Math.max(...CATEGORIES.map(c => c.id)) + 1 : 1;
+
+    CATEGORIES.push({ id: newId, name: name, icon: iconVal });
+    saveCategories(CATEGORIES);
+
+    nameInput.value = '';
+    if (fileInput) fileInput.value = '';
+    renderCategories();
+    showToast('Kategori berhasil ditambahkan!');
+  }
+
+  async function updateCategory(id) {
+    const nameInput = document.getElementById(`cat-name-${id}`);
+    const name = nameInput.value.trim();
+    if (!name) return;
+
+    const fileInput = document.getElementById(`cat-file-${id}`);
+    const cat = CATEGORIES.find(c => c.id === id);
+    if (cat) {
+      cat.name = name;
+      if (fileInput && fileInput.files && fileInput.files[0]) {
+        try {
+          cat.icon = await getBase64(fileInput.files[0]);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      saveCategories(CATEGORIES);
+      renderCategories();
+      showToast('Kategori berhasil disimpan!');
+    }
+  }
+
+  function deleteCategory(id) {
+    if (confirm('Apakah Anda yakin ingin menghapus kategori ini?')) {
+      CATEGORIES = CATEGORIES.filter(c => c.id !== id);
+      saveCategories(CATEGORIES);
+      renderCategories();
+      showToast('Kategori berhasil dihapus!');
+    }
+  }
+
+  function showToast(msg) {
+    let t = document.getElementById('toast-notification');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'toast-notification';
+      t.className = 'cart-toast';
+      document.body.appendChild(t);
+    }
+    t.innerHTML = `<i class="fi fi-rr-bell" style="margin-right:6px;color:var(--blue)"></i> <strong>${msg}</strong>`;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  renderCategories();
+</script>
+</body>
+</html>

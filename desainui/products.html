@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Katalog Produk – Elektronik Modern</title>
+    <link rel="stylesheet" href="shared.css" />
+    <style>
+      .listing-wrap {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 24px;
+        padding: 24px 0 64px;
+      }
+      .filter-panel {
+        background: #fff;
+        border-radius: var(--rlg);
+        padding: 22px;
+        box-shadow: var(--sh);
+        height: fit-content;
+        position: sticky;
+        top: 84px;
+        border: 1px solid var(--g100);
+      }
+      .fp-title {
+        font-weight: 800;
+        font-size: 15px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--g800);
+      }
+      .fp-label {
+        font-size: 10px;
+        font-weight: 800;
+        color: var(--g400);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+      }
+      .cat-filter-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .cat-filter-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        color: var(--g600);
+        transition: .2s;
+      }
+      .cat-filter-item:hover {
+        background: var(--g100);
+      }
+      .cat-filter-item.active {
+        background: var(--blue);
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(26,92,255,0.2);
+      }
+      .cat-filter-item.active .cat-badge-qty {
+        background: rgba(255,255,255,0.2);
+        color: #fff;
+      }
+      .cat-badge-qty {
+        font-size: 10px;
+        padding: 2px 6px;
+        border-radius: 6px;
+        background: var(--g100);
+        color: var(--g500);
+      }
+      .toolbar {
+        background: #fff;
+        border-radius: var(--rlg);
+        padding: 14px 20px;
+        box-shadow: var(--sh);
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        border: 1px solid var(--g100);
+      }
+      .toolbar-count {
+        font-size: 13px;
+        color: var(--g500);
+        font-weight: 500;
+      }
+      .prod-grid-4 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+      }
+      .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 36px;
+      }
+      .page-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        border: 1.5px solid var(--g200);
+        background: #fff;
+        color: var(--g600);
+        transition: 0.15s;
+        font-family: var(--font);
+      }
+      .page-btn:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+      }
+      .page-btn.active {
+        background: var(--blue);
+        color: #fff;
+        border-color: var(--blue);
+      }
+
+      /* Mobile Filters styling */
+      @media(max-width: 992px) {
+        .listing-wrap { grid-template-columns: 1fr; padding-top: 16px; }
+        .filter-panel { display: none; width: 100%; position: relative; top: 0; margin-bottom: 16px; }
+        .filter-panel.open { display: block; }
+        .prod-grid-4 { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+      }
+      @media(max-width: 600px) {
+        .prod-grid-4 { grid-template-columns: repeat(2, 1fr); }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button type="button" class="burger-btn" id="mobileMenuBtn">
+          <i class="fi fi-rr-menu-burger" id="mobileMenuIcon"></i>
+        </button>
+        <a href="index.html" class="nav-logo">
+          <i class="fi fi-rr-bolt"></i>
+          <span>Elektronik<span>Modern</span></span>
+        </a>
+      </div>
+
+      <div class="nav-search">
+        <span class="search-icon"><i class="fi fi-rr-search"></i></span>
+        <input type="text" placeholder="Cari produk elektronik..." id="navSearchInput" onkeydown="handleSearch(this, event)" />
+      </div>
+
+      <!-- Mobile Search Slide Panel -->
+      <div id="mobileSearchBar" class="mobile-search-bar">
+        <button onclick="toggleMobileSearch()" class="nav-icon-btn" style="background:none"><i class="fi fi-rr-angle-small-left"></i></button>
+        <div style="flex:1;position:relative">
+          <span class="search-icon" style="left:12px"><i class="fi fi-rr-search"></i></span>
+          <input type="text" placeholder="Cari produk..." id="mobileSearchInput" onkeydown="handleSearch(this, event)" style="padding-left:40px">
+        </div>
+      </div>
+
+      <div class="nav-right">
+        <button class="nav-icon-btn mobile-search-trigger" onclick="toggleMobileSearch()" style="display:none">
+          <i class="fi fi-rr-search"></i>
+        </button>
+        <button class="nav-icon-btn" onclick="toggleNotifPanel()" title="Notifikasi">
+          <i class="fi fi-rr-bell"></i>
+          <span class="notif-badge" id="notifBadgeNav">2</span>
+        </button>
+        <a href="cart.html" class="nav-icon-btn" title="Keranjang">
+          <i class="fi fi-rr-shopping-cart"></i>
+          <span class="cart-badge" id="cartBadgeNav">0</span>
+        </a>
+        <a href="orders.html" class="nav-icon-btn desktop-only" title="Pesanan Saya">
+          <i class="fi fi-rr-box"></i>
+        </a>
+        <a href="profile.html" class="nav-icon-btn desktop-only" title="Profil Saya">
+          <i class="fi fi-rr-user"></i>
+        </a>
+        <div class="desktop-only" style="display:flex;gap:8px">
+          <a href="login.html" class="btn btn-outline btn-sm">Masuk</a>
+          <a href="register.html" class="btn btn-primary btn-sm">Daftar</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- NOTIFICATION DROPDOWN PANEL -->
+    <div class="notif-overlay" id="notifOverlay" onclick="closeNotifPanel()"></div>
+    <div class="notif-panel" id="notifPanel">
+      <div class="notif-pheader">
+        <div>
+          <h4 style="font-weight:800;font-size:15px;color:var(--g900)">Notifikasi</h4>
+          <p style="font-size:11px;color:var(--g400);font-weight:600;margin-top:2px">Info terbaru akun Anda</p>
+        </div>
+        <button class="notif-mark" onclick="markNotificationsRead()">Tandai Dibaca</button>
+      </div>
+      <div class="notif-list" id="notifList"></div>
+    </div>
+
+    <!-- MOBILE DRAWER SIDEBAR -->
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay" onclick="toggleMobileMenu()"></div>
+    <div id="mobileMenu" class="mobile-menu">
+      <div class="mobile-menu-header">
+        <a href="index.html" class="nav-logo" style="font-size:18px">
+          <i class="fi fi-rr-bolt"></i>
+          <span>Elektronik<span>Modern</span></span>
+        </a>
+        <button onclick="toggleMobileMenu()" style="background:none;border:none;font-size:20px;color:var(--g400);cursor:pointer">✕</button>
+      </div>
+      <div class="mobile-menu-user">
+        <div class="m-avatar">BS</div>
+        <div class="m-user-info">
+          <div class="m-user-name">Budi Santoso</div>
+          <div class="m-user-email">budi.s@email.com</div>
+        </div>
+      </div>
+      <div class="m-group-title">Menu Utama</div>
+      <div class="mobile-menu-list">
+        <a href="index.html" class="m-item"><i class="fi fi-rr-home"></i> Beranda</a>
+        <a href="products.html" class="m-item active"><i class="fi fi-rr-shopping-bag"></i> Katalog Produk</a>
+      </div>
+      <div class="m-group-title">Akun Saya</div>
+      <div class="mobile-menu-list">
+        <a href="profile.html" class="m-item"><i class="fi fi-rr-user"></i> Profil Saya</a>
+        <a href="orders.html" class="m-item"><i class="fi fi-rr-box"></i> Pesanan Saya</a>
+        <a href="#" class="m-item"><i class="fi fi-rr-heart"></i> Wishlist</a>
+      </div>
+      <div style="border-top:1px solid var(--g100);padding-top:16px;margin-top:16px">
+        <a href="login.html" class="m-item" style="color:var(--danger)"><i class="fi fi-rr-sign-out-alt"></i> Keluar Akun</a>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="breadcrumb" style="margin-top:16px">
+        <a href="index.html" style="display:flex;align-items:center;gap:6px"><i class="fi fi-rr-home"></i> Beranda</a> 
+        <i class="fi fi-rr-angle-small-right"></i> 
+        <span>Katalog Produk</span>
+      </div>
+
+      <div style="margin-bottom: 24px">
+        <h1 class="section-title" style="font-size: 32px">Katalog Produk</h1>
+        <p style="color: var(--g500); font-size: 15px">Temukan produk elektronik berkualitas dengan harga terbaik</p>
+      </div>
+
+      <div class="listing-wrap">
+        <!-- FILTER SIDEBAR -->
+        <aside>
+          <div class="filter-panel" id="filterContent">
+            <div class="fp-title" style="font-family:var(--font);font-size:15px;font-weight:800;display:flex;align-items:center;gap:8px">
+              <i class="fi fi-rr-filter text-primary"></i> Filter
+            </div>
+
+            <!-- Search inside filters -->
+            <div style="margin-bottom:24px">
+              <div class="fp-label">Pencarian</div>
+              <div style="position:relative">
+                <i class="fi fi-rr-search" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--g400)"></i>
+                <input type="text" placeholder="Cari produk..." id="sidebarSearchInput" oninput="filterProducts()" style="padding-left:40px;font-size:13px;border-radius:12px;background:var(--g50)">
+              </div>
+            </div>
+
+            <!-- Categories list matching Laravel -->
+            <div>
+              <div class="fp-label">Kategori</div>
+              <div class="cat-filter-list" id="catFilterList"></div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- PRODUCTS LIST -->
+        <div style="flex:1;min-width:0">
+          <div class="toolbar">
+            <div class="toolbar-count" id="toolbarCount">
+              Menampilkan <strong style="color:var(--g900)" id="countVal">0</strong> produk
+            </div>
+            
+            <!-- Sorting Pills matching Laravel -->
+            <div class="sort-pills" id="sortPills">
+              <a href="#" class="sort-pill active" onclick="changeSort('terbaru', event)">Terbaru</a>
+              <a href="#" class="sort-pill" onclick="changeSort('termurah', event)">Termurah</a>
+              <a href="#" class="sort-pill" onclick="changeSort('termahal', event)">Termahal</a>
+              <a href="#" class="sort-pill" onclick="changeSort('nama', event)">A-Z</a>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div class="card" style="padding:60px 40px;text-align:center;margin-top:20px;border-radius:32px;display:none;border:1px solid var(--g100)" id="emptyState">
+            <div style="font-size:60px;color:var(--g300);margin-bottom:16px"><i class="fi fi-rr-search-alt"></i></div>
+            <h3 style="font-weight:800;font-size:20px;color:var(--g900);margin-bottom:8px">Produk Tidak Ditemukan</h3>
+            <p style="color:var(--g500);font-size:14px;max-width:320px;margin:0 auto 24px">Coba ubah filter, kategori, atau kata kunci pencarian Anda untuk menemukan produk.</p>
+            <button class="btn btn-primary" onclick="resetFilters()">Lihat Semua Produk</button>
+          </div>
+
+          <div class="prod-grid-4" id="prodGrid"></div>
+
+          <div class="pagination" id="pagination">
+            <button class="page-btn active">1</button>
+            <button class="page-btn">2</button>
+            <button class="page-btn">→</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand"><i class="fi fi-rr-bolt" style="color:var(--blue)"></i> Elektronik Modern</div>
+          <p class="footer-desc">
+            Platform belanja elektronik rumah tangga terpercaya. Produk original, harga bersaing, pengiriman cepat ke seluruh Indonesia.
+          </p>
+        </div>
+        <div>
+          <h4>Belanja</h4>
+          <a href="products.html">Smart TV</a>
+          <a href="products.html">Kulkas</a>
+          <a href="products.html">AC & Pendingin</a>
+          <a href="products.html">Mesin Cuci</a>
+          <a href="products.html">Dapur</a>
+        </div>
+        <div>
+          <h4>Bantuan</h4>
+          <a href="#">Cara Pemesanan</a>
+          <a href="checkout.html">Konfirmasi Bayar</a>
+          <a href="orders.html">Lacak Pesanan</a>
+          <a href="#">Kebijakan Retur</a>
+        </div>
+        <div>
+          <h4>Perusahaan</h4>
+          <a href="#">Tentang Kami</a>
+          <a href="#">Kontak</a>
+          <a href="#">Karir</a>
+          <a href="#">Syarat & Ketentuan</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Elektronik Modern – Kelompok 2 IF4E Universitas Trunojoyo Madura</span>
+        <span>Rekayasa Perangkat Lunak</span>
+      </div>
+    </footer>
+
+    <div class="cart-toast" id="cart-toast"></div>
+
+    <script src="shared.js"></script>
+    <script>
+      let activeCategory = null;
+      let activeSort = 'terbaru';
+      let searchQuery = '';
+
+      // Read search query from URL params (e.g. ?q=samsung&kategori=Smart TV)
+      const urlParams = new URLSearchParams(window.location.search);
+      if(urlParams.get('q')){
+        searchQuery = urlParams.get('q');
+        document.getElementById('sidebarSearchInput').value = searchQuery;
+        document.getElementById('navSearchInput').value = searchQuery;
+      }
+      if(urlParams.get('kategori')){
+        activeCategory = urlParams.get('kategori');
+      }
+
+      function toggleFilters() {
+        const panel = document.getElementById('filterContent');
+        const chevron = document.getElementById('filterChevron');
+        const isHidden = panel.classList.toggle('open');
+        if (chevron) chevron.classList.toggle('rotate-180');
+      }
+
+      // Render Categories Filter list dynamically matching categories counts
+      function renderCategoriesFilter() {
+        const counts = {};
+        PRODUCTS.forEach(p => {
+          counts[p.cat] = (counts[p.cat] || 0) + 1;
+        });
+
+        const listEl = document.getElementById('catFilterList');
+        if (!listEl) return;
+        const cats = getCategories();
+
+        let listHtml = `
+          <a href="#" class="cat-filter-item ${activeCategory === null ? 'active' : ''}" onclick="selectCategory(null, event)">
+            <div style="display:flex;align-items:center;gap:10px"><i class="fi fi-rr-apps"></i> Semua</div>
+            <span class="cat-badge-qty">${PRODUCTS.length}</span>
+          </a>
+        `;
+
+        cats.forEach(cat => {
+          const count = counts[cat.name] || 0;
+          const activeClass = activeCategory === cat.name ? 'active' : '';
+          const isCustom = cat.icon && (cat.icon.startsWith('data:image/') || cat.icon.includes('/') || cat.icon.includes('.'));
+          const iconHtml = isCustom 
+            ? `<img src="${cat.icon}" alt="${cat.name}" style="width:16px;height:16px;object-fit:contain">`
+            : `<i class="fi ${cat.icon || 'fi-rr-box'}"></i>`;
+
+          listHtml += `
+            <a href="#" class="cat-filter-item ${activeClass}" onclick="selectCategory('${cat.name}', event)">
+              <div style="display:flex;align-items:center;gap:10px">${iconHtml} ${cat.name}</div>
+              <span class="cat-badge-qty">${count}</span>
+            </a>
+          `;
+        });
+
+        listEl.innerHTML = listHtml;
+      }
+
+      function selectCategory(cat, event) {
+        if(event) event.preventDefault();
+        activeCategory = cat;
+        renderCategoriesFilter();
+        filterProducts();
+        // Update URL
+        const url = new URL(window.location);
+        if(cat) url.searchParams.set('kategori', cat);
+        else url.searchParams.delete('kategori');
+        window.history.pushState({}, '', url);
+      }
+
+      function changeSort(sort, event) {
+        if(event) event.preventDefault();
+        activeSort = sort;
+        document.querySelectorAll('.sort-pill').forEach(el => el.classList.remove('active'));
+        event.target.classList.add('active');
+        filterProducts();
+      }
+
+      function resetFilters() {
+        activeCategory = null;
+        searchQuery = '';
+        document.getElementById('sidebarSearchInput').value = '';
+        document.getElementById('navSearchInput').value = '';
+        selectCategory(null);
+      }
+
+      function filterProducts() {
+        const sidebarSearch = document.getElementById('sidebarSearchInput').value.toLowerCase();
+        searchQuery = sidebarSearch;
+
+        let filtered = PRODUCTS.filter(p => {
+          const matchesSearch = p.name.toLowerCase().includes(searchQuery) || p.cat.toLowerCase().includes(searchQuery);
+          const matchesCat = activeCategory === null || p.cat === activeCategory;
+          return matchesSearch && matchesCat;
+        });
+
+        // Sort items
+        if(activeSort === 'termurah') {
+          filtered.sort((a, b) => a.price - b.price);
+        } else if(activeSort === 'termahal') {
+          filtered.sort((a, b) => b.price - a.price);
+        } else if(activeSort === 'nama') {
+          filtered.sort((a, b) => a.name.localeCompare(b.name));
+        } else {
+          // terbaru (default order in array)
+          filtered.sort((a, b) => a.id - b.id);
+        }
+
+        // Render Count
+        document.getElementById('countVal').textContent = filtered.length;
+        
+        // Show/hide empty state
+        const emptyState = document.getElementById('emptyState');
+        const grid = document.getElementById('prodGrid');
+        const pagination = document.getElementById('pagination');
+
+        if(filtered.length === 0) {
+          emptyState.style.display = 'block';
+          grid.style.display = 'none';
+          pagination.style.display = 'none';
+        } else {
+          emptyState.style.display = 'none';
+          grid.style.display = 'grid';
+          pagination.style.display = 'flex';
+          
+          grid.innerHTML = filtered.map(p => prodCard(p)).join('');
+        }
+      }
+
+      function prodCard(p) {
+        const stockBadge = p.stock < 5 && p.stock > 0 
+          ? `<div style="position:absolute;top:12px;left:12px;z-index:10;font-size:11px;font-weight:800;background:#ffedd5;color:#ea580c;padding:4px 10px;border-radius:8px">Sisa ${p.stock}</div>`
+          : (p.stock === 0 ? `<div style="position:absolute;top:12px;left:12px;z-index:10;font-size:11px;font-weight:800;background:#fee2e2;color:#dc2626;padding:4px 10px;border-radius:8px">Habis</div>` : '');
+        
+        return `<div class="prod-card" onclick="window.location='product-detail.html'">
+          ${stockBadge}
+          <button type="button" class="prod-wishlist" onclick="event.stopPropagation();this.classList.toggle('active');this.innerHTML=this.classList.contains('active')?'<i class=\\'fi fi-sr-heart text-red-500\\'></i>':'<i class=\\'fi fi-rr-heart\\'></i>'" style="display:flex;align-items:center;justify-content:center;opacity:1;background:rgba(255,255,255,0.9)">
+            <i class="fi fi-rr-heart"></i>
+          </button>
+          <div class="prod-img-wrap" style="aspect-ratio:1">
+            <img src="${p.img}" alt="${p.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover">
+          </div>
+          <div class="prod-body">
+            <div class="prod-cat" style="color:var(--blue);font-weight:700;font-size:11px;letter-spacing:0.04em;text-transform:uppercase">${p.cat}</div>
+            <div class="prod-name" style="font-weight:700;font-size:14px;color:var(--g800);margin:6px 0;line-height:1.4">${p.name}</div>
+            <div class="prod-price-row" style="margin-bottom:8px">
+              <span class="prod-price" style="font-size:17px;font-weight:800;color:var(--blue)">${fmt(p.price)}</span>
+            </div>
+            <div class="prod-footer" style="display:flex;justify-content:space-between;align-items:center;margin-top:auto">
+              <span class="prod-stock" style="font-size:11px;color:var(--g500)"><i class="fi fi-rr-box"></i> Stok ${p.stock}</span>
+              <button class="add-cart-btn" onclick="event.stopPropagation();addToCart(${p.id})" style="border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center" title="Tambah ke keranjang">
+                <i class="fi fi-rr-shopping-cart-add"></i>
+              </button>
+            </div>
+          </div>
+        </div>`;
+      }
+
+      // Sync navbar search, mobile search, and sidebar search inputs
+      const navSearch = document.getElementById('navSearchInput');
+      const sidebarSearch = document.getElementById('sidebarSearchInput');
+      const mobileSearch = document.getElementById('mobileSearchInput');
+
+      if (navSearch) {
+        navSearch.addEventListener('input', () => {
+          if (sidebarSearch) sidebarSearch.value = navSearch.value;
+          if (mobileSearch) mobileSearch.value = navSearch.value;
+          filterProducts();
+        });
+      }
+      if (sidebarSearch) {
+        sidebarSearch.addEventListener('input', () => {
+          if (navSearch) navSearch.value = sidebarSearch.value;
+          if (mobileSearch) mobileSearch.value = sidebarSearch.value;
+          filterProducts();
+        });
+      }
+      if (mobileSearch) {
+        mobileSearch.addEventListener('input', () => {
+          if (sidebarSearch) sidebarSearch.value = mobileSearch.value;
+          if (navSearch) navSearch.value = mobileSearch.value;
+          filterProducts();
+        });
+      }
+
+      // Override handleSearch locally to prevent page reload on products.html
+      window.handleSearch = function(input, event) {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          input.blur();
+        }
+      };
+
+      // Initial Filter call
+      renderCategoriesFilter();
+      filterProducts();
+
+      function renderCart() {
+        updateCartBadge();
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,2483 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Pembayaran Midtrans & Pengiriman RajaOngkir – Elektronik Modern</title>
+  <link rel="stylesheet" href="shared.css" />
+  <style>
+    /* Layout & Page Header */
+    .page-wrapper {
+      padding: 28px 16px 80px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .checkout-grid {
+      display: grid;
+      grid-template-columns: 1fr 410px;
+      gap: 28px;
+      align-items: start;
+      margin-top: 24px;
+    }
+
+    @media (max-width: 992px) {
+      .checkout-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Integration Badges Bar */
+    .gateway-badge-bar {
+      background: linear-gradient(135deg, #0A192F 0%, #172A45 100%);
+      border-radius: var(--rlg);
+      padding: 16px 24px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 24px rgba(10, 25, 47, 0.15);
+    }
+
+    .gateway-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
+
+    .gateway-pill.midtrans {
+      background: rgba(0, 114, 255, 0.2);
+      border-color: #0072ff;
+      color: #99c7ff;
+    }
+
+    .gateway-pill.rajaongkir {
+      background: rgba(255, 87, 34, 0.2);
+      border-color: #ff5722;
+      color: #ffab91;
+    }
+
+    /* Stepper */
+    .stepper-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      border-radius: var(--rlg);
+      padding: 18px 28px;
+      box-shadow: var(--sh);
+      margin-bottom: 24px;
+      border: 1px solid var(--g200);
+    }
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .step-circle {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+      background: var(--g100);
+      color: var(--g500);
+      transition: 0.3s;
+    }
+
+    .step-item.active .step-circle {
+      background: var(--blue);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(26, 92, 255, 0.35);
+    }
+
+    .step-item.completed .step-circle {
+      background: var(--sl);
+      color: var(--success);
+    }
+
+    .step-text h4 {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--g900);
+      margin-bottom: 2px;
+    }
+
+    .step-text p {
+      font-size: 11px;
+      color: var(--g500);
+      margin: 0;
+    }
+
+    .step-line {
+      flex: 1;
+      height: 2px;
+      background: var(--g200);
+      margin: 0 20px;
+    }
+
+    /* Card styling */
+    .section-card {
+      background: #fff;
+      border-radius: var(--rlg);
+      border: 1px solid var(--g200);
+      box-shadow: var(--sh);
+      padding: 26px;
+      margin-bottom: 24px;
+    }
+
+    .card-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--g100);
+    }
+
+    .card-header-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--g900);
+    }
+
+    .card-header-title i {
+      font-size: 20px;
+      color: var(--blue);
+    }
+
+    /* RajaOngkir Destination Cascade */
+    .ro-meta-box {
+      background: #FFF7ED;
+      border: 1px solid #FFEDD5;
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .ro-meta-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #EA580C;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 640px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Courier Selector Tabs */
+    .courier-tabs {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 18px;
+    }
+
+    .courier-tab-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: 1.5px solid var(--g200);
+      background: #fff;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--g700);
+      white-space: nowrap;
+      transition: 0.2s;
+    }
+
+    .courier-tab-btn:hover {
+      border-color: var(--blue);
+      background: var(--g50);
+    }
+
+    .courier-tab-btn.active {
+      border-color: var(--blue);
+      background: var(--blue-l);
+      color: var(--blue);
+      box-shadow: 0 4px 12px rgba(26, 92, 255, 0.12);
+    }
+
+    .courier-logo-badge {
+      font-weight: 900;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .cl-jne {
+      background: #0b3b60;
+      color: #fff;
+    }
+
+    .cl-sicepat {
+      background: #b91c1c;
+      color: #fff;
+    }
+
+    .cl-jnt {
+      background: #dc2626;
+      color: #fff;
+    }
+
+    .cl-pos {
+      background: #ea580c;
+      color: #fff;
+    }
+
+    .cl-tiki {
+      background: #1e3a8a;
+      color: #fff;
+    }
+
+    /* Shipping Service Cards */
+    .shipping-services-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .shipping-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-radius: var(--radius);
+      border: 1.5px solid var(--g200);
+      background: #fff;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .shipping-option:hover {
+      border-color: var(--blue);
+      transform: translateY(-1px);
+      box-shadow: var(--sh);
+    }
+
+    .shipping-option.selected {
+      border-color: var(--blue);
+      background: var(--blue-l);
+      box-shadow: 0 0 0 3px rgba(26, 92, 255, 0.15);
+    }
+
+    .shipping-info-col {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .shipping-radio {
+      accent-color: var(--blue);
+      width: 18px;
+      height: 18px;
+    }
+
+    .service-name {
+      font-weight: 800;
+      font-size: 15px;
+      color: var(--g900);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .service-desc {
+      font-size: 12px;
+      color: var(--g500);
+      margin-top: 2px;
+    }
+
+    .service-cost {
+      text-align: right;
+    }
+
+    .service-price {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--blue);
+      font-family: var(--font-h);
+    }
+
+    .service-etd {
+      font-size: 11px;
+      color: var(--g500);
+      font-weight: 600;
+    }
+
+    /* Midtrans Payment Gateway UI */
+    .midtrans-box {
+      background: #fff;
+      border: 1.5px solid #0072FF;
+      border-radius: var(--rlg);
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 114, 255, 0.08);
+    }
+
+    .midtrans-header {
+      background: linear-gradient(135deg, #02234D 0%, #00458E 100%);
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #fff;
+    }
+
+    .midtrans-logo-tag {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .midtrans-diamond {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #00A6FF, #0052CC);
+      transform: rotate(45deg);
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .midtrans-nav {
+      display: flex;
+      background: var(--g50);
+      border-bottom: 1px solid var(--g200);
+      overflow-x: auto;
+    }
+
+    .midtrans-tab {
+      padding: 14px 20px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--g600);
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      transition: 0.2s;
+    }
+
+    .midtrans-tab:hover {
+      color: var(--blue);
+      background: #fff;
+    }
+
+    .midtrans-tab.active {
+      color: var(--blue);
+      background: #fff;
+      border-bottom-color: var(--blue);
+    }
+
+    .midtrans-body {
+      padding: 26px;
+    }
+
+    .payment-channel-pane {
+      display: none;
+    }
+
+    .payment-channel-pane.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Bank VA Cards */
+    .va-card {
+      border: 1.5px solid var(--g200);
+      border-radius: 14px;
+      padding: 16px;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .va-card:hover,
+    .va-card.selected {
+      border-color: var(--blue);
+      background: var(--blue-l);
+    }
+
+    .va-card.selected {
+      box-shadow: 0 0 0 3px rgba(26, 92, 255, 0.15);
+    }
+
+    .va-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .va-badge {
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-weight: 900;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .va-bca {
+      background: #005bab;
+      color: #fff;
+    }
+
+    .va-mandiri {
+      background: #003057;
+      color: #ffbe00;
+    }
+
+    .va-bri {
+      background: #00529c;
+      color: #f58220;
+    }
+
+    .va-bni {
+      background: #f15a24;
+      color: #fff;
+    }
+
+    .va-permata {
+      background: #438f29;
+      color: #fff;
+    }
+
+    /* QRIS Box */
+    .qris-display-box {
+      text-align: center;
+      padding: 24px;
+      background: #FAFAFA;
+      border-radius: 16px;
+      border: 2px dashed #D4D4D8;
+      max-width: 380px;
+      margin: 0 auto;
+    }
+
+    .qris-timer-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #FEF3C7;
+      color: #B45309;
+      padding: 6px 14px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    .qris-qr-frame {
+      width: 220px;
+      height: 220px;
+      background: #fff;
+      padding: 12px;
+      border-radius: 14px;
+      margin: 0 auto 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .qris-scan-line {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #22C55E, transparent);
+      box-shadow: 0 0 10px #22C55E;
+      animation: scanAnim 2.4s infinite ease-in-out;
+    }
+
+    @keyframes scanAnim {
+
+      0%,
+      100% {
+        top: 12px;
+      }
+
+      50% {
+        top: 195px;
+      }
+    }
+
+    /* Credit Card Interactive Preview */
+    .card-preview-container {
+      background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 50%, #1D4ED8 100%);
+      border-radius: 18px;
+      padding: 24px;
+      color: #fff;
+      max-width: 380px;
+      margin: 0 auto 24px;
+      box-shadow: 0 14px 35px rgba(30, 58, 138, 0.35);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-preview-container::after {
+      content: '';
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 50%;
+      top: -60px;
+      right: -60px;
+    }
+
+    .cc-chip {
+      width: 44px;
+      height: 32px;
+      background: linear-gradient(135deg, #F59E0B, #FDE68A);
+      border-radius: 6px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .cc-number-mock {
+      font-family: 'Courier New', monospace;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .cc-footer-mock {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .cc-holder-name {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Copy Button */
+    .copy-btn {
+      background: #fff;
+      border: 1px solid var(--g300);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--blue);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: var(--blue-l);
+      border-color: var(--blue);
+    }
+
+    /* Order Summary Sidebar */
+    .summary-card-sticky {
+      position: sticky;
+      top: 88px;
+      background: #fff;
+      border-radius: var(--rlg);
+      border: 1px solid var(--g200);
+      box-shadow: var(--sh-md);
+      overflow: hidden;
+    }
+
+    .summary-header {
+      background: linear-gradient(135deg, var(--g50) 0%, var(--g100) 100%);
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--g200);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .summary-items-list {
+      max-height: 220px;
+      overflow-y: auto;
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--g100);
+    }
+
+    .sum-item-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .sum-item-row:last-child {
+      margin-bottom: 0;
+    }
+
+    .sum-item-thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: var(--g100);
+    }
+
+    .sum-item-details {
+      flex: 1;
+    }
+
+    .sum-item-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--g800);
+      line-height: 1.3;
+    }
+
+    .sum-item-qty {
+      font-size: 11px;
+      color: var(--g500);
+    }
+
+    .sum-item-price {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--g900);
+    }
+
+    .summary-breakdown {
+      padding: 20px 22px;
+    }
+
+    .summary-calc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13.5px;
+      margin-bottom: 10px;
+      color: var(--g600);
+    }
+
+    .summary-calc-row.highlight {
+      color: var(--success);
+      font-weight: 700;
+    }
+
+    .summary-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 14px;
+      margin-top: 10px;
+      border-top: 2px dashed var(--g200);
+    }
+
+    .summary-total-label {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--g900);
+    }
+
+    .summary-total-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--blue);
+      font-family: var(--font-h);
+    }
+
+    /* Midtrans Snap Modal Simulator */
+    .snap-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 15, 30, 0.7);
+      backdrop-filter: blur(6px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.25s ease;
+    }
+
+    .snap-overlay.open {
+      display: flex;
+    }
+
+    .snap-modal-card {
+      background: #fff;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: popUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes popUp {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .snap-topbar {
+      background: #111827;
+      color: #fff;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .snap-merchant-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .snap-close-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: 0.2s;
+    }
+
+    .snap-close-btn:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .snap-payment-body {
+      padding: 24px;
+    }
+
+    /* Notification Toast */
+    .toast-notice {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0D1728;
+      color: #fff;
+      padding: 14px 20px;
+      border-radius: 12px;
+      box-shadow: var(--sh-lg);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 3000;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: 0.3s;
+      pointer-events: none;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .toast-notice.show {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    /* Live Rajaongkir Loading Skeleton/Pulse */
+    .loading-pulse {
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.5;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- TOP NAVBAR -->
+  <nav class="navbar">
+    <div style="display:flex;align-items:center;gap:12px">
+      <button type="button" class="burger-btn" id="mobileMenuBtn" onclick="toggleMobileMenu()">
+        <i class="fi fi-rr-menu-burger" id="mobileMenuIcon"></i>
+      </button>
+      <a href="index.html" class="nav-logo">
+        <i class="fi fi-rr-bolt"></i>
+        <span>Elektronik<span>Modern</span></span>
+      </a>
+    </div>
+
+    <div class="nav-search">
+      <span class="search-icon"><i class="fi fi-rr-search"></i></span>
+      <input type="text" placeholder="Cari produk elektronik..." onkeydown="handleSearch(this, event)" />
+    </div>
+
+    <!-- Mobile Search Bar -->
+    <div id="mobileSearchBar" class="mobile-search-bar">
+      <button onclick="toggleMobileSearch()" class="nav-icon-btn" style="background:none"><i
+          class="fi fi-rr-angle-small-left"></i></button>
+      <div style="flex:1;position:relative">
+        <span class="search-icon" style="left:12px"><i class="fi fi-rr-search"></i></span>
+        <input type="text" placeholder="Cari produk..." id="mobileSearchInput" onkeydown="handleSearch(this, event)"
+          style="padding-left:40px">
+      </div>
+    </div>
+
+    <div class="nav-right">
+      <button class="nav-icon-btn mobile-search-trigger" onclick="toggleMobileSearch()" style="display:none">
+        <i class="fi fi-rr-search"></i>
+      </button>
+      <button class="nav-icon-btn" onclick="toggleNotifPanel()" title="Notifikasi">
+        <i class="fi fi-rr-bell"></i>
+        <span class="notif-badge" id="notifBadgeNav">2</span>
+      </button>
+      <a href="cart.html" class="nav-icon-btn" title="Keranjang">
+        <i class="fi fi-rr-shopping-cart"></i>
+        <span class="cart-badge" id="cartBadgeNav">2</span>
+      </a>
+      <a href="orders.html" class="nav-icon-btn desktop-only" title="Pesanan Saya">
+        <i class="fi fi-rr-box"></i>
+      </a>
+      <a href="profile.html" class="nav-icon-btn desktop-only" title="Profil Saya">
+        <i class="fi fi-rr-user"></i>
+      </a>
+      <div class="desktop-only" style="display:flex;gap:8px">
+        <a href="login.html" class="btn btn-outline btn-sm">Masuk</a>
+        <a href="register.html" class="btn btn-primary btn-sm">Daftar</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- NOTIFICATION DROPDOWN PANEL -->
+  <div class="notif-overlay" id="notifOverlay" onclick="closeNotifPanel()"></div>
+  <div class="notif-panel" id="notifPanel">
+    <div class="notif-pheader">
+      <div>
+        <h4 style="font-weight:800;font-size:15px;color:var(--g900)">Notifikasi</h4>
+        <p style="font-size:11px;color:var(--g400);font-weight:600;margin-top:2px">Info terbaru akun Anda</p>
+      </div>
+      <button class="notif-mark" onclick="markNotificationsRead()">Tandai Dibaca</button>
+    </div>
+    <div class="notif-list" id="notifList"></div>
+  </div>
+
+  <!-- MOBILE DRAWER SIDEBAR -->
+  <div id="mobileMenuOverlay" class="mobile-menu-overlay" onclick="toggleMobileMenu()"></div>
+  <div id="mobileMenu" class="mobile-menu">
+    <div class="mobile-menu-header">
+      <a href="index.html" class="nav-logo" style="font-size:18px">
+        <i class="fi fi-rr-bolt"></i>
+        <span>Elektronik<span>Modern</span></span>
+      </a>
+      <button onclick="toggleMobileMenu()"
+        style="background:none;border:none;font-size:20px;color:var(--g400);cursor:pointer">✕</button>
+    </div>
+    <div class="mobile-menu-user">
+      <div class="m-avatar">BS</div>
+      <div class="m-user-info">
+        <div class="m-user-name">Budi Santoso</div>
+        <div class="m-user-email">budi.s@email.com</div>
+      </div>
+    </div>
+    <div class="m-group-title">Menu Utama</div>
+    <div class="mobile-menu-list">
+      <a href="index.html" class="m-item"><i class="fi fi-rr-home"></i> Beranda</a>
+      <a href="products.html" class="m-item"><i class="fi fi-rr-shopping-bag"></i> Katalog Produk</a>
+      <a href="cart.html" class="m-item"><i class="fi fi-rr-shopping-cart"></i> Keranjang</a>
+    </div>
+    <div class="m-group-title">Akun & Transaksi</div>
+    <div class="mobile-menu-list">
+      <a href="profile.html" class="m-item"><i class="fi fi-rr-user"></i> Profil Saya</a>
+      <a href="orders.html" class="m-item"><i class="fi fi-rr-box"></i> Pesanan Saya</a>
+    </div>
+    <div style="border-top:1px solid var(--g100);padding-top:16px;margin-top:16px">
+      <a href="login.html" class="m-item" style="color:var(--danger)"><i class="fi fi-rr-sign-out-alt"></i> Keluar
+        Akun</a>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT WRAPPER -->
+  <main class="page-wrapper">
+    <!-- Breadcrumbs -->
+    <div style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:16px">
+      <a href="index.html" style="color:var(--g500); text-decoration:none; display:flex; align-items:center; gap:6px">
+        <i class="fi fi-rr-home"></i> Beranda
+      </a>
+      <i class="fi fi-rr-angle-small-right" style="color:var(--g400)"></i>
+      <a href="cart.html" style="color:var(--g500); text-decoration:none">Keranjang</a>
+      <i class="fi fi-rr-angle-small-right" style="color:var(--g400)"></i>
+      <span style="font-weight:700; color:var(--g900)">Pengiriman RajaOngkir & Pembayaran Midtrans</span>
+    </div>
+
+    <!-- Live Integration Banner -->
+    <div class="gateway-badge-bar">
+      <div>
+        <h2 style="font-size:18px; font-weight:800; font-family:var(--font-h); margin-bottom:4px">
+          Sistem Checkout Pintar: RajaOngkir & Midtrans Gateway
+        </h2>
+        <p style="font-size:13px; color:#cbd5e1; margin:0">
+          Perhitungan ongkir akurat ke seluruh Indonesia via API RajaOngkir &amp; pembayaran instan aman berlisensi Bank
+          Indonesia via Midtrans.
+        </p>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap">
+        <div class="gateway-pill rajaongkir">
+          <i class="fi fi-rr-truck-side"></i> RajaOngkir PRO Live
+        </div>
+        <div class="gateway-pill midtrans">
+          <span class="midtrans-diamond" style="width:12px;height:12px"></span> Midtrans Snap 3DS
+        </div>
+      </div>
+    </div>
+
+    <!-- Checkout Process Stepper -->
+    <div class="stepper-wrap">
+      <div class="step-item completed">
+        <div class="step-circle"><i class="fi fi-rr-check"></i></div>
+        <div class="step-text">
+          <h4>1. Keranjang</h4>
+          <p>2 Produk Dipilih</p>
+        </div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item active">
+        <div class="step-circle">2</div>
+        <div class="step-text">
+          <h4>2. Kurir RajaOngkir</h4>
+          <p>Hitung Ongkir Real-time</p>
+        </div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-item active">
+        <div class="step-circle">3</div>
+        <div class="step-text">
+          <h4>3. Bayar Midtrans</h4>
+          <p>QRIS / VA / CC</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="checkout-grid">
+      <!-- LEFT COLUMN: RAJAONGKIR & MIDTRANS FORMS -->
+      <div>
+        <!-- SECTION 1: RAJAONGKIR SHIPPING CALCULATOR -->
+        <div class="section-card">
+          <div class="card-header-row">
+            <div class="card-header-title">
+              <i class="fi fi-rr-truck-side"></i>
+              <span>1. Kalkulator Pengiriman RajaOngkir</span>
+            </div>
+            <span class="badge" style="background:#FFF7ED; color:#EA580C; border:1px solid #FFEDD5">
+              <i class="fi fi-rr-refresh" style="margin-right:4px"></i> Auto Tarif
+            </span>
+          </div>
+
+          <!-- Origin Info Banner -->
+          <div class="ro-meta-box">
+            <div class="ro-meta-icon">
+              <i class="fi fi-rr-warehouse-alt"></i>
+            </div>
+            <div style="flex:1">
+              <div
+                style="font-size:11px; font-weight:800; color:#C2410C; text-transform:uppercase; letter-spacing:0.5px">
+                Gudang Asal Pengiriman (Origin)
+              </div>
+              <div style="font-size:14px; font-weight:800; color:var(--g900)">
+                DKI Jakarta &bull; Jakarta Selatan (Kec. Kebayoran Baru, 12190)
+              </div>
+              <div style="font-size:12px; color:var(--g600); margin-top:2px">
+                Estimasi Berat Paket: <strong id="roTotalWeight">2.450 Gram (~3 Kg)</strong> &bull; Free Packing Kayu
+                &amp; Bubble Wrap
+              </div>
+            </div>
+          </div>
+
+          <!-- Destination Address Cascade -->
+          <div id="savedAddressSection" style="margin-bottom:18px">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
+              <label style="margin:0; font-size:13px; font-weight:800; color:var(--g900)">
+                <i class="fi fi-rr-marker" style="color:var(--blue)"></i> Pilih Alamat Pengiriman Tersimpan (Profil):
+              </label>
+              <a href="profile.html?tab=alamat"
+                style="font-size:12px; color:var(--blue); font-weight:700; text-decoration:none">
+                + Kelola di Profil
+              </a>
+            </div>
+            <div id="savedAddressList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:12px">
+              <!-- Dynamically loaded from getAddresses() -->
+            </div>
+          </div>
+
+          <div style="margin-bottom:20px">
+            <label style="margin-bottom:8px">Detail Alamat Lengkap &amp; Catatan Kurir</label>
+            <textarea id="coAddressDetail" rows="2"
+              placeholder="Jl. Jend. Sudirman Kav 52-53, Gedung Equity Tower Lt. 12, RT 05 / RW 03..."
+              style="resize:none">Jl. Asia Afrika No. 8, Senayan, Kebayoran Baru</textarea>
+          </div>
+
+          <div class="grid-3" style="margin-bottom:20px">
+            <div>
+              <label for="roProvince">Provinsi Tujuan</label>
+              <select id="roProvince" onchange="onProvinceChange()">
+                <option value="dki_jakarta" selected>DKI Jakarta</option>
+                <option value="jawa_barat">Jawa Barat</option>
+                <option value="jawa_tengah">Jawa Tengah</option>
+                <option value="jawa_timur">Jawa Timur</option>
+                <option value="banten">Banten</option>
+                <option value="di_yogyakarta">DI Yogyakarta</option>
+                <option value="bali">Bali</option>
+                <option value="sumatera_utara">Sumatera Utara</option>
+                <option value="sulawesi_selatan">Sulawesi Selatan</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="roCity">Kota / Kabupaten</label>
+              <select id="roCity" onchange="onCityChange()">
+                <!-- Dynamically populated -->
+              </select>
+            </div>
+
+            <div>
+              <label for="roSubdistrict">Kecamatan &amp; Kode Pos</label>
+              <select id="roSubdistrict" onchange="calculateRajaOngkir()">
+                <!-- Dynamically populated -->
+              </select>
+            </div>
+          </div>
+
+          <!-- Courier Selection Tabs -->
+          <div style="margin-top:22px; margin-bottom:12px">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px">
+              <label style="margin:0">Pilih Ekspedisi Mitra RajaOngkir:</label>
+              <span id="roQueryStatus" style="font-size:12px; color:var(--success); font-weight:700">
+                <i class="fi fi-rr-check"></i> 5 Kurir Tersedia
+              </span>
+            </div>
+            <div class="courier-tabs" id="courierTabs">
+              <button type="button" class="courier-tab-btn active" onclick="switchCourier('JNE', this)">
+                <span class="courier-logo-badge cl-jne">JNE</span>
+                <span>JNE Express</span>
+              </button>
+              <button type="button" class="courier-tab-btn" onclick="switchCourier('SICEPAT', this)">
+                <span class="courier-logo-badge cl-sicepat">SiCepat</span>
+                <span>SiCepat Ekspres</span>
+              </button>
+              <button type="button" class="courier-tab-btn" onclick="switchCourier('JNT', this)">
+                <span class="courier-logo-badge cl-jnt">J&amp;T</span>
+                <span>J&amp;T Express</span>
+              </button>
+              <button type="button" class="courier-tab-btn" onclick="switchCourier('POS', this)">
+                <span class="courier-logo-badge cl-pos">POS</span>
+                <span>POS Indonesia</span>
+              </button>
+              <button type="button" class="courier-tab-btn" onclick="switchCourier('TIKI', this)">
+                <span class="courier-logo-badge cl-tiki">TIKI</span>
+                <span>TIKI</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Services List Output -->
+          <div class="shipping-services-list" id="shippingServicesContainer">
+            <!-- Dynamically populated services with prices & ETD -->
+          </div>
+
+          <div
+            style="margin-top:14px; display:flex; align-items:center; justify-content:space-between; font-size:12px; color:var(--g500)">
+            <span><i class="fi fi-rr-shield-check" style="color:var(--success)"></i> Dilindungi Asuransi Kehilangan
+              &amp; Kerusakan</span>
+            <button type="button" onclick="calculateRajaOngkir(true)"
+              style="background:none; border:none; color:var(--blue); font-weight:700; cursor:pointer">
+              <i class="fi fi-rr-refresh"></i> Cek Ulang Tarif
+            </button>
+          </div>
+        </div>
+
+        <!-- SECTION 2: MIDTRANS PAYMENT GATEWAY -->
+        <div class="section-card" style="padding:0; overflow:hidden">
+          <!-- Midtrans Gateway Header -->
+          <div class="midtrans-header">
+            <div class="midtrans-logo-tag">
+              <div class="midtrans-diamond"></div>
+              <div>
+                <div style="font-size:16px; font-weight:900; letter-spacing:0.5px">MIDTRANS PAYMENT GATEWAY</div>
+                <div style="font-size:11px; color:#99C7FF; font-weight:600">Snap API &bull; Verified by Bank Indonesia
+                  &amp; PCI-DSS Level 1</div>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <span class="badge" style="background:rgba(255,255,255,0.15); color:#fff; font-size:11px">
+                <i class="fi fi-rr-lock" style="margin-right:4px"></i> 256-Bit SSL Secured
+              </span>
+            </div>
+          </div>
+
+          <!-- Midtrans Payment Category Tabs -->
+          <div class="midtrans-nav">
+            <button type="button" class="midtrans-tab active" onclick="switchPaymentTab('qris', this)">
+              <i class="fi fi-rr-qr-scan"></i> QRIS (Instan)
+            </button>
+            <button type="button" class="midtrans-tab" onclick="switchPaymentTab('va', this)">
+              <i class="fi fi-rr-bank"></i> Virtual Account
+            </button>
+            <button type="button" class="midtrans-tab" onclick="switchPaymentTab('card', this)">
+              <i class="fi fi-rr-credit-card"></i> Kartu Kredit / Debit
+            </button>
+            <button type="button" class="midtrans-tab" onclick="switchPaymentTab('ewallet', this)">
+              <i class="fi fi-rr-wallet"></i> E-Wallet
+            </button>
+            <button type="button" class="midtrans-tab" onclick="switchPaymentTab('store', this)">
+              <i class="fi fi-rr-shop"></i> Gerai Tunai
+            </button>
+          </div>
+
+          <div class="midtrans-body">
+            <!-- TAB 1: QRIS -->
+            <div id="pane-qris" class="payment-channel-pane active">
+              <div class="qris-display-box">
+                <div class="qris-timer-pill">
+                  <i class="fi fi-rr-time-fast"></i> Bayar dalam: <span id="qrisCountdown"
+                    style="font-family:monospace; font-weight:800">14:59</span>
+                </div>
+
+                <div class="qris-qr-frame">
+                  <div class="qris-scan-line"></div>
+                  <!-- Scalable Vector QR Code -->
+                  <svg viewBox="0 0 100 100" width="180" height="180">
+                    <!-- Corners -->
+                    <rect x="0" y="0" width="30" height="30" fill="#0D1728" rx="4" />
+                    <rect x="5" y="5" width="20" height="20" fill="#fff" rx="2" />
+                    <rect x="9" y="9" width="12" height="12" fill="#0D1728" rx="1" />
+
+                    <rect x="70" y="0" width="30" height="30" fill="#0D1728" rx="4" />
+                    <rect x="75" y="5" width="20" height="20" fill="#fff" rx="2" />
+                    <rect x="79" y="9" width="12" height="12" fill="#0D1728" rx="1" />
+
+                    <rect x="0" y="70" width="30" height="30" fill="#0D1728" rx="4" />
+                    <rect x="5" y="75" width="20" height="20" fill="#fff" rx="2" />
+                    <rect x="9" y="79" width="12" height="12" fill="#0D1728" rx="1" />
+
+                    <!-- QR Pattern blocks -->
+                    <rect x="36" y="8" width="6" height="6" fill="#0D1728" />
+                    <rect x="46" y="8" width="8" height="6" fill="#0D1728" />
+                    <rect x="58" y="8" width="6" height="6" fill="#0D1728" />
+
+                    <rect x="36" y="20" width="12" height="6" fill="#0D1728" />
+                    <rect x="52" y="18" width="6" height="12" fill="#0D1728" />
+
+                    <rect x="8" y="36" width="6" height="8" fill="#0D1728" />
+                    <rect x="18" y="44" width="8" height="6" fill="#0D1728" />
+                    <rect x="8" y="56" width="12" height="6" fill="#0D1728" />
+
+                    <rect x="36" y="36" width="28" height="28" fill="#0072FF" rx="4" />
+                    <text x="50" y="54" font-family="'Plus Jakarta Sans',sans-serif" font-weight="900" font-size="11"
+                      fill="#fff" text-anchor="middle">QRIS</text>
+
+                    <rect x="70" y="36" width="8" height="14" fill="#0D1728" />
+                    <rect x="82" y="40" width="12" height="8" fill="#0D1728" />
+                    <rect x="72" y="56" width="16" height="6" fill="#0D1728" />
+
+                    <rect x="36" y="70" width="10" height="6" fill="#0D1728" />
+                    <rect x="50" y="74" width="14" height="6" fill="#0D1728" />
+                    <rect x="40" y="84" width="8" height="10" fill="#0D1728" />
+                    <rect x="54" y="86" width="12" height="6" fill="#0D1728" />
+                    <rect x="70" y="72" width="6" height="18" fill="#0D1728" />
+                    <rect x="82" y="82" width="12" height="12" fill="#0D1728" />
+                  </svg>
+                </div>
+
+                <div style="font-size:13px; font-weight:800; color:var(--g900); margin-bottom:4px">
+                  Scan via GoPay, OVO, Dana, BCA Mobile, Livin, atau ShopeePay
+                </div>
+                <div style="font-size:12px; color:var(--g500); margin-bottom:16px">
+                  Kode QRIS dinamis diperbarui otomatis sesuai total belanja Anda.
+                </div>
+
+                <div style="display:flex; justify-content:center; gap:8px">
+                  <button type="button" class="copy-btn" onclick="copyQrisCode()">
+                    <i class="fi fi-rr-copy"></i> Salin Link QRIS
+                  </button>
+                  <button type="button" class="btn btn-primary btn-sm"
+                    onclick="simulatePaymentSuccess('QRIS Midtrans')">
+                    <i class="fi fi-rr-checkbox"></i> Simulasi Bayar Sukses
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- TAB 2: VIRTUAL ACCOUNT -->
+            <div id="pane-va" class="payment-channel-pane">
+              <p style="font-size:13px; color:var(--g600); margin-bottom:14px">
+                Pilih bank penyedia Virtual Account. Nomor VA aktif selama 24 jam &amp; diverifikasi otomatis dalam 5
+                detik:
+              </p>
+
+              <!-- BCA VA -->
+              <div class="va-card selected" onclick="selectVaBank('BCA', '8801 2948 5719 3201', this)">
+                <div class="va-brand">
+                  <span class="va-badge va-bca">BCA</span>
+                  <div>
+                    <div style="font-weight:800; font-size:14px; color:var(--g900)">BCA Virtual Account</div>
+                    <div style="font-size:12px; color:var(--g500)">Otomatis verifikasi &bull; Bebas biaya admin</div>
+                  </div>
+                </div>
+                <input type="radio" name="va_choice" checked style="accent-color:var(--blue); width:18px; height:18px">
+              </div>
+
+              <!-- Mandiri VA -->
+              <div class="va-card" onclick="selectVaBank('Mandiri', '7001 4829 1049 5521', this)">
+                <div class="va-brand">
+                  <span class="va-badge va-mandiri">MANDIRI</span>
+                  <div>
+                    <div style="font-weight:800; font-size:14px; color:var(--g900)">Mandiri Bill Payment</div>
+                    <div style="font-size:12px; color:var(--g500)">Kode Perusahaan: 70014</div>
+                  </div>
+                </div>
+                <input type="radio" name="va_choice" style="accent-color:var(--blue); width:18px; height:18px">
+              </div>
+
+              <!-- BRI VA -->
+              <div class="va-card" onclick="selectVaBank('BRI', '1029 4810 5928 4710', this)">
+                <div class="va-brand">
+                  <span class="va-badge va-bri">BRIVA</span>
+                  <div>
+                    <div style="font-weight:800; font-size:14px; color:var(--g900)">BRI Virtual Account (BRIVA)</div>
+                    <div style="font-size:12px; color:var(--g500)">Bisa lewat BRImo &amp; Agen BRILink</div>
+                  </div>
+                </div>
+                <input type="radio" name="va_choice" style="accent-color:var(--blue); width:18px; height:18px">
+              </div>
+
+              <!-- BNI VA -->
+              <div class="va-card" onclick="selectVaBank('BNI', '9881 2049 5729 1102', this)">
+                <div class="va-brand">
+                  <span class="va-badge va-bni">BNI</span>
+                  <div>
+                    <div style="font-weight:800; font-size:14px; color:var(--g900)">BNI Virtual Account</div>
+                    <div style="font-size:12px; color:var(--g500)">Transfer dari seluruh ATM &amp; Mobile Banking</div>
+                  </div>
+                </div>
+                <input type="radio" name="va_choice" style="accent-color:var(--blue); width:18px; height:18px">
+              </div>
+
+              <!-- Active VA Number Box -->
+              <div
+                style="background:var(--blue-l); border-radius:14px; padding:18px; margin-top:18px; border:1px solid rgba(26,92,255,0.2)">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px">
+                  <span style="font-size:12px; font-weight:800; color:var(--blue); text-transform:uppercase">
+                    Nomor Virtual Account <span id="currentVaBankName">BCA</span>
+                  </span>
+                  <button type="button" class="copy-btn" onclick="copyVaNumber()">
+                    <i class="fi fi-rr-copy"></i> Salin Nomor
+                  </button>
+                </div>
+                <div id="currentVaNumberDisplay"
+                  style="font-size:22px; font-weight:900; letter-spacing:1px; color:var(--g900); font-family:monospace">
+                  8801 2948 5719 3201
+                </div>
+                <div style="font-size:12px; color:var(--g600); margin-top:6px">
+                  Atas nama: <strong>MIDTRANS - ELEKTRONIK MODERN</strong>
+                </div>
+              </div>
+
+              <div style="margin-top:16px; text-align:right">
+                <button type="button" class="btn btn-primary btn-sm"
+                  onclick="simulatePaymentSuccess('Virtual Account ' + document.getElementById('currentVaBankName').textContent)">
+                  <i class="fi fi-rr-checkbox"></i> Simulasikan Transfer Selesai
+                </button>
+              </div>
+            </div>
+
+            <!-- TAB 3: KARTU KREDIT / DEBIT -->
+            <div id="pane-card" class="payment-channel-pane">
+              <!-- 3D Card Simulation -->
+              <div class="card-preview-container">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px">
+                  <span style="font-size:12px; font-weight:800; letter-spacing:1px">CREDIT / DEBIT</span>
+                  <span style="font-weight:900; font-size:18px; font-style:italic">VISA</span>
+                </div>
+                <div class="cc-chip"></div>
+                <div class="cc-number-mock" id="previewCardNumber">•••• •••• •••• 4242</div>
+                <div class="cc-footer-mock">
+                  <div>
+                    <div style="font-size:9px; opacity:0.8; text-transform:uppercase">Card Holder</div>
+                    <div class="cc-holder-name" id="previewCardName">BUDI SANTOSO</div>
+                  </div>
+                  <div>
+                    <div style="font-size:9px; opacity:0.8; text-transform:uppercase">Expires</div>
+                    <div style="font-family:monospace; font-weight:800; font-size:13px" id="previewCardExpiry">12/28
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid-2" style="margin-bottom:14px">
+                <div style="grid-column: 1 / -1">
+                  <label>Nomor Kartu (Visa, Mastercard, JCB, Amex)</label>
+                  <input type="text" id="ccInputNumber" placeholder="4000 1234 5678 9010" maxlength="19"
+                    oninput="formatCardNumber(this)" value="4242 •••• •••• 4242">
+                </div>
+                <div>
+                  <label>Masa Berlaku (MM/YY)</label>
+                  <input type="text" id="ccInputExpiry" placeholder="12/28" maxlength="5" oninput="formatExpiry(this)"
+                    value="12/28">
+                </div>
+                <div>
+                  <label>Kode Keamanan (CVV)</label>
+                  <input type="password" id="ccInputCvv" placeholder="123" maxlength="4" value="888">
+                </div>
+                <div style="grid-column: 1 / -1">
+                  <label>Nama Pemegang Kartu</label>
+                  <input type="text" id="ccInputHolder" placeholder="BUDI SANTOSO"
+                    oninput="document.getElementById('previewCardName').textContent = this.value || 'NAMA PEMILIK'"
+                    value="BUDI SANTOSO">
+                </div>
+              </div>
+
+              <div
+                style="background:var(--g50); padding:12px 16px; border-radius:12px; margin-bottom:16px; border:1px solid var(--g200); font-size:12px; color:var(--g600); display:flex; gap:10px; align-items:center">
+                <i class="fi fi-rr-shield-check" style="color:var(--blue); font-size:18px"></i>
+                <span>Pembayaran kartu dilindungi dengan 3D Secure OTP &amp; tokenisasi Midtrans. Data sensitif Anda
+                  tidak pernah disimpan di server toko.</span>
+              </div>
+
+              <div style="text-align:right">
+                <button type="button" class="btn btn-primary btn-sm"
+                  onclick="simulatePaymentSuccess('Kartu Kredit (Midtrans 3DS)')">
+                  <i class="fi fi-rr-lock"></i> Otorisasi &amp; Bayar
+                </button>
+              </div>
+            </div>
+
+            <!-- TAB 4: E-WALLET DIRECT -->
+            <div id="pane-ewallet" class="payment-channel-pane">
+              <div class="grid-2" style="margin-bottom:16px">
+                <label class="shipping-option selected" style="margin:0" onclick="selectEwalletMethod(this, 'GoPay')">
+                  <div class="shipping-info-col">
+                    <input type="radio" name="ewallet_opt" checked class="shipping-radio">
+                    <div>
+                      <div class="service-name">GoPay</div>
+                      <div class="service-desc">Hubungkan akun GoPay instan 1-klik</div>
+                    </div>
+                  </div>
+                  <span class="badge badge-success">Cashback 5%</span>
+                </label>
+
+                <label class="shipping-option" style="margin:0" onclick="selectEwalletMethod(this, 'ShopeePay')">
+                  <div class="shipping-info-col">
+                    <input type="radio" name="ewallet_opt" class="shipping-radio">
+                    <div>
+                      <div class="service-name">ShopeePay</div>
+                      <div class="service-desc">Buka aplikasi Shopee untuk konfirmasi</div>
+                    </div>
+                  </div>
+                </label>
+
+                <label class="shipping-option" style="margin:0" onclick="selectEwalletMethod(this, 'DANA')">
+                  <div class="shipping-info-col">
+                    <input type="radio" name="ewallet_opt" class="shipping-radio">
+                    <div>
+                      <div class="service-name">DANA</div>
+                      <div class="service-desc">Saldo DANA Dompet Digital</div>
+                    </div>
+                  </div>
+                </label>
+
+                <label class="shipping-option" style="margin:0" onclick="selectEwalletMethod(this, 'OVO')">
+                  <div class="shipping-info-col">
+                    <input type="radio" name="ewallet_opt" class="shipping-radio">
+                    <div>
+                      <div class="service-name">OVO</div>
+                      <div class="service-desc">Notifikasi push ke ponsel Anda</div>
+                    </div>
+                  </div>
+                </label>
+              </div>
+
+              <div class="form-group">
+                <label>Nomor Ponsel Terdaftar</label>
+                <input type="tel" value="0812-3456-7890" placeholder="08xxxxxxxxxx">
+              </div>
+
+              <div style="text-align:right">
+                <button type="button" class="btn btn-primary btn-sm"
+                  onclick="simulatePaymentSuccess('E-Wallet Direct Midtrans')">
+                  <i class="fi fi-rr-paper-plane"></i> Kirim Permintaan Pembayaran
+                </button>
+              </div>
+            </div>
+
+            <!-- TAB 5: GERAI TUNAI / RETAIL -->
+            <div id="pane-store" class="payment-channel-pane">
+              <p style="font-size:13px; color:var(--g600); margin-bottom:14px">
+                Tunjukkan kode pembayaran berikut ke kasir gerai terdekat dalam waktu 24 jam:
+              </p>
+              <div class="grid-2" style="margin-bottom:16px">
+                <div class="shipping-option selected" onclick="selectStore('Indomaret', 'IDM-8891-2309', this)">
+                  <div class="shipping-info-col">
+                    <input type="radio" name="store_opt" checked class="shipping-radio">
+                    <div>
+                      <div class="service-name">Indomaret / Ceriamart</div>
+                      <div class="service-desc">Kode Gerai &bull; Bebas biaya admin</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="shipping-option" onclick="selectStore('Alfamart', 'ALFA-7721-9982', this)">
+                  <div class="shipping-info-col">
+                    <input type="radio" name="store_opt" class="shipping-radio">
+                    <div>
+                      <div class="service-name">Alfamart / Alfamidi / Dan+Dan</div>
+                      <div class="service-desc">Kode Bayar Gerai Retail</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                style="background:#FFFBEB; border:1px solid #FDE68A; border-radius:14px; padding:18px; text-align:center">
+                <div
+                  style="font-size:12px; font-weight:800; color:#B45309; text-transform:uppercase; margin-bottom:4px">
+                  Kode Pembayaran <span id="storeNameText">Indomaret</span>
+                </div>
+                <div id="storeCodeDisplay"
+                  style="font-size:24px; font-weight:900; letter-spacing:2px; font-family:monospace; color:#92400E; margin-bottom:8px">
+                  IDM-8891-2309
+                </div>
+                <button type="button" class="copy-btn" onclick="copyStoreCode()">
+                  <i class="fi fi-rr-copy"></i> Salin Kode Bayar
+                </button>
+              </div>
+
+              <div style="margin-top:16px; text-align:right">
+                <button type="button" class="btn btn-primary btn-sm"
+                  onclick="simulatePaymentSuccess('Gerai Retail Midtrans')">
+                  <i class="fi fi-rr-check"></i> Simulasi Kasir Selesai
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: STICKY ORDER & TARIFF SUMMARY -->
+      <div>
+        <div class="summary-card-sticky">
+          <div class="summary-header">
+            <h3
+              style="font-size:16px; font-weight:800; color:var(--g900); margin:0; display:flex; align-items:center; gap:8px">
+              <i class="fi fi-rr-shopping-bag" style="color:var(--blue)"></i> Ringkasan Belanja
+            </h3>
+            <span class="badge badge-info" id="summaryItemCount">2 Barang</span>
+          </div>
+
+          <!-- Items list -->
+          <div class="summary-items-list" id="summaryItemsContainer">
+            <!-- Item 1 -->
+            <div class="sum-item-row">
+              <img src="https://images.unsplash.com/photo-1593784991095-a205069470b6?w=200&q=80" alt="Smart TV"
+                class="sum-item-thumb">
+              <div class="sum-item-details">
+                <div class="sum-item-title">Samsung Smart TV 43" 4K UHD</div>
+                <div class="sum-item-qty">1 x Rp 6.499.000 &bull; 2.200 gr</div>
+              </div>
+              <div class="sum-item-price">Rp 6.499.000</div>
+            </div>
+            <!-- Item 2 -->
+            <div class="sum-item-row">
+              <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=200&q=80" alt="Smart Bulb"
+                class="sum-item-thumb">
+              <div class="sum-item-details">
+                <div class="sum-item-title">Philips LED Smart Bulb 12W Wi-Fi</div>
+                <div class="sum-item-qty">1 x Rp 249.000 &bull; 250 gr</div>
+              </div>
+              <div class="sum-item-price">Rp 249.000</div>
+            </div>
+          </div>
+
+          <!-- Breakdown -->
+          <div class="summary-breakdown">
+            <div class="summary-calc-row">
+              <span>Subtotal Produk</span>
+              <span id="sumSubtotal" style="font-weight:700; color:var(--g900)">Rp 6.748.000</span>
+            </div>
+
+            <div class="summary-calc-row">
+              <span style="display:flex; align-items:center; gap:6px">
+                <i class="fi fi-rr-truck" style="color:var(--blue)"></i>
+                Ongkir (<span id="sumCourierBadge">JNE REG</span>)
+              </span>
+              <span id="sumShippingCost" style="font-weight:700; color:var(--g900)">Rp 18.000</span>
+            </div>
+
+            <div class="summary-calc-row">
+              <span>Biaya Layanan Midtrans</span>
+              <span style="font-weight:700; color:var(--success)">GRATIS (Rp 0)</span>
+            </div>
+
+            <!-- Insurance Checkbox -->
+            <div
+              style="background:var(--g50); padding:10px 14px; border-radius:10px; margin:10px 0; border:1px solid var(--g200)">
+              <label style="display:flex; align-items:center; gap:10px; margin:0; cursor:pointer">
+                <input type="checkbox" id="insuranceCheckbox" checked onchange="toggleInsurance(this)"
+                  style="width:16px; height:16px; accent-color:var(--blue)">
+                <div style="font-size:12px; font-weight:700; color:var(--g800)">
+                  Asuransi Pengiriman Produk (+Rp 5.000)
+                  <div style="font-size:11px; color:var(--g500); font-weight:normal">Ganti rugi 100% jika rusak/hilang
+                  </div>
+                </div>
+              </label>
+            </div>
+
+            <!-- Promo Code Box -->
+            <div style="margin-top:14px; margin-bottom:14px">
+              <div style="display:flex; gap:8px">
+                <input type="text" id="voucherCodeInput" placeholder="Kode Promo (MIDTRANS20)"
+                  style="text-transform:uppercase; font-size:13px; padding:8px 12px">
+                <button type="button" class="btn btn-outline btn-sm" onclick="applyPromoCode()">Terapkan</button>
+              </div>
+              <div id="voucherMsg" style="font-size:11px; margin-top:4px; display:none"></div>
+            </div>
+
+            <div class="summary-calc-row highlight" id="promoDiscountRow" style="display:none">
+              <span>Diskon Promo Spesial</span>
+              <span id="sumPromoDiscount">- Rp 50.000</span>
+            </div>
+
+            <div class="summary-total-row">
+              <div>
+                <div class="summary-total-label">Total Pembayaran</div>
+                <div style="font-size:11px; color:var(--g500)">Termasuk PPN &amp; Tarif RajaOngkir</div>
+              </div>
+              <div class="summary-total-val" id="sumGrandTotal">Rp 6.771.000</div>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div style="margin-top:20px; display:flex; flex-direction:column; gap:10px">
+              <button type="button" class="btn btn-primary btn-lg" onclick="triggerMidtransSnapModal()"
+                style="width:100%; justify-content:center; box-shadow:0 6px 20px rgba(26,92,255,0.4)">
+                <span class="midtrans-diamond" style="width:14px;height:14px"></span>
+                <span>Bayar Sekarang via Midtrans</span>
+              </button>
+
+              <button type="button" class="btn btn-outline btn-sm"
+                onclick="simulatePaymentSuccess('Pembayaran Berhasil')" style="width:100%; justify-content:center">
+                <i class="fi fi-rr-badge-check"></i> Cepat: Uji Transaksi Sukses
+              </button>
+            </div>
+
+            <div
+              style="display:flex; align-items:center; justify-content:center; gap:12px; margin-top:16px; font-size:11px; color:var(--g500)">
+              <span><i class="fi fi-rr-lock"></i> 100% Aman</span>
+              <span>&bull;</span>
+              <span>Garansi Resmi</span>
+              <span>&bull;</span>
+              <span>Verifikasi 24/7</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MIDTRANS SNAP POPUP MODAL (AUTHENTIC HIGH-FIDELITY SIMULATION) -->
+  <div class="snap-overlay" id="snapModalOverlay" onclick="closeSnapModalOnBg(event)">
+    <div class="snap-modal-card">
+      <!-- Snap Modal Topbar -->
+      <div class="snap-topbar">
+        <div class="snap-merchant-info">
+          <div class="midtrans-diamond" style="width:18px;height:18px"></div>
+          <div>
+            <div style="font-weight:800; font-size:14px; letter-spacing:0.3px">Elektronik Modern</div>
+            <div style="font-size:11px; color:#9CA3AF">Order #MID-20261027-8941</div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:12px">
+          <div style="text-align:right">
+            <div style="font-size:10px; color:#9CA3AF">TOTAL BAYAR</div>
+            <div id="snapModalTotal" style="font-size:14px; font-weight:800; color:#60A5FA; font-family:monospace">Rp
+              6.771.000</div>
+          </div>
+          <button type="button" class="snap-close-btn" onclick="closeSnapModal()">✕</button>
+        </div>
+      </div>
+
+      <div class="snap-payment-body">
+        <div
+          style="background:#F3F4F6; border-radius:12px; padding:12px 16px; margin-bottom:18px; display:flex; justify-content:space-between; align-items:center">
+          <span style="font-size:13px; font-weight:700; color:var(--g700)">Metode Dipilih di Gateway:</span>
+          <span class="badge badge-info" id="snapSelectedMethodBadge">QRIS Dinamis</span>
+        </div>
+
+        <!-- Interactive Snap Content -->
+        <div id="snapModalInnerDetails" style="text-align:center; padding:10px 0">
+          <div style="font-size:13px; color:var(--g600); margin-bottom:14px">
+            Silakan selesaikan transaksi dengan membuka aplikasi mobile banking Anda atau transfer ke nomor akun resmi
+            Midtrans.
+          </div>
+
+          <div
+            style="padding:16px; border:1px solid var(--g200); border-radius:14px; background:var(--g50); margin-bottom:20px">
+            <div style="font-size:11px; color:var(--g500); text-transform:uppercase; font-weight:800">Nomor Transaksi
+              Midtrans</div>
+            <div style="font-family:monospace; font-size:18px; font-weight:800; color:var(--blue); margin:4px 0">
+              MID-TX-78190248-ID
+            </div>
+            <div style="font-size:12px; color:var(--g600)">Waktu tersisa: <strong>23 Jam 59 Menit</strong></div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px">
+            <button type="button" class="btn btn-primary" onclick="executeSnapPaymentSimulation()"
+              style="width:100%; justify-content:center">
+              <i class="fi fi-rr-check"></i> Konfirmasi Pembayaran Selesai
+            </button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="closeSnapModal()"
+              style="width:100%; justify-content:center">
+              Batal / Pilih Metode Lain
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS PAYMENT MODAL -->
+  <div class="snap-overlay" id="successModalOverlay">
+    <div class="snap-modal-card" style="text-align:center; padding:36px 28px">
+      <div
+        style="width:72px; height:72px; border-radius:50%; background:#DCFCE7; color:#16A34A; display:flex; align-items:center; justify-content:center; font-size:36px; margin:0 auto 16px; box-shadow:0 8px 24px rgba(22, 163, 74, 0.25)">
+        <i class="fi fi-rr-checkbox"></i>
+      </div>
+
+      <h3 style="font-size:22px; font-weight:900; color:var(--g900); font-family:var(--font-h); margin-bottom:6px">
+        Pembayaran Midtrans Berhasil!
+      </h3>
+      <p style="font-size:14px; color:var(--g600); margin-bottom:22px">
+        Terima kasih! Pesanan Anda telah diterima dan diteruskan ke tim gudang untuk dipacking dan dikirim melalui kurir
+        RajaOngkir pilihan Anda.
+      </p>
+
+      <div
+        style="background:var(--g50); border:1px solid var(--g200); border-radius:14px; padding:16px; text-align:left; margin-bottom:24px; font-size:13px">
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px">
+          <span style="color:var(--g500)">No. Pesanan:</span>
+          <strong style="color:var(--g900)" id="succOrderId">#ORD-20261027-081</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px">
+          <span style="color:var(--g500)">Gateway:</span>
+          <strong style="color:var(--blue)">Midtrans Snap (Verifikasi Instan)</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:8px">
+          <span style="color:var(--g500)">Kurir Pengiriman:</span>
+          <strong style="color:var(--g900)" id="succCourier">JNE Regular (RajaOngkir)</strong>
+        </div>
+        <div style="display:flex; justify-content:space-between">
+          <span style="color:var(--g500)">Total Dibayar:</span>
+          <strong style="color:var(--blue); font-size:15px" id="succTotalPaid">Rp 6.771.000</strong>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; justify-content:center">
+        <a href="orders.html" class="btn btn-primary" style="flex:1; justify-content:center">
+          <i class="fi fi-rr-box"></i> Cek Pesanan Saya
+        </a>
+        <a href="index.html" class="btn btn-outline" style="flex:1; justify-content:center">
+          <i class="fi fi-rr-home"></i> Kembali ke Beranda
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast-notice" id="appToast">
+    <i class="fi fi-rr-check-circle" style="color:#22C55E; font-size:18px"></i>
+    <span id="toastMsg">Teks notifikasi</span>
+  </div>
+
+  <!-- SHARED JS FOR SITE FUNCTIONALITY -->
+  <script src="shared.js"></script>
+
+  <!-- RAJAONGKIR & MIDTRANS INTERACTIVE LOGIC SCRIPT -->
+  <script>
+    // ==========================================
+    // RAJAONGKIR DATA & LOGIC ENGINE
+    // ==========================================
+    const RAJAONGKIR_DESTINATIONS = {
+      dki_jakarta: {
+        cities: [
+          { id: "jaksel", name: "Kota Jakarta Selatan", subs: ["Kebayoran Baru (12190)", "Cilandak (12430)", "Mampang Prapatan (12790)", "Tebet (12810)", "Pasar Minggu (12520)"] },
+          { id: "jakpus", name: "Kota Jakarta Pusat", subs: ["Menteng (10310)", "Gambir (10110)", "Kemayoran (10620)", "Tanah Abang (10260)"] },
+          { id: "jakbar", name: "Kota Jakarta Barat", subs: ["Kebon Jeruk (11530)", "Grogol Petamburan (11450)", "Cengkareng (11730)"] },
+          { id: "jaktim", name: "Kota Jakarta Timur", subs: ["Jatinegara (13310)", "Duren Sawit (13440)", "Cakung (13910)"] },
+          { id: "jakut", name: "Kota Jakarta Utara", subs: ["Kelapa Gading (14240)", "Penjaringan (14440)", "Tanjung Priok (14310)"] }
+        ],
+        rateFactor: 1.0
+      },
+      jawa_barat: {
+        cities: [
+          { id: "bdg_kota", name: "Kota Bandung", subs: ["Coblong (40132)", "Cicendo (40171)", "Sumur Bandung (40111)", "Lengkong (40261)"] },
+          { id: "bgr_kota", name: "Kota Bogor", subs: ["Bogor Tengah (16121)", "Bogor Selatan (16130)", "Bogor Timur (16143)"] },
+          { id: "bks_kota", name: "Kota Bekasi", subs: ["Bekasi Barat (17145)", "Bekasi Selatan (17148)", "Rawalumbu (17115)"] },
+          { id: "dpk_kota", name: "Kota Depok", subs: ["Margonda (16424)", "Pancoran Mas (16436)", "Sukmajaya (16412)"] },
+          { id: "cmi_kota", name: "Kota Cimahi", subs: ["Cimahi Tengah (40525)", "Cimahi Utara (40511)"] }
+        ],
+        rateFactor: 1.25
+      },
+      banten: {
+        cities: [
+          { id: "tangsel", name: "Kota Tangerang Selatan", subs: ["BSD Serpong (15310)", "Bintaro Pondok Aren (15224)", "Ciputat (15411)"] },
+          { id: "tng_kota", name: "Kota Tangerang", subs: ["Karawaci (15115)", "Cipondoh (15148)", "Batuceper (15122)"] },
+          { id: "serang_kota", name: "Kota Serang", subs: ["Serang Kota (42111)", "Cipocok Jaya (42121)"] }
+        ],
+        rateFactor: 1.15
+      },
+      jawa_tengah: {
+        cities: [
+          { id: "smg_kota", name: "Kota Semarang", subs: ["Semarang Tengah (50134)", "Banyumanik (50264)", "Gajahmungkur (50232)"] },
+          { id: "solo_kota", name: "Kota Surakarta (Solo)", subs: ["Banjarsari (57139)", "Laweyan (57148)", "Jebres (57126)"] }
+        ],
+        rateFactor: 1.55
+      },
+      di_yogyakarta: {
+        cities: [
+          { id: "yk_kota", name: "Kota Yogyakarta", subs: ["Gondomanan (55121)", "Danurejan (55213)", "Kotagede (55172)"] },
+          { id: "sleman", name: "Kabupaten Sleman", subs: ["Depok (55281)", "Mlati (55284)", "Ngaglik (55581)"] }
+        ],
+        rateFactor: 1.5
+      },
+      jawa_timur: {
+        cities: [
+          { id: "sby_kota", name: "Kota Surabaya", subs: ["Gubeng (60281)", "Wonokromo (60243)", "Tegalsari (60262)", "Rungkut (60293)"] },
+          { id: "mlg_kota", name: "Kota Malang", subs: ["Klojen (65111)", "Lowokwaru (65141)", "Sukun (65147)"] }
+        ],
+        rateFactor: 1.7
+      },
+      bali: {
+        cities: [
+          { id: "dps_kota", name: "Kota Denpasar", subs: ["Denpasar Selatan (80227)", "Denpasar Barat (80119)", "Denpasar Timur (80237)"] },
+          { id: "badung", name: "Kabupaten Badung", subs: ["Kuta (80361)", "Kuta Utara / Canggu (80351)", "Kuta Selatan (80362)"] }
+        ],
+        rateFactor: 2.1
+      },
+      sumatera_utara: {
+        cities: [
+          { id: "mdn_kota", name: "Kota Medan", subs: ["Medan Baru (20153)", "Medan Petisah (20112)", "Medan Kota (20212)"] },
+          { id: "deli_serdang", name: "Kabupaten Deli Serdang", subs: ["Lubuk Pakam (20518)", "Percut Sei Tuan (20371)"] }
+        ],
+        rateFactor: 2.6
+      },
+      sulawesi_selatan: {
+        cities: [
+          { id: "mks_kota", name: "Kota Makassar", subs: ["Ujung Pandang (90111)", "Panakkukang (90231)", "Rappocini (90222)"] }
+        ],
+        rateFactor: 2.9
+      }
+    };
+
+    const COURIER_SERVICES_MATRIX = {
+      JNE: [
+        { code: "REG", name: "JNE Reguler", basePrice: 15000, etd: "1-2 Hari", desc: "Layanan reguler terpercaya ke seluruh pelosok" },
+        { code: "YES", name: "JNE YES (Yakin Esok Sampai)", basePrice: 28000, etd: "1 Hari (Besok Sampai)", desc: "Garansi uang kembali jika terlambat sampai" },
+        { code: "OKE", name: "JNE OKE (Ekonomis)", basePrice: 11000, etd: "2-4 Hari", desc: "Tarif ramah kantong untuk paket non-mendesak" }
+      ],
+      SICEPAT: [
+        { code: "SIUNT", name: "SiCepat SIUNTUNG", basePrice: 14000, etd: "1-2 Hari", desc: "Pengiriman cepat dengan tarif murah meriah" },
+        { code: "BEST", name: "SiCepat BEST", basePrice: 27000, etd: "Besok Sampai Tujuan", desc: "Layanan prioritas kilat esok hari" },
+        { code: "GOKIL", name: "SiCepat GOKIL (Cargo)", basePrice: 22000, etd: "2-3 Hari", desc: "Paket kargo hemat elektronik berat" }
+      ],
+      JNT: [
+        { code: "EZ", name: "J&T EZ (Reguler)", basePrice: 15000, etd: "1-3 Hari", desc: "Jangkauan luas tanpa hari libur operasional" },
+        { code: "SUPER", name: "J&T Super", basePrice: 29000, etd: "1 Hari Cepat", desc: "Layanan VIP ekspres dengan prioritas kurir" }
+      ],
+      POS: [
+        { code: "KILAT", name: "POS Kilat Khusus", basePrice: 13000, etd: "2-3 Hari", desc: "Jaringan BUMN menjangkau hingga pelosok desa" },
+        { code: "NEXT", name: "POS Nextday", basePrice: 26000, etd: "1 Hari", desc: "Sampai di hari berikutnya terjamin aman" }
+      ],
+      TIKI: [
+        { code: "REG", name: "TIKI Reguler", basePrice: 14500, etd: "2-3 Hari", desc: "Layanan standar amanah seluruh nusantara" },
+        { code: "ONS", name: "TIKI ONS (Over Night)", basePrice: 28500, etd: "1 Hari", desc: "Jaminan pengantaran tepat satu malam" }
+      ]
+    };
+
+    // State
+    let currentCourier = "JNE";
+    let selectedShippingRate = 18000;
+    let selectedShippingName = "JNE Reguler";
+    let subtotalAmount = 6748000;
+    let insuranceAmount = 5000;
+    let promoDiscount = 0;
+    let appliedPromoCode = null;
+    let currentPaymentMethod = "QRIS Midtrans";
+
+    // Initialize Page
+    document.addEventListener("DOMContentLoaded", () => {
+      renderSavedAddresses();
+      populateCities();
+      calculateRajaOngkir();
+      initCartFromStorage();
+      checkAppliedVoucher();
+      startQrisCountdown();
+    });
+
+    // Render Saved Addresses from getAddresses() (Profile storage)
+    function renderSavedAddresses() {
+      const listEl = document.getElementById("savedAddressList");
+      if (!listEl) return;
+      const addresses = typeof getAddresses === 'function' ? getAddresses() : [];
+      if (!addresses || addresses.length === 0) {
+        listEl.innerHTML = `
+            <div style="font-size:12px; color:var(--g500); background:var(--g50); padding:10px 14px; border-radius:10px; border:1px solid var(--g200)">
+              Belum ada alamat tersimpan di profil. Gunakan form provinsi &amp; kota di bawah untuk menghitung ongkir.
+            </div>
+          `;
+        return;
+      }
+
+      listEl.innerHTML = addresses.map((addr, idx) => `
+          <label class="shipping-option ${addr.isDefault ? 'selected' : ''}" style="margin:0; padding:12px 16px; cursor:pointer" onclick="selectSavedAddress(${addr.id}, this)">
+            <div class="shipping-info-col">
+              <input type="radio" name="saved_addr_choice" ${addr.isDefault ? 'checked' : ''} class="shipping-radio">
+              <div>
+                <div class="service-name" style="font-size:13.5px">
+                  ${addr.label} &bull; ${addr.name} (${addr.phone})
+                  ${addr.isDefault ? '<span class="badge badge-success" style="font-size:9px; padding:2px 6px">Utama</span>' : ''}
+                </div>
+                <div class="service-desc" style="font-size:12px">${addr.street}, ${addr.district || ''}, ${addr.city}, ${addr.province}</div>
+              </div>
+            </div>
+          </label>
+        `).join("");
+
+      const def = addresses.find(a => a.isDefault) || addresses[0];
+      if (def) {
+        applyAddressData(def, false);
+      }
+    }
+
+    function selectSavedAddress(addrId, labelEl) {
+      document.querySelectorAll("#savedAddressList .shipping-option").forEach(el => el.classList.remove("selected"));
+      if (labelEl) labelEl.classList.add("selected");
+      const radio = labelEl?.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
+
+      const addresses = typeof getAddresses === 'function' ? getAddresses() : [];
+      const found = addresses.find(a => a.id === addrId);
+      if (found) {
+        applyAddressData(found, true);
+      }
+    }
+
+    function applyAddressData(addr, showNotice = true) {
+      const detailInput = document.getElementById("coAddressDetail");
+      if (detailInput) {
+        detailInput.value = `${addr.street}, ${addr.village || ''}, ${addr.district || ''}, ${addr.city}, ${addr.province}`;
+      }
+      const provSelect = document.getElementById("roProvince");
+      const pNorm = (addr.province || '').toLowerCase();
+      if (pNorm.includes('timur')) provSelect.value = 'jawa_timur';
+      else if (pNorm.includes('barat')) provSelect.value = 'jawa_barat';
+      else if (pNorm.includes('tengah')) provSelect.value = 'jawa_tengah';
+      else if (pNorm.includes('banten')) provSelect.value = 'banten';
+      else if (pNorm.includes('yogyakarta') || pNorm.includes('jogja')) provSelect.value = 'di_yogyakarta';
+      else if (pNorm.includes('bali')) provSelect.value = 'bali';
+      else if (pNorm.includes('utara')) provSelect.value = 'sumatera_utara';
+      else if (pNorm.includes('sulawesi')) provSelect.value = 'sulawesi_selatan';
+      else provSelect.value = 'dki_jakarta';
+
+      populateCities();
+      calculateRajaOngkir();
+      if (showNotice) {
+        showToast(`Alamat ${addr.label} dipilih & tarif RajaOngkir disesuaikan.`);
+      }
+    }
+
+    function checkAppliedVoucher() {
+      try {
+        const savedVoucher = JSON.parse(localStorage.getItem('eh_applied_voucher') || 'null');
+        if (savedVoucher) {
+          if (savedVoucher.type === 'persen') {
+            promoDiscount = Math.floor(subtotalAmount * (savedVoucher.value / 100));
+          } else {
+            promoDiscount = Number(savedVoucher.value) || 0;
+          }
+          appliedPromoCode = savedVoucher.code;
+          const codeInput = document.getElementById("voucherCodeInput");
+          if (codeInput) codeInput.value = savedVoucher.code;
+          const msg = document.getElementById("voucherMsg");
+          if (msg) {
+            msg.style.display = "block";
+            msg.style.color = "var(--success)";
+            msg.innerHTML = `<i class="fi fi-rr-check-circle"></i> Voucher aktif dari keranjang: <strong>${savedVoucher.code}</strong> (-${fmt(promoDiscount)})`;
+          }
+          document.getElementById("promoDiscountRow").style.display = "flex";
+          document.getElementById("sumPromoDiscount").textContent = "- " + fmt(promoDiscount);
+          recalculateGrandTotal();
+        }
+      } catch (e) { }
+    }
+
+    // Populate City Dropdown based on selected province
+    function onProvinceChange() {
+      populateCities();
+      calculateRajaOngkir();
+    }
+
+    function populateCities() {
+      const provKey = document.getElementById("roProvince").value;
+      const citySelect = document.getElementById("roCity");
+      citySelect.innerHTML = "";
+
+      const provData = RAJAONGKIR_DESTINATIONS[provKey] || RAJAONGKIR_DESTINATIONS.dki_jakarta;
+      provData.cities.forEach((city, idx) => {
+        const opt = document.createElement("option");
+        opt.value = city.id;
+        opt.textContent = city.name;
+        if (idx === 0) opt.selected = true;
+        citySelect.appendChild(opt);
+      });
+
+      populateSubdistricts();
+    }
+
+    function onCityChange() {
+      populateSubdistricts();
+      calculateRajaOngkir();
+    }
+
+    function populateSubdistricts() {
+      const provKey = document.getElementById("roProvince").value;
+      const cityId = document.getElementById("roCity").value;
+      const subSelect = document.getElementById("roSubdistrict");
+      subSelect.innerHTML = "";
+
+      const provData = RAJAONGKIR_DESTINATIONS[provKey];
+      const cityData = provData.cities.find(c => c.id === cityId) || provData.cities[0];
+
+      cityData.subs.forEach((sub, idx) => {
+        const opt = document.createElement("option");
+        opt.value = sub;
+        opt.textContent = sub;
+        if (idx === 0) opt.selected = true;
+        subSelect.appendChild(opt);
+      });
+    }
+
+    // Switch Courier Brand
+    function switchCourier(courierKey, btnEl) {
+      currentCourier = courierKey;
+      document.querySelectorAll(".courier-tab-btn").forEach(b => b.classList.remove("active"));
+      if (btnEl) btnEl.classList.add("active");
+      calculateRajaOngkir();
+    }
+
+    // Calculate RajaOngkir Rate
+    function calculateRajaOngkir(isManualRefresh = false) {
+      const provKey = document.getElementById("roProvince").value;
+      const provData = RAJAONGKIR_DESTINATIONS[provKey] || RAJAONGKIR_DESTINATIONS.dki_jakarta;
+      const factor = provData.rateFactor;
+
+      const container = document.getElementById("shippingServicesContainer");
+      const statusEl = document.getElementById("roQueryStatus");
+
+      if (isManualRefresh) {
+        container.classList.add("loading-pulse");
+        statusEl.innerHTML = '<i class="fi fi-rr-spinner" style="animation:spin 1s infinite"></i> Menghitung ke server RajaOngkir...';
+      }
+
+      setTimeout(() => {
+        container.classList.remove("loading-pulse");
+        statusEl.innerHTML = `<i class="fi fi-rr-check"></i> ${currentCourier} &bull; Tarif Real-Time`;
+
+        const services = COURIER_SERVICES_MATRIX[currentCourier] || COURIER_SERVICES_MATRIX.JNE;
+        container.innerHTML = "";
+
+        services.forEach((srv, idx) => {
+          const calculatedCost = Math.round((srv.basePrice * factor) / 1000) * 1000;
+          const isSelected = idx === 0;
+
+          if (isSelected) {
+            selectedShippingRate = calculatedCost;
+            selectedShippingName = `${currentCourier} ${srv.code}`;
+          }
+
+          const card = document.createElement("div");
+          card.className = `shipping-option ${isSelected ? 'selected' : ''}`;
+          card.onclick = () => selectShippingService(card, srv, calculatedCost);
+
+          card.innerHTML = `
+              <div class="shipping-info-col">
+                <input type="radio" name="shipping_service_radio" ${isSelected ? 'checked' : ''} class="shipping-radio">
+                <div>
+                  <div class="service-name">
+                    ${srv.name}
+                    ${idx === 0 ? '<span class="badge badge-info" style="font-size:10px">Rekomendasi</span>' : ''}
+                  </div>
+                  <div class="service-desc">${srv.desc}</div>
+                </div>
+              </div>
+              <div class="service-cost">
+                <div class="service-price">${fmt(calculatedCost)}</div>
+                <div class="service-etd"><i class="fi fi-rr-clock"></i> Estimasi ${srv.etd}</div>
+              </div>
+            `;
+          container.appendChild(card);
+        });
+
+        recalculateGrandTotal();
+        if (isManualRefresh) {
+          showToast("Tarif RajaOngkir berhasil diperbarui!");
+        }
+      }, isManualRefresh ? 450 : 0);
+    }
+
+    function selectShippingService(cardEl, srv, cost) {
+      document.querySelectorAll("#shippingServicesContainer .shipping-option").forEach(c => {
+        c.classList.remove("selected");
+        const radio = c.querySelector('input[type="radio"]');
+        if (radio) radio.checked = false;
+      });
+      cardEl.classList.add("selected");
+      const radio = cardEl.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
+
+      selectedShippingRate = cost;
+      selectedShippingName = `${currentCourier} ${srv.code}`;
+      recalculateGrandTotal();
+      showToast(`Layanan kurir dipilih: ${selectedShippingName} (${fmt(cost)})`);
+    }
+
+    // Toggle Insurance
+    function toggleInsurance(checkbox) {
+      insuranceAmount = checkbox.checked ? 5000 : 0;
+      recalculateGrandTotal();
+      showToast(checkbox.checked ? "Asuransi pengiriman ditambahkan (+Rp 5.000)" : "Asuransi pengiriman dilepas");
+    }
+
+    // Promo Code Logic
+    function applyPromoCode() {
+      const input = document.getElementById("voucherCodeInput");
+      const msg = document.getElementById("voucherMsg");
+      const code = (input.value || "").trim().toUpperCase();
+
+      if (code === "MIDTRANS20" || code === "HEMAT20") {
+        promoDiscount = 50000;
+        msg.style.display = "block";
+        msg.style.color = "var(--success)";
+        msg.innerHTML = '<i class="fi fi-rr-check-circle"></i> Kupon diskon Rp 50.000 berhasil diterapkan!';
+        document.getElementById("promoDiscountRow").style.display = "flex";
+        document.getElementById("sumPromoDiscount").textContent = "- " + fmt(promoDiscount);
+      } else if (code === "GRATISONGKIR") {
+        promoDiscount = Math.min(selectedShippingRate, 20000);
+        msg.style.display = "block";
+        msg.style.color = "var(--success)";
+        msg.innerHTML = `<i class="fi fi-rr-check-circle"></i> Potongan ongkir ${fmt(promoDiscount)} berhasil!`;
+        document.getElementById("promoDiscountRow").style.display = "flex";
+        document.getElementById("sumPromoDiscount").textContent = "- " + fmt(promoDiscount);
+      } else if (code === "") {
+        msg.style.display = "block";
+        msg.style.color = "var(--danger)";
+        msg.innerHTML = "Masukkan kode promo terlebih dahulu.";
+      } else {
+        promoDiscount = 0;
+        msg.style.display = "block";
+        msg.style.color = "var(--danger)";
+        msg.innerHTML = "Kode promo tidak valid atau telah kedaluwarsa.";
+        document.getElementById("promoDiscountRow").style.display = "none";
+      }
+      recalculateGrandTotal();
+    }
+
+    // Recalculate Grand Total
+    function recalculateGrandTotal() {
+      document.getElementById("sumCourierBadge").textContent = selectedShippingName;
+      document.getElementById("sumShippingCost").textContent = fmt(selectedShippingRate);
+
+      const grandTotal = Math.max(0, subtotalAmount + selectedShippingRate + insuranceAmount - promoDiscount);
+      document.getElementById("sumGrandTotal").textContent = fmt(grandTotal);
+      document.getElementById("snapModalTotal").textContent = fmt(grandTotal);
+    }
+
+    // ==========================================
+    // MIDTRANS PAYMENT GATEWAY ENGINE
+    // ==========================================
+    function switchPaymentTab(tabKey, btnEl) {
+      document.querySelectorAll(".midtrans-tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".payment-channel-pane").forEach(p => p.classList.remove("active"));
+
+      if (btnEl) btnEl.classList.add("active");
+      const pane = document.getElementById("pane-" + tabKey);
+      if (pane) pane.classList.add("active");
+
+      const methodMap = {
+        qris: "QRIS Dinamis",
+        va: "Virtual Account " + document.getElementById("currentVaBankName").textContent,
+        card: "Kartu Kredit / Debit (Midtrans)",
+        ewallet: "E-Wallet Direct (GoPay/ShopeePay)",
+        store: "Gerai Tunai Retail"
+      };
+      currentPaymentMethod = methodMap[tabKey] || "Midtrans Gateway";
+      document.getElementById("snapSelectedMethodBadge").textContent = currentPaymentMethod;
+    }
+
+    // VA Bank Selection
+    function selectVaBank(bankName, vaNumber, cardEl) {
+      document.querySelectorAll(".va-card").forEach(c => {
+        c.classList.remove("selected");
+        const radio = c.querySelector('input[type="radio"]');
+        if (radio) radio.checked = false;
+      });
+      cardEl.classList.add("selected");
+      const radio = cardEl.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
+
+      document.getElementById("currentVaBankName").textContent = bankName;
+      document.getElementById("currentVaNumberDisplay").textContent = vaNumber;
+      currentPaymentMethod = "Virtual Account " + bankName;
+      document.getElementById("snapSelectedMethodBadge").textContent = currentPaymentMethod;
+      showToast(`Virtual Account ${bankName} dipilih.`);
+    }
+
+    function copyVaNumber() {
+      const text = document.getElementById("currentVaNumberDisplay").textContent.replace(/\s+/g, '');
+      navigator.clipboard.writeText(text);
+      showToast("Nomor VA berhasil disalin ke clipboard!");
+    }
+
+    function copyQrisCode() {
+      navigator.clipboard.writeText("https://payment.midtrans.com/qris/dynamic-payload?id=MID-98231");
+      showToast("Tautan pembayaran QRIS disalin!");
+    }
+
+    function copyStoreCode() {
+      const text = document.getElementById("storeCodeDisplay").textContent.trim();
+      navigator.clipboard.writeText(text);
+      showToast("Kode pembayaran gerai disalin!");
+    }
+
+    function selectEwalletMethod(cardEl, name) {
+      document.querySelectorAll("#pane-ewallet .shipping-option").forEach(c => {
+        c.classList.remove("selected");
+        const radio = c.querySelector('input[type="radio"]');
+        if (radio) radio.checked = false;
+      });
+      cardEl.classList.add("selected");
+      const radio = cardEl.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
+      currentPaymentMethod = "E-Wallet (" + name + ")";
+      document.getElementById("snapSelectedMethodBadge").textContent = currentPaymentMethod;
+      showToast(`Metode e-wallet ${name} dipilih`);
+    }
+
+    function selectStore(name, code, cardEl) {
+      document.querySelectorAll("#pane-store .shipping-option").forEach(c => {
+        c.classList.remove("selected");
+        const radio = c.querySelector('input[type="radio"]');
+        if (radio) radio.checked = false;
+      });
+      cardEl.classList.add("selected");
+      const radio = cardEl.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
+
+      document.getElementById("storeNameText").textContent = name;
+      document.getElementById("storeCodeDisplay").textContent = code;
+      currentPaymentMethod = "Gerai Retail " + name;
+      document.getElementById("snapSelectedMethodBadge").textContent = currentPaymentMethod;
+      showToast(`Gerai retail ${name} dipilih`);
+    }
+
+    // Credit Card Formatting Helpers
+    function formatCardNumber(input) {
+      let val = input.value.replace(/\D/g, '').substring(0, 16);
+      let formatted = val.match(/.{1,4}/g)?.join(' ') || val;
+      input.value = formatted;
+      document.getElementById("previewCardNumber").textContent = formatted || "•••• •••• •••• 4242";
+    }
+
+    function formatExpiry(input) {
+      let val = input.value.replace(/\D/g, '').substring(0, 4);
+      if (val.length >= 2) {
+        input.value = val.substring(0, 2) + '/' + val.substring(2);
+      } else {
+        input.value = val;
+      }
+      document.getElementById("previewCardExpiry").textContent = input.value || "12/28";
+    }
+
+    // QRIS Countdown Timer Simulation
+    function startQrisCountdown() {
+      let seconds = 14 * 60 + 59;
+      const el = document.getElementById("qrisCountdown");
+      setInterval(() => {
+        if (seconds <= 0) {
+          seconds = 15 * 60;
+        }
+        seconds--;
+        const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+        const s = String(seconds % 60).padStart(2, '0');
+        if (el) el.textContent = `${m}:${s}`;
+      }, 1000);
+    }
+
+    // Midtrans Snap Modal Controls
+    function triggerMidtransSnapModal() {
+      document.getElementById("snapModalOverlay").classList.add("open");
+      document.getElementById("snapSelectedMethodBadge").textContent = currentPaymentMethod;
+    }
+
+    function closeSnapModal() {
+      document.getElementById("snapModalOverlay").classList.remove("open");
+    }
+
+    function closeSnapModalOnBg(event) {
+      if (event.target === document.getElementById("snapModalOverlay")) {
+        closeSnapModal();
+      }
+    }
+
+    function executeSnapPaymentSimulation() {
+      closeSnapModal();
+      simulatePaymentSuccess(currentPaymentMethod);
+    }
+
+    // Simulate Payment Success (Final State with Orders & Cart Sync)
+    function simulatePaymentSuccess(methodName) {
+      const grandTotalNum = Math.max(0, subtotalAmount + selectedShippingRate + insuranceAmount - promoDiscount);
+      const grandTotalStr = fmt(grandTotalNum);
+
+      const now = new Date();
+      const dateStr = now.getFullYear().toString() +
+        (now.getMonth() + 1).toString().padStart(2, '0') +
+        now.getDate().toString().padStart(2, '0');
+      const randNum = Math.floor(Math.random() * 900 + 100);
+      const orderNo = `#ORD-${dateStr}-${randNum}`;
+
+      // Get actual current cart items for the order
+      let cart = (typeof CART !== 'undefined' && CART.length > 0)
+        ? CART
+        : JSON.parse(localStorage.getItem('eh_cart') || '[]');
+
+      if (!cart || cart.length === 0) {
+        cart = [
+          { id: 1, name: 'Samsung Smart TV 43" 4K UHD', price: 6499000, qty: 1, img: 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=400&q=80' },
+          { id: 8, name: 'Philips LED Smart Bulb 12W Wi-Fi', price: 249000, qty: 1, img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80' }
+        ];
+      }
+
+      const orderItems = cart.map(c => ({
+        name: c.name,
+        qty: c.qty,
+        price: c.price,
+        img: c.img
+      }));
+
+      const newOrder = {
+        id: Date.now(),
+        no_resi: orderNo,
+        tanggal_pesan: now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + `, ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`,
+        status_pesanan: "diproses", // Menampilkan status Diproses di orders.html
+        metode_pembayaran: "Midtrans (" + (methodName || currentPaymentMethod) + ")",
+        ekspedisi: { nama_ekspedisi: selectedShippingName + " (RajaOngkir)" },
+        ongkos_kirim: selectedShippingRate,
+        subtotal: subtotalAmount,
+        diskon: promoDiscount,
+        kode_voucher: appliedPromoCode || null,
+        total_bayar: grandTotalNum,
+        items: orderItems
+      };
+
+      // Save order to localStorage in exact format orders.html uses
+      try {
+        const orders = typeof getOrders === 'function' ? getOrders() : JSON.parse(localStorage.getItem('eh_orders') || '[]');
+        orders.unshift(newOrder);
+        if (typeof saveOrders === 'function') {
+          saveOrders(orders);
+        } else {
+          localStorage.setItem('eh_orders', JSON.stringify(orders));
+        }
+      } catch (e) {
+        console.error("Gagal menyimpan pesanan", e);
+      }
+
+      // Clear user cart after payment success
+      try {
+        if (typeof CART !== 'undefined') {
+          CART.length = 0;
+        }
+        if (typeof saveCart === 'function') {
+          saveCart();
+        } else {
+          localStorage.setItem('eh_cart', '[]');
+        }
+        if (typeof updateCartBadge === 'function') {
+          updateCartBadge();
+        }
+        localStorage.removeItem('eh_applied_voucher');
+      } catch (e) { }
+
+      // Populate and open success modal
+      document.getElementById("succOrderId").textContent = orderNo;
+      document.getElementById("succCourier").textContent = `${selectedShippingName} (RajaOngkir)`;
+      document.getElementById("succTotalPaid").textContent = grandTotalStr;
+
+      document.getElementById("successModalOverlay").classList.add("open");
+      showToast("Pembayaran berhasil diverifikasi Midtrans! Pesanan otomatis tersimpan di riwayat pesanan.");
+    }
+
+    // Load products from localStorage or use defaults
+    function initCartFromStorage() {
+      try {
+        let cart = (typeof CART !== 'undefined' && CART.length > 0)
+          ? CART
+          : JSON.parse(localStorage.getItem('eh_cart') || '[]');
+
+        if (!cart || cart.length === 0) {
+          cart = [
+            { id: 1, name: 'Samsung Smart TV 43" 4K UHD', price: 6499000, qty: 1, img: 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=400&q=80' },
+            { id: 8, name: 'Philips LED Smart Bulb 12W Wi-Fi', price: 249000, qty: 1, img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80' }
+          ];
+        }
+
+        const container = document.getElementById("summaryItemsContainer");
+        container.innerHTML = "";
+        let calculatedSubtotal = 0;
+        let totalWeightGrams = 0;
+
+        cart.forEach(item => {
+          const itemTotal = (item.price || 0) * (item.qty || 1);
+          calculatedSubtotal += itemTotal;
+          totalWeightGrams += (item.qty || 1) * 850; // estimate 850gr per item
+
+          const row = document.createElement("div");
+          row.className = "sum-item-row";
+          row.innerHTML = `
+              <img src="${item.img || 'https://images.unsplash.com/photo-1593784991095-a205069470b6?w=200&q=80'}" alt="${item.name}" class="sum-item-thumb">
+              <div class="sum-item-details">
+                <div class="sum-item-title">${item.name}</div>
+                <div class="sum-item-qty">${item.qty} x ${fmt(item.price)}</div>
+              </div>
+              <div class="sum-item-price">${fmt(itemTotal)}</div>
+            `;
+          container.appendChild(row);
+        });
+
+        subtotalAmount = calculatedSubtotal;
+        document.getElementById("sumSubtotal").textContent = fmt(subtotalAmount);
+        document.getElementById("summaryItemCount").textContent = `${cart.length} Barang`;
+        const roundedKg = Math.max(1, Math.ceil(totalWeightGrams / 1000));
+        document.getElementById("roTotalWeight").textContent = `${totalWeightGrams.toLocaleString('id-ID')} Gram (~${roundedKg} Kg)`;
+      } catch (e) { }
+      recalculateGrandTotal();
+    }
+
+    // Toast Helper
+    function showToast(message) {
+      const toast = document.getElementById("appToast");
+      const msg = document.getElementById("toastMsg");
+      if (!toast || !msg) return;
+
+      msg.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
+  </script>
+</body>
+
+</html>

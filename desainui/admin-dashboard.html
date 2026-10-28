@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Admin Dashboard – Elektronik Modern</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  .chart-bars{display:flex;align-items:flex-end;gap:6px;height:160px;padding:0 4px}
+  .bar-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
+  .bar-fill{width:100%;border-radius:6px 6px 0 0;min-height:4px;transition:.3s}
+  .bar-label{font-size:10px;color:var(--g400);font-weight:600}
+  .report-form{display:flex;align-items:center;gap:8px;background:#fff;padding:6px;border-radius:12px;border:1px solid var(--g200);box-shadow:var(--sh)}
+  .report-form select{background:transparent;border:none;font-size:12px;font-weight:700;color:var(--g700);outline:none;padding:4px 8px;font-family:var(--font)}
+  .report-form button{background:var(--blue);color:#fff;padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;font-family:var(--font);display:flex;align-items:center;gap:6px;transition:.2s}
+  .report-form button:hover{background:var(--blue-d)}
+  .date-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:#fff;border:1px solid var(--g200);border-radius:12px;font-size:13px;font-weight:700;color:var(--g700);box-shadow:var(--sh)}
+</style>
+</head>
+<body>
+<div class="admin-layout">
+  <div class="sidebar">
+    <div class="sidebar-brand"><div class="sidebar-brand-name"><i class="fi fi-rr-bolt" style="color:var(--blue)"></i> Elektronik Modern</div><div class="sidebar-brand-role">Panel Admin</div></div>
+    <div class="s-group">Menu Utama</div>
+    <a href="admin-dashboard.html" class="s-item active"><span class="si"><i class="fi fi-rr-chart-pie"></i></span> Dashboard</a>
+    <a href="admin-products.html" class="s-item"><span class="si"><i class="fi fi-rr-box"></i></span> Kelola Produk</a>
+    <a href="admin-categories.html" class="s-item"><span class="si"><i class="fi fi-rr-apps"></i></span> Kelola Kategori</a>
+    <a href="admin-promos.html" class="s-item"><span class="si"><i class="fi fi-rr-ticket"></i></span> Kelola Promo</a>
+    <a href="admin-orders.html" class="s-item"><span class="si"><i class="fi fi-rr-receipt"></i></span> Kelola Pesanan</a>
+    <a href="admin-users.html" class="s-item"><span class="si"><i class="fi fi-rr-users"></i></span> Kelola Customer</a>
+    <div class="s-group">Akun</div>
+    <a href="login.html" class="s-item"><span class="si"><i class="fi fi-rr-sign-out-alt"></i></span> Keluar</a>
+  </div>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div>
+        <div style="font-size:13px;color:var(--g500);margin-bottom:2px">Selamat datang kembali,</div>
+        <div class="page-title">Dashboard Admin</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <div class="report-form">
+          <select><option>January</option><option>February</option><option>March</option><option>April</option><option>May</option><option selected>June</option><option>July</option><option>August</option><option>September</option><option>October</option><option>November</option><option>December</option></select>
+          <select><option>2024</option><option>2025</option><option selected>2026</option></select>
+          <button><i class="fi fi-rr-download"></i> Laporan PDF</button>
+        </div>
+        <span class="date-badge"><i class="fi fi-rr-calendar" style="margin-right: 4px"></i> 12 Jun 2026</span>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-ico blue"><i class="fi fi-rr-box"></i></div><div><div class="stat-label">Total Produk</div><div class="stat-val">247</div></div></div>
+      <div class="stat-card"><div class="stat-ico green"><i class="fi fi-rr-users"></i></div><div><div class="stat-label">Total Customer</div><div class="stat-val">1.842</div></div></div>
+      <div class="stat-card"><div class="stat-ico warn"><i class="fi fi-rr-clock-three"></i></div><div><div class="stat-label">Perlu Konfirmasi</div><div class="stat-val">14</div><div class="stat-chg" style="color:var(--warn)">Pesanan tertunda</div></div></div>
+      <div class="stat-card"><div class="stat-ico teal"><i class="fi fi-rr-checkbox"></i></div><div><div class="stat-label">Pesanan Selesai</div><div class="stat-val">156</div></div></div>
+    </div>
+
+    <!-- Charts -->
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px">
+      <div class="data-card">
+        <div class="data-card-head">
+          <h3><i class="fi fi-rr-chart-histogram" style="margin-right: 6px"></i> Pesanan 7 Hari Terakhir</h3>
+          <span class="badge badge-info" style="font-size:11px;padding:4px 10px">38 pesanan</span>
+        </div>
+        <div style="padding:20px">
+          <div class="chart-bars">
+            <div class="bar-wrap"><div class="bar-fill" style="height:55%;background:var(--blue)"></div><div class="bar-label">Sen</div></div>
+            <div class="bar-wrap"><div class="bar-fill" style="height:72%;background:var(--blue)"></div><div class="bar-label">Sel</div></div>
+            <div class="bar-wrap"><div class="bar-fill" style="height:48%;background:var(--blue)"></div><div class="bar-label">Rab</div></div>
+            <div class="bar-wrap"><div class="bar-fill" style="height:83%;background:var(--blue)"></div><div class="bar-label">Kam</div></div>
+            <div class="bar-wrap"><div class="bar-fill" style="height:91%;background:var(--blue)"></div><div class="bar-label">Jum</div></div>
+            <div class="bar-wrap"><div class="bar-fill" style="height:65%;background:var(--g300)"></div><div class="bar-label">Sab</div></div>
+            <div class="bar-wrap"><div class="bar-fill" style="height:38%;background:var(--g300)"></div><div class="bar-label">Min</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="data-card">
+        <div class="data-card-head"><h3><i class="fi fi-rr-box" style="margin-right: 6px"></i> Status Pesanan</h3></div>
+        <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
+          <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span style="font-weight:600;color:var(--g600)">Menunggu</span><strong>14</strong></div><div style="height:6px;background:var(--g100);border-radius:3px"><div style="width:20%;height:100%;background:var(--warn);border-radius:3px"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span style="font-weight:600;color:var(--g600)">Diproses</span><strong>22</strong></div><div style="height:6px;background:var(--g100);border-radius:3px"><div style="width:32%;height:100%;background:var(--blue);border-radius:3px"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span style="font-weight:600;color:var(--g600)">Dikirim</span><strong>31</strong></div><div style="height:6px;background:var(--g100);border-radius:3px"><div style="width:45%;height:100%;background:var(--pend);border-radius:3px"></div></div></div>
+          <div><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span style="font-weight:600;color:var(--g600)">Selesai</span><strong>156</strong></div><div style="height:6px;background:var(--g100);border-radius:3px"><div style="width:85%;height:100%;background:var(--success);border-radius:3px"></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="data-card">
+      <div class="data-card-head">
+        <h3><i class="fi fi-rr-receipt" style="margin-right:8px;color:var(--blue)"></i>Pesanan Terbaru</h3>
+        <a href="admin-orders.html" class="btn btn-outline btn-sm">Lihat Semua →</a>
+      </div>
+      <table>
+        <thead><tr><th>No. Resi</th><th>Pelanggan</th><th>Total</th><th>Status</th><th>Aksi</th></tr></thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:800;font-size:14px">#ORD-001</td>
+            <td style="font-weight:600;color:var(--g700);font-size:13px">Budi Santoso</td>
+            <td style="font-weight:800;color:var(--blue);font-family:'Syne',sans-serif;font-size:15px">Rp 6.499.000</td>
+            <td><span class="badge badge-warn" style="padding:4px 10px;font-size:10px;letter-spacing:.05em;text-transform:uppercase">Menunggu</span></td>
+            <td><button class="btn-edit">Proses →</button></td>
+          </tr>
+          <tr>
+            <td style="font-weight:800;font-size:14px">#ORD-002</td>
+            <td style="font-weight:600;color:var(--g700);font-size:13px">Siti Rahayu</td>
+            <td style="font-weight:800;color:var(--blue);font-family:'Syne',sans-serif;font-size:15px">Rp 5.199.000</td>
+            <td><span class="badge badge-info" style="padding:4px 10px;font-size:10px;letter-spacing:.05em;text-transform:uppercase">Diproses</span></td>
+            <td><button class="btn-edit">Kirim →</button></td>
+          </tr>
+          <tr>
+            <td style="font-weight:800;font-size:14px">#ORD-003</td>
+            <td style="font-weight:600;color:var(--g700);font-size:13px">Ahmad Fauzi</td>
+            <td style="font-weight:800;color:var(--blue);font-family:'Syne',sans-serif;font-size:15px">Rp 7.700.000</td>
+            <td><span class="badge badge-pend" style="padding:4px 10px;font-size:10px;letter-spacing:.05em;text-transform:uppercase">Dikirim</span></td>
+            <td><span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--success);background:var(--sl);padding:6px 12px;border-radius:8px"><i class="fi fi-rr-check"></i> —</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:800;font-size:14px">#ORD-004</td>
+            <td style="font-weight:600;color:var(--g700);font-size:13px">Dewi Lestari</td>
+            <td style="font-weight:800;color:var(--blue);font-family:'Syne',sans-serif;font-size:15px">Rp 4.299.000</td>
+            <td><span class="badge badge-success" style="padding:4px 10px;font-size:10px;letter-spacing:.05em;text-transform:uppercase">Selesai</span></td>
+            <td><span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--success);background:var(--sl);padding:6px 12px;border-radius:8px"><i class="fi fi-rr-check"></i> Selesai</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>

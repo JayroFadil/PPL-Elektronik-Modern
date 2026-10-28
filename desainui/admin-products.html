@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Kelola Produk – Admin Elektronik Modern</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  .add-form{background:#fff;border-radius:16px;box-shadow:var(--sh);overflow:hidden;margin-bottom:24px}
+  .add-form-head{padding:18px 20px;border-bottom:1px solid var(--g100);display:flex;align-items:center;gap:8px;font-weight:800;font-size:15px}
+  .add-form-head i{color:var(--blue)}
+  .add-form-body{padding:20px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px}
+  .f-label{display:block;font-size:11px;font-weight:800;color:var(--g700);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+  .f-input{width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:10px;font-family:var(--font);font-size:13px;font-weight:600;color:var(--g800);background:var(--g50);outline:none;transition:.2s}
+  .f-input:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 4px rgba(26,92,255,.08)}
+  .f-textarea{resize:vertical;min-height:80px}
+  .harga-wrap{position:relative}
+  .harga-wrap .rp{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:700;color:var(--g500)}
+  .harga-wrap .f-input{padding-left:36px}
+  .btn-save{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:var(--font);cursor:pointer;box-shadow:0 4px 12px rgba(26,92,255,.3);transition:.2s}
+  .btn-save:hover{background:var(--blue-d);transform:translateY(-1px)}
+  .file-input{font-size:12px}
+</style>
+</head>
+<body>
+<div class="admin-layout">
+  <div class="sidebar">
+    <div class="sidebar-brand"><div class="sidebar-brand-name"><i class="fi fi-rr-bolt" style="color:var(--blue)"></i> Elektronik Modern</div><div class="sidebar-brand-role">Panel Admin</div></div>
+    <div class="s-group">Menu Utama</div>
+    <a href="admin-dashboard.html" class="s-item"><span class="si"><i class="fi fi-rr-chart-pie"></i></span> Dashboard</a>
+    <a href="admin-products.html" class="s-item active"><span class="si"><i class="fi fi-rr-box"></i></span> Kelola Produk</a>
+    <a href="admin-categories.html" class="s-item"><span class="si"><i class="fi fi-rr-apps"></i></span> Kelola Kategori</a>
+    <a href="admin-promos.html" class="s-item"><span class="si"><i class="fi fi-rr-ticket"></i></span> Kelola Promo</a>
+    <a href="admin-orders.html" class="s-item"><span class="si"><i class="fi fi-rr-receipt"></i></span> Kelola Pesanan</a>
+    <a href="admin-users.html" class="s-item"><span class="si"><i class="fi fi-rr-users"></i></span> Kelola Customer</a>
+    <div class="s-group">Akun</div>
+    <a href="login.html" class="s-item"><span class="si"><i class="fi fi-rr-sign-out-alt"></i></span> Keluar</a>
+  </div>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div class="page-title">Kelola Produk</div>
+    </div>
+
+    <!-- Add Product Form -->
+    <div class="add-form">
+      <div class="add-form-head"><i class="fi fi-rr-plus" style="margin-right:6px"></i> Tambah Produk</div>
+      <div class="add-form-body">
+        <div class="grid-2">
+          <div><label class="f-label">Nama Produk</label><input class="f-input" placeholder="Masukkan nama produk..."></div>
+          <div><label class="f-label">Kategori</label><select class="f-input" id="newProdCategory"><option>Pilih kategori</option><option>Smart TV</option><option>Kulkas</option><option>AC / Pendingin</option><option>Mesin Cuci</option><option>Dapur</option><option>Penerangan</option></select></div>
+        </div>
+        <div class="grid-3">
+          <div><label class="f-label">Harga</label><div class="harga-wrap"><span class="rp">Rp</span><input type="number" class="f-input" placeholder="0"></div></div>
+          <div><label class="f-label">Stok</label><input type="number" class="f-input" placeholder="0"></div>
+          <div><label class="f-label">Gambar Produk</label><input type="file" class="f-input file-input" accept="image/*"></div>
+        </div>
+        <div style="margin-bottom:16px"><label class="f-label">Deskripsi</label><textarea class="f-input f-textarea" placeholder="Deskripsi produk..."></textarea></div>
+        <button class="btn-save"><i class="fi fi-rr-checkbox" style="margin-right:6px"></i> Simpan Produk</button>
+      </div>
+    </div>
+
+    <!-- Product Table -->
+    <div class="data-card">
+      <div class="data-card-head">
+        <h3><i class="fi fi-rr-box" style="margin-right:6px"></i> Daftar Produk</h3>
+      </div>
+      <table>
+        <thead><tr><th>ID</th><th>Produk</th><th>Kategori</th><th>Harga</th><th>Stok</th><th>Status</th><th style="text-align:right">Aksi</th></tr></thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--g400);font-size:12px;font-weight:700">#P001</td>
+            <td><div style="display:flex;align-items:center;gap:10px"><div style="width:44px;height:44px;border-radius:8px;background:#fff;border:1px solid var(--g100);padding:2px;display:flex;align-items:center;justify-content:center"><img src="https://images.unsplash.com/photo-1593784991095-a205069470b6?w=60&q=70" style="width:100%;height:100%;object-fit:contain"></div><span style="font-weight:700;font-size:13px">Samsung Smart TV 43" 4K</span></div></td>
+            <td><span class="badge badge-info" style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px">Smart TV</span></td>
+            <td style="font-weight:800;font-family:'Syne',sans-serif;font-size:14px">Rp 6.499.000</td>
+            <td><span class="badge badge-success" style="font-size:11px;letter-spacing:.05em;padding:4px 10px">12 unit</span></td>
+            <td><span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--success)"><span style="width:8px;height:8px;border-radius:50%;background:var(--success)"></span> Aktif</span></td>
+            <td style="text-align:right"><div style="display:flex;gap:6px;justify-content:flex-end"><button class="btn-edit" title="Edit"><i class="fi fi-rr-edit"></i></button><button class="btn-del" title="Hapus"><i class="fi fi-rr-trash"></i></button></div></td>
+          </tr>
+          <tr>
+            <td style="color:var(--g400);font-size:12px;font-weight:700">#P002</td>
+            <td><div style="display:flex;align-items:center;gap:10px"><div style="width:44px;height:44px;border-radius:8px;background:#fff;border:1px solid var(--g100);padding:2px;display:flex;align-items:center;justify-content:center"><img src="https://images.unsplash.com/photo-1571175443880-49e1d25b2bc5?w=60&q=70" style="width:100%;height:100%;object-fit:contain"></div><span style="font-weight:700;font-size:13px">LG Kulkas 2 Pintu 380L</span></div></td>
+            <td><span class="badge badge-info" style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px">Kulkas</span></td>
+            <td style="font-weight:800;font-family:'Syne',sans-serif;font-size:14px">Rp 5.199.000</td>
+            <td><span class="badge badge-warn" style="font-size:11px;letter-spacing:.05em;padding:4px 10px">8 unit</span></td>
+            <td><span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--success)"><span style="width:8px;height:8px;border-radius:50%;background:var(--success)"></span> Aktif</span></td>
+            <td style="text-align:right"><div style="display:flex;gap:6px;justify-content:flex-end"><button class="btn-edit" title="Edit"><i class="fi fi-rr-edit"></i></button><button class="btn-del" title="Hapus"><i class="fi fi-rr-trash"></i></button></div></td>
+          </tr>
+          <tr>
+            <td style="color:var(--g400);font-size:12px;font-weight:700">#P003</td>
+            <td><div style="display:flex;align-items:center;gap:10px"><div style="width:44px;height:44px;border-radius:8px;background:#fff;border:1px solid var(--g100);padding:2px;display:flex;align-items:center;justify-content:center"><img src="https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?w=60&q=70" style="width:100%;height:100%;object-fit:contain"></div><span style="font-weight:700;font-size:13px">Panasonic Mesin Cuci 7KG</span></div></td>
+            <td><span class="badge badge-info" style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px">Mesin Cuci</span></td>
+            <td style="font-weight:800;font-family:'Syne',sans-serif;font-size:14px">Rp 4.299.000</td>
+            <td><span class="badge badge-warn" style="font-size:11px;letter-spacing:.05em;padding:4px 10px">5 unit</span></td>
+            <td><span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--success)"><span style="width:8px;height:8px;border-radius:50%;background:var(--success)"></span> Aktif</span></td>
+            <td style="text-align:right"><div style="display:flex;gap:6px;justify-content:flex-end"><button class="btn-edit" title="Edit"><i class="fi fi-rr-edit"></i></button><button class="btn-del" title="Hapus"><i class="fi fi-rr-trash"></i></button></div></td>
+          </tr>
+          <tr>
+            <td style="color:var(--g400);font-size:12px;font-weight:700">#P005</td>
+            <td><div style="display:flex;align-items:center;gap:10px"><div style="width:44px;height:44px;border-radius:8px;background:#fff;border:1px solid var(--g100);padding:2px;display:flex;align-items:center;justify-content:center"><img src="https://images.unsplash.com/photo-1509281373149-e957c6296406?w=60&q=70" style="width:100%;height:100%;object-fit:contain"></div><span style="font-weight:700;font-size:13px">Sony BRAVIA 55" OLED</span></div></td>
+            <td><span class="badge badge-info" style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px">Smart TV</span></td>
+            <td style="font-weight:800;font-family:'Syne',sans-serif;font-size:14px">Rp 14.999.000</td>
+            <td><span class="badge badge-danger" style="font-size:11px;letter-spacing:.05em;padding:4px 10px">0 unit</span></td>
+            <td><span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:var(--danger)"><span style="width:8px;height:8px;border-radius:50%;background:var(--danger)"></span> Habis</span></td>
+            <td style="text-align:right"><div style="display:flex;gap:6px;justify-content:flex-end"><button class="btn-edit" title="Edit"><i class="fi fi-rr-edit"></i></button><button class="btn-del" title="Hapus"><i class="fi fi-rr-trash"></i></button></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<script src="shared.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const selectEl = document.getElementById('newProdCategory');
+    if (selectEl) {
+      const cats = getCategories();
+      selectEl.innerHTML = '<option value="">Pilih kategori</option>' + 
+        cats.map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+    }
+  });
+</script>
+</body>
+</html>

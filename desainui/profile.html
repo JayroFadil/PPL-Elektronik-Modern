@@ -1,0 +1,1408 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Profil Saya – Elektronik Modern</title>
+    <link rel="stylesheet" href="shared.css" />
+    <style>
+      /* ===== LAYOUT ===== */
+      .profile-layout {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        gap: 24px;
+        padding: 32px 0 64px;
+        align-items: start;
+      }
+      .profile-sidebar {
+        background: #fff;
+        border-radius: var(--rlg);
+        box-shadow: var(--sh);
+        overflow: hidden;
+        position: sticky;
+        top: 84px;
+      }
+      .profile-avatar-section {
+        padding: 28px 20px;
+        text-align: center;
+        background: linear-gradient(135deg, #0f2060, #1a5cff);
+        position: relative;
+      }
+      .avatar-circle {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        border: 3px solid rgba(255, 255, 255, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Syne", sans-serif;
+        font-size: 28px;
+        font-weight: 800;
+        color: #fff;
+        margin: 0 auto 14px;
+      }
+      .profile-user-name {
+        font-family: "Syne", sans-serif;
+        font-size: 17px;
+        font-weight: 800;
+        color: #fff;
+        margin-bottom: 3px;
+      }
+      .profile-user-email {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+      }
+      .profile-joined {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(255, 255, 255, 0.15);
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 50px;
+        margin-top: 8px;
+      }
+      .profile-nav {
+        padding: 8px 0;
+      }
+      .pnav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 20px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--g600);
+        transition: 0.15s;
+        text-decoration: none;
+        border-left: 3px solid transparent;
+      }
+      .pnav-item:hover {
+        background: var(--g50);
+        color: var(--g900);
+      }
+      .pnav-item.active {
+        background: var(--blue-l);
+        color: var(--blue);
+        border-left-color: var(--blue);
+      }
+      .pnav-icon {
+        font-size: 18px;
+        width: 22px;
+        text-align: center;
+      }
+      .pnav-badge {
+        margin-left: auto;
+        background: var(--blue);
+        color: #fff;
+        border-radius: 50px;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 7px;
+      }
+
+      /* ===== CONTENT PANELS ===== */
+      .profile-panel {
+        display: none;
+      }
+      .profile-panel.active {
+        display: block;
+      }
+      .panel-card {
+        background: #fff;
+        border-radius: var(--rlg);
+        box-shadow: var(--sh);
+        overflow: hidden;
+        margin-bottom: 20px;
+      }
+      .panel-head {
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--g100);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .panel-head h2 {
+        font-family: "Syne", sans-serif;
+        font-size: 18px;
+        font-weight: 800;
+        color: var(--g900);
+      }
+      .panel-head p {
+        font-size: 13px;
+        color: var(--g400);
+        margin-top: 2px;
+      }
+      .panel-body {
+        padding: 24px;
+      }
+
+      /* ===== ADDRESS CARDS ===== */
+      .address-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .addr-card {
+        background: #fff;
+        border: 2px solid var(--g200);
+        border-radius: var(--rlg);
+        padding: 20px;
+        position: relative;
+        transition: 0.2s;
+      }
+      .addr-card.default {
+        border-color: var(--blue);
+        background: var(--blue-l);
+      }
+      .addr-card:hover {
+        border-color: var(--g300);
+        box-shadow: var(--sh);
+      }
+      .addr-card.default:hover {
+        border-color: var(--blue-d);
+      }
+      .addr-label-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .addr-label {
+        font-size: 12px;
+        font-weight: 800;
+        background: var(--g100);
+        color: var(--g600);
+        padding: 3px 10px;
+        border-radius: 50px;
+        letter-spacing: 0.03em;
+      }
+      .addr-card.default .addr-label {
+        background: var(--blue);
+        color: #fff;
+      }
+      .addr-default-badge {
+        font-size: 11px;
+        font-weight: 700;
+        background: rgba(26, 92, 255, 0.12);
+        color: var(--blue);
+        padding: 3px 10px;
+        border-radius: 50px;
+        margin-left: auto;
+      }
+      .addr-name {
+        font-weight: 800;
+        font-size: 14px;
+        color: var(--g900);
+        margin-bottom: 3px;
+      }
+      .addr-phone {
+        font-size: 13px;
+        color: var(--g500);
+        margin-bottom: 10px;
+      }
+      .addr-street {
+        font-size: 13px;
+        color: var(--g700);
+        line-height: 1.6;
+        margin-bottom: 10px;
+      }
+      .addr-region {
+        font-size: 12px;
+        color: var(--g400);
+        font-weight: 600;
+      }
+      .addr-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px solid var(--g200);
+      }
+      .addr-card.default .addr-actions {
+        border-top-color: rgba(26, 92, 255, 0.15);
+      }
+      .btn-addr-edit {
+        background: var(--blue-l);
+        color: var(--blue);
+        border: none;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        transition: 0.15s;
+      }
+      .btn-addr-edit:hover {
+        background: var(--blue);
+        color: #fff;
+      }
+      .btn-addr-del {
+        background: var(--dl);
+        color: var(--danger);
+        border: none;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        transition: 0.15s;
+      }
+      .btn-addr-del:hover {
+        background: var(--danger);
+        color: #fff;
+      }
+      .btn-addr-default {
+        background: var(--g100);
+        color: var(--g500);
+        border: none;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        transition: 0.15s;
+        margin-left: auto;
+      }
+      .btn-addr-default:hover {
+        background: var(--sl);
+        color: var(--success);
+      }
+      .add-addr-card {
+        border: 2px dashed var(--g300);
+        border-radius: var(--rlg);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 200px;
+        cursor: pointer;
+        transition: 0.2s;
+        color: var(--g400);
+        text-align: center;
+      }
+      .add-addr-card:hover {
+        border-color: var(--blue);
+        color: var(--blue);
+        background: var(--blue-l);
+      }
+      .add-addr-icon {
+        font-size: 36px;
+        margin-bottom: 10px;
+      }
+      .add-addr-text {
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .add-addr-sub {
+        font-size: 12px;
+      }
+
+      /* ===== MODAL ===== */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(10, 15, 30, 0.55);
+        z-index: 1000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        backdrop-filter: blur(4px);
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+      .modal {
+        background: #fff;
+        border-radius: var(--rxl);
+        box-shadow: var(--sh-lg);
+        width: 100%;
+        max-width: 560px;
+        max-height: 90vh;
+        overflow-y: auto;
+        animation: modalIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      @keyframes modalIn {
+        from {
+          transform: scale(0.92) translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1) translateY(0);
+          opacity: 1;
+        }
+      }
+      .modal-head {
+        padding: 24px 28px 0;
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+      }
+      .modal-title {
+        font-family: "Syne", sans-serif;
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--g900);
+        margin-bottom: 3px;
+      }
+      .modal-sub {
+        font-size: 13px;
+        color: var(--g400);
+      }
+      .modal-close {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--g100);
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--g500);
+        transition: 0.2s;
+        flex-shrink: 0;
+      }
+      .modal-close:hover {
+        background: var(--g200);
+        color: var(--g900);
+      }
+      .modal-body {
+        padding: 24px 28px;
+      }
+      .form-grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+      .form-grid-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 14px;
+      }
+      .modal-footer {
+        padding: 0 28px 24px;
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+      }
+      .default-toggle {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px;
+        background: var(--g50);
+        border-radius: var(--radius);
+        cursor: pointer;
+        margin-bottom: 4px;
+      }
+      .toggle-switch {
+        width: 44px;
+        height: 24px;
+        background: var(--g300);
+        border-radius: 50px;
+        position: relative;
+        transition: 0.2s;
+        flex-shrink: 0;
+      }
+      .toggle-switch.on {
+        background: var(--blue);
+      }
+      .toggle-knob {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 18px;
+        height: 18px;
+        background: #fff;
+        border-radius: 50%;
+        transition: 0.2s;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+      .toggle-switch.on .toggle-knob {
+        left: 23px;
+      }
+      .toggle-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--g700);
+      }
+      .toggle-sub {
+        font-size: 12px;
+        color: var(--g400);
+      }
+
+      /* ===== DELETE CONFIRM MODAL ===== */
+      .confirm-modal {
+        background: #fff;
+        border-radius: var(--rxl);
+        box-shadow: var(--sh-lg);
+        width: 100%;
+        max-width: 400px;
+        padding: 32px;
+        text-align: center;
+        animation: modalIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+      .confirm-icon {
+        font-size: 52px;
+        margin-bottom: 16px;
+      }
+      .confirm-title {
+        font-family: "Syne", sans-serif;
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--g900);
+        margin-bottom: 8px;
+      }
+      .confirm-text {
+        font-size: 14px;
+        color: var(--g500);
+        line-height: 1.7;
+        margin-bottom: 24px;
+      }
+      .confirm-btns {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+      }
+
+      /* ===== TOAST ===== */
+      .profile-toast {
+        position: fixed;
+        bottom: 32px;
+        left: 50%;
+        transform: translateX(-50%) translateY(80px);
+        background: var(--dark);
+        color: #fff;
+        padding: 14px 24px;
+        border-radius: 50px;
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        z-index: 2000;
+        box-shadow: var(--sh-lg);
+        opacity: 0;
+        transition: 0.3s;
+        white-space: nowrap;
+        pointer-events: none;
+      }
+      .profile-toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      /* ===== INFO PANEL ===== */
+      .info-row {
+        display: flex;
+        align-items: center;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--g100);
+      }
+      .info-row:last-child {
+        border-bottom: none;
+      }
+      .info-key {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--g500);
+        width: 140px;
+        flex-shrink: 0;
+      }
+      .info-val {
+        font-size: 14px;
+        color: var(--g800);
+        font-weight: 600;
+      }
+      .info-locked {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--g400);
+        margin-left: auto;
+        background: var(--g100);
+        padding: 4px 10px;
+        border-radius: 50px;
+      }
+
+      /* ===== QUICK STATS ===== */
+      .quick-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-bottom: 20px;
+      }
+      .qs-card {
+        background: #fff;
+        border-radius: var(--rlg);
+        box-shadow: var(--sh);
+        padding: 20px;
+        text-align: center;
+      }
+      .qs-num {
+        font-family: "Syne", sans-serif;
+        font-size: 28px;
+        font-weight: 800;
+        margin-bottom: 4px;
+      }
+      .qs-label {
+        font-size: 12px;
+        color: var(--g400);
+        font-weight: 600;
+      }
+
+      @media (max-width: 900px) {
+        .profile-layout {
+          grid-template-columns: 1fr;
+        }
+        .profile-sidebar {
+          position: static;
+        }
+        .address-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button type="button" class="burger-btn" id="mobileMenuBtn">
+          <i class="fi fi-rr-menu-burger" id="mobileMenuIcon"></i>
+        </button>
+        <a href="index.html" class="nav-logo">
+          <i class="fi fi-rr-bolt"></i>
+          <span>Elektronik<span>Modern</span></span>
+        </a>
+      </div>
+
+      <div class="nav-search">
+        <span class="search-icon"><i class="fi fi-rr-search"></i></span>
+        <input type="text" placeholder="Cari produk elektronik..." onkeydown="handleSearch(this, event)" />
+      </div>
+
+      <!-- Mobile Search Slide Panel -->
+      <div id="mobileSearchBar" class="mobile-search-bar">
+        <button onclick="toggleMobileSearch()" class="nav-icon-btn" style="background:none"><i class="fi fi-rr-angle-small-left"></i></button>
+        <div style="flex:1;position:relative">
+          <span class="search-icon" style="left:12px"><i class="fi fi-rr-search"></i></span>
+          <input type="text" placeholder="Cari produk..." id="mobileSearchInput" onkeydown="handleSearch(this, event)" style="padding-left:40px">
+        </div>
+      </div>
+
+      <div class="nav-right">
+        <button class="nav-icon-btn mobile-search-trigger" onclick="toggleMobileSearch()" style="display:none">
+          <i class="fi fi-rr-search"></i>
+        </button>
+        <button class="nav-icon-btn" onclick="toggleNotifPanel()" title="Notifikasi">
+          <i class="fi fi-rr-bell"></i>
+          <span class="notif-badge" id="notifBadgeNav">2</span>
+        </button>
+        <a href="cart.html" class="nav-icon-btn" title="Keranjang">
+          <i class="fi fi-rr-shopping-cart"></i>
+          <span class="cart-badge" id="cartBadgeNav">0</span>
+        </a>
+        <a href="orders.html" class="nav-icon-btn desktop-only" title="Pesanan Saya">
+          <i class="fi fi-rr-box"></i>
+        </a>
+        <a href="profile.html" class="nav-icon-btn desktop-only" title="Profil Saya">
+          <i class="fi fi-rr-user"></i>
+        </a>
+        <div class="desktop-only" style="display:flex;gap:8px">
+          <a href="login.html" class="btn btn-outline btn-sm">Masuk</a>
+          <a href="register.html" class="btn btn-primary btn-sm">Daftar</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- NOTIFICATION DROPDOWN PANEL -->
+    <div class="notif-overlay" id="notifOverlay" onclick="closeNotifPanel()"></div>
+    <div class="notif-panel" id="notifPanel">
+      <div class="notif-pheader">
+        <div>
+          <h4 style="font-weight:800;font-size:15px;color:var(--g900)">Notifikasi</h4>
+          <p style="font-size:11px;color:var(--g400);font-weight:600;margin-top:2px">Info terbaru akun Anda</p>
+        </div>
+        <button class="notif-mark" onclick="markNotificationsRead()">Tandai Dibaca</button>
+      </div>
+      <div class="notif-list" id="notifList"></div>
+    </div>
+
+    <!-- MOBILE DRAWER SIDEBAR -->
+    <div id="mobileMenuOverlay" class="mobile-menu-overlay" onclick="toggleMobileMenu()"></div>
+    <div id="mobileMenu" class="mobile-menu">
+      <div class="mobile-menu-header">
+        <a href="index.html" class="nav-logo" style="font-size:18px">
+          <i class="fi fi-rr-bolt"></i>
+          <span>Elektronik<span>Modern</span></span>
+        </a>
+        <button onclick="toggleMobileMenu()" style="background:none;border:none;font-size:20px;color:var(--g400);cursor:pointer">✕</button>
+      </div>
+      <div class="mobile-menu-user">
+        <div class="m-avatar">BS</div>
+        <div class="m-user-info">
+          <div class="m-user-name">Budi Santoso</div>
+          <div class="m-user-email">budi.s@email.com</div>
+        </div>
+      </div>
+      <div class="m-group-title">Menu Utama</div>
+      <div class="mobile-menu-list">
+        <a href="index.html" class="m-item"><i class="fi fi-rr-home"></i> Beranda</a>
+        <a href="products.html" class="m-item"><i class="fi fi-rr-shopping-bag"></i> Katalog Produk</a>
+      </div>
+      <div class="m-group-title">Akun Saya</div>
+      <div class="mobile-menu-list">
+        <a href="profile.html" class="m-item"><i class="fi fi-rr-user"></i> Profil Saya</a>
+        <a href="orders.html" class="m-item"><i class="fi fi-rr-box"></i> Pesanan Saya</a>
+        <a href="#" class="m-item"><i class="fi fi-rr-heart"></i> Wishlist</a>
+      </div>
+      <div style="border-top:1px solid var(--g100);padding-top:16px;margin-top:16px">
+        <a href="login.html" class="m-item" style="color:var(--danger)"><i class="fi fi-rr-sign-out-alt"></i> Keluar Akun</a>
+      </div>
+    </div>
+
+    <!-- PROFILE TOAST -->
+    <div class="profile-toast" id="profileToast"></div>
+
+    <!-- MAIN CONTENT -->
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">Home</a> › Profil Saya</div>
+      <div class="profile-layout">
+        <!-- SIDEBAR -->
+        <div class="profile-sidebar">
+          <div class="profile-avatar-section">
+            <div class="avatar-circle" id="sidebarAvatar">BS</div>
+            <div class="profile-user-name" id="sidebarName">Budi Santoso</div>
+            <div class="profile-user-email" id="sidebarEmail">
+              budi.s@email.com
+            </div>
+            <div class="profile-joined"><i class="fi fi-rr-calendar" style="margin-right:4px"></i> Bergabung November 2024</div>
+          </div>
+          <nav class="profile-nav">
+            <a
+              href="#"
+              class="pnav-item active"
+              onclick="switchPanel('overview', this)"
+            >
+              <span class="pnav-icon"><i class="fi fi-rr-home"></i></span> Ikhtisar Akun
+            </a>
+            <a
+              href="#"
+              class="pnav-item"
+              onclick="switchPanel('addresses', this)"
+            >
+              <span class="pnav-icon"><i class="fi fi-rr-marker"></i></span> Alamat Pengiriman
+              <span class="pnav-badge" id="addrCountBadge">0</span>
+            </a>
+            <a href="orders.html" class="pnav-item">
+              <span class="pnav-icon"><i class="fi fi-rr-clipboard-list"></i></span> Riwayat Pesanan
+            </a>
+            <a href="login.html" class="pnav-item" style="color: var(--danger)">
+              <span class="pnav-icon"><i class="fi fi-rr-exit"></i></span> Keluar
+            </a>
+          </nav>
+        </div>
+
+        <!-- CONTENT -->
+        <div>
+          <!-- PANEL: OVERVIEW -->
+          <div class="profile-panel active" id="panel-overview">
+            <div class="quick-stats">
+              <div class="qs-card">
+                <div class="qs-num" style="color: var(--blue)">4</div>
+                <div class="qs-label">Total Pesanan</div>
+              </div>
+              <div class="qs-card">
+                <div class="qs-num" style="color: var(--success)">1</div>
+                <div class="qs-label">Selesai</div>
+              </div>
+              <div class="qs-card">
+                <div
+                  class="qs-num"
+                  id="overviewAddrCount"
+                  style="color: var(--teal)"
+                >
+                  0
+                </div>
+                <div class="qs-label">Alamat Tersimpan</div>
+              </div>
+            </div>
+            <div class="panel-card">
+              <div class="panel-head">
+                <div>
+                  <h2>Informasi Akun</h2>
+                  <p>Ubah data profil akun Anda di sini</p>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div class="form-group" style="margin-bottom: 14px">
+                  <label class="info-key">Nama Lengkap</label>
+                  <input
+                    type="text"
+                    id="editName"
+                    placeholder="Nama lengkap Anda..."
+                  />
+                </div>
+                <div class="form-group" style="margin-bottom: 14px">
+                  <label class="info-key">Email</label>
+                  <input
+                    type="email"
+                    id="editEmail"
+                    placeholder="nama@email.com..."
+                  />
+                </div>
+                <div class="form-group" style="margin-bottom: 18px">
+                  <label class="info-key">No. Telepon</label>
+                  <input
+                    type="tel"
+                    id="editPhone"
+                    placeholder="08xx-xxxx-xxxx..."
+                  />
+                </div>
+                <div
+                  class="info-row"
+                  style="padding-top: 10px; border-top: 1px solid var(--g100)"
+                >
+                  <span class="info-key">Bergabung Sejak</span>
+                  <span class="info-val" id="infoJoined">–</span>
+                </div>
+                <div style="margin-top: 20px; text-align: right">
+                  <button class="btn btn-primary" onclick="saveProfile()">
+                    <i class="fi fi-rr-disk" style="margin-right:6px"></i> Simpan Profil
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="panel-card">
+              <div class="panel-head">
+                <div>
+                  <h2>Alamat Utama</h2>
+                  <p>Digunakan sebagai default di checkout</p>
+                </div>
+                <button
+                  class="btn btn-outline btn-sm"
+                  onclick="
+                    switchPanel(
+                      'addresses',
+                      document.querySelector('.pnav-item:nth-child(2)'),
+                    )
+                  "
+                >
+                  Kelola Semua →
+                </button>
+              </div>
+              <div class="panel-body" id="defaultAddrPreview">
+                <div
+                  style="text-align: center; padding: 20px; color: var(--g400)"
+                >
+                  <div style="font-size: 36px; margin-bottom: 8px; color: var(--blue)"><i class="fi fi-rr-marker"></i></div>
+                  Belum ada alamat utama
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- PANEL: ADDRESSES -->
+          <div class="profile-panel" id="panel-addresses">
+            <div class="panel-card">
+              <div class="panel-head">
+                <div>
+                  <h2>Alamat Pengiriman</h2>
+                  <p>Kelola alamat pengiriman Anda</p>
+                </div>
+              </div>
+              <div class="panel-body">
+                <div id="addressGrid" style="display:flex; flex-direction:column; gap:16px; margin-bottom: 24px;">
+                  <!-- rendered by JS -->
+                </div>
+                
+                <!-- TAMBAH ALAMAT BARU INLINE -->
+                <div style="border-top: 1px solid var(--g200); padding-top:24px; margin-top:24px">
+                  <h3 style="font-family:var(--font-h); font-size:18px; font-weight:800; color:var(--g900); margin-bottom:20px; display:flex; align-items:center; gap:8px">
+                    <i class="fi fi-rr-plus text-primary"></i> Tambah Alamat Baru
+                  </h3>
+                  <form id="inlineAddAddressForm" onsubmit="saveInlineAddAddress(this, event)" style="display:grid; gap:16px">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px">
+                      <div>
+                        <label>Label Alamat (Cth: Rumah, Kantor)</label>
+                        <input type="text" name="label" placeholder="Cth: Rumah" required />
+                      </div>
+                      <div>
+                        <label>Nomor Telepon</label>
+                        <input type="text" name="phone" placeholder="08..." required />
+                      </div>
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px">
+                      <div>
+                        <label>Provinsi</label>
+                        <select name="province" class="prov-select" onchange="onInlineProvChange(this)" required>
+                          <option value="">-- Pilih Provinsi --</option>
+                          <option>Jawa Timur</option>
+                          <option>DKI Jakarta</option>
+                          <option>Jawa Barat</option>
+                          <option>Bali</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label>Kota/Kabupaten</label>
+                        <select name="city" class="city-select" onchange="onInlineCityChange(this)" required disabled>
+                          <option value="">-- Pilih Kota --</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px">
+                      <div>
+                        <label>Kecamatan</label>
+                        <select name="district" class="dist-select" onchange="onInlineDistChange(this)" required disabled>
+                          <option value="">-- Pilih Kecamatan --</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label>Desa/Kelurahan</label>
+                        <select name="village" class="vill-select" required disabled>
+                          <option value="">-- Pilih Desa --</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <label>Detail Alamat (Jalan, RT/RW, Patokan)</label>
+                      <textarea name="street" rows="3" placeholder="Jl. Mawar No 1..." required></textarea>
+                    </div>
+                    
+
+                    
+                    <div style="margin-bottom: 8px">
+                      <label style="display:flex; align-items:center; gap:8px; cursor:pointer; width:fit-content">
+                        <input type="checkbox" name="isDefault" style="width:16px; height:16px; accent-color:var(--blue)" />
+                        <span style="font-size:13px; font-weight:700; color:var(--g800)">Jadikan sebagai alamat utama</span>
+                      </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width:fit-content; border-radius:50px">
+                      <i class="fi fi-rr-plus"></i> Tambah Alamat
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+        <!-- /content -->
+      </div>
+      <!-- /layout -->
+    </div>
+    <!-- /container -->
+
+    <footer class="footer">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand"><i class="fi fi-rr-bolt" style="color:var(--teal)"></i> Elektronik Modern</div>
+          <p class="footer-desc">
+            Platform belanja elektronik rumah tangga terpercaya.
+          </p>
+        </div>
+        <div>
+          <h4>Belanja</h4>
+          <a href="products.html">Semua Produk</a>
+        </div>
+        <div>
+          <h4>Akun</h4>
+          <a href="profile.html">Profil Saya</a
+          ><a href="orders.html">Riwayat Pesanan</a>
+        </div>
+        <div>
+          <h4>Bantuan</h4>
+          <a href="#">Hubungi Kami</a><a href="#">FAQ</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2024 Elektronik Modern – Kelompok 2 IF4E UTM</span>
+      </div>
+    </footer>
+
+    <div class="cart-toast" id="cart-toast"></div>
+
+    <script src="shared.js"></script>
+    <script>
+      // ===== WILAYAH DATA =====
+      const WILAYAH = {
+        "Jawa Timur": {
+          Bangkalan: {
+            Bangkalan: ["Pejagan", "Demangan", "Kemayoran", "Mlajah"],
+            Burneh: ["Burneh", "Pemecutan", "Tonjung"],
+            Socah: ["Socah", "Jaddih", "Bilaporah"],
+          },
+          Surabaya: {
+            Tegalsari: ["Kedungdoro", "Kapasari", "Keputran"],
+            Gubeng: ["Gubeng", "Mojo", "Airlangga"],
+          },
+          Malang: {
+            Klojen: ["Klojen", "Oro-Oro Dowo", "Bareng"],
+            Lowokwaru: ["Lowokwaru", "Tulusrejo", "Merjosari"],
+          },
+        },
+        "DKI Jakarta": {
+          "Jakarta Pusat": {
+            Gambir: ["Gambir", "Cideng", "Petojo Utara"],
+            "Tanah Abang": ["Tanah Abang", "Bendungan Hilir"],
+          },
+          "Jakarta Selatan": {
+            "Kebayoran Baru": ["Senayan", "Selong", "Rawa Barat"],
+            Mampang: ["Mampang Prapatan", "Tegal Parang"],
+          },
+        },
+        "Jawa Barat": {
+          Bandung: {
+            Coblong: ["Dago", "Lebak Gede", "Sadang Serang"],
+            Cicendo: ["Husein Sastranegara", "Pasirkaliki"],
+          },
+          Bekasi: {
+            "Bekasi Utara": ["Marga Mulya", "Harapan Jaya"],
+            "Bekasi Selatan": ["Pekayon Jaya", "Margajaya"],
+          },
+        },
+        Bali: {
+          Denpasar: {
+            "Denpasar Selatan": ["Sesetan", "Pedungan", "Sanur"],
+            "Denpasar Utara": ["Tonja", "Peguyangan"],
+          },
+          Badung: {
+            Kuta: ["Kuta", "Kedonganan", "Tuban"],
+            Mengwi: ["Mengwi", "Gulingan"],
+          },
+        },
+      };
+
+      function onProvinceChange() {
+        const prov = document.getElementById("fProvince").value;
+        const cityEl = document.getElementById("fCity");
+        const distEl = document.getElementById("fDistrict");
+        const villEl = document.getElementById("fVillage");
+        cityEl.innerHTML = '<option value="">-- Pilih Kota --</option>';
+        distEl.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+        villEl.innerHTML = '<option value="">-- Pilih Desa --</option>';
+        if (prov && WILAYAH[prov]) {
+          Object.keys(WILAYAH[prov]).forEach(
+            (c) => (cityEl.innerHTML += `<option>${c}</option>`),
+          );
+        }
+      }
+      function onCityChange() {
+        const prov = document.getElementById("fProvince").value;
+        const city = document.getElementById("fCity").value;
+        const distEl = document.getElementById("fDistrict");
+        const villEl = document.getElementById("fVillage");
+        distEl.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+        villEl.innerHTML = '<option value="">-- Pilih Desa --</option>';
+        if (prov && city && WILAYAH[prov]?.[city]) {
+          Object.keys(WILAYAH[prov][city]).forEach(
+            (d) => (distEl.innerHTML += `<option>${d}</option>`),
+          );
+        }
+      }
+      function onDistrictChange() {
+        const prov = document.getElementById("fProvince").value;
+        const city = document.getElementById("fCity").value;
+        const dist = document.getElementById("fDistrict").value;
+        const villEl = document.getElementById("fVillage");
+        villEl.innerHTML = '<option value="">-- Pilih Desa --</option>';
+        if (prov && city && dist && WILAYAH[prov]?.[city]?.[dist]) {
+          WILAYAH[prov][city][dist].forEach(
+            (v) => (villEl.innerHTML += `<option>${v}</option>`),
+          );
+        }
+      }
+
+      // ===== PANEL SWITCHER =====
+      function switchPanel(id, el) {
+        document
+          .querySelectorAll(".profile-panel")
+          .forEach((p) => p.classList.remove("active"));
+        document
+          .querySelectorAll(".pnav-item")
+          .forEach((i) => i.classList.remove("active"));
+        document.getElementById("panel-" + id).classList.add("active");
+        if (el) el.classList.add("active");
+        if (id === "addresses") renderAddresses();
+        if (id === "overview") renderOverview();
+      }
+
+      // ===== RENDER FUNCTIONS =====
+      function renderOverview() {
+        const u = getUser();
+        document.getElementById("editName").value = u.name;
+        document.getElementById("editEmail").value = u.email;
+        document.getElementById("editPhone").value = u.phone;
+        document.getElementById("infoJoined").textContent = u.joined;
+
+        document.getElementById("sidebarName").textContent = u.name;
+        document.getElementById("sidebarEmail").textContent = u.email;
+
+        const initials = u.name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .substring(0, 2)
+          .toUpperCase();
+        document.getElementById("sidebarAvatar").textContent = initials;
+        const addresses = getAddresses();
+        const cnt = addresses.length;
+        document.getElementById("overviewAddrCount").textContent = cnt;
+        document.getElementById("addrCountBadge").textContent = cnt;
+
+        const def = getDefaultAddress();
+        const prev = document.getElementById("defaultAddrPreview");
+        if (def) {
+          prev.innerHTML = `
+      <div style="display:flex;align-items:flex-start;gap:14px">
+        <div style="width:44px;height:44px;border-radius:12px;background:var(--blue-l);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;color:var(--blue)"><i class="fi fi-rr-marker"></i></div>
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="font-weight:800;font-size:14px">${def.name}</span>
+            <span style="font-size:11px;font-weight:700;background:var(--blue);color:#fff;padding:2px 8px;border-radius:50px">${def.label}</span>
+          </div>
+          <div style="font-size:13px;color:var(--g500);margin-bottom:4px">${def.phone}</div>
+          <div style="font-size:13px;color:var(--g700);line-height:1.6">${def.street}, ${def.village}, ${def.district}, ${def.city}, ${def.province}</div>
+        </div>
+      </div>`;
+        } else {
+          prev.innerHTML = `<div style="text-align:center;padding:20px;color:var(--g400)"><div style="font-size:36px;margin-bottom:8px;color:var(--blue)"><i class="fi fi-rr-marker"></i></div>Belum ada alamat utama.<br><a href="#" onclick="switchPanel('addresses',document.querySelector('.pnav-item:nth-child(2)'));return false;" style="color:var(--blue);font-weight:700;text-decoration:none">+ Tambah sekarang</a></div>`;
+        }
+      }
+
+      function renderAddresses() {
+        const addresses = getAddresses();
+        const grid = document.getElementById("addressGrid");
+        const cnt = addresses.length;
+        document.getElementById("addrCountBadge").textContent = cnt;
+        document.getElementById("overviewAddrCount").textContent = cnt;
+
+        let html = "";
+        addresses.forEach((addr) => {
+          const provs = Object.keys(WILAYAH);
+          let provOptions = '<option value="">-- Pilih Provinsi --</option>';
+          provs.forEach(p => {
+            provOptions += `<option value="${p}" ${p === addr.province ? 'selected' : ''}>${p}</option>`;
+          });
+
+          let cityOptions = '<option value="">-- Pilih Kota --</option>';
+          if (addr.province && WILAYAH[addr.province]) {
+            Object.keys(WILAYAH[addr.province]).forEach(c => {
+              cityOptions += `<option value="${c}" ${c === addr.city ? 'selected' : ''}>${c}</option>`;
+            });
+          }
+
+          let distOptions = '<option value="">-- Pilih Kecamatan --</option>';
+          if (addr.province && addr.city && WILAYAH[addr.province]?.[addr.city]) {
+            Object.keys(WILAYAH[addr.province][addr.city]).forEach(d => {
+              distOptions += `<option value="${d}" ${d === addr.district ? 'selected' : ''}>${d}</option>`;
+            });
+          }
+
+          let villOptions = '<option value="">-- Pilih Desa --</option>';
+          if (addr.province && addr.city && addr.district && WILAYAH[addr.province]?.[addr.city]?.[addr.district]) {
+            WILAYAH[addr.province][addr.city][addr.district].forEach(v => {
+              villOptions += `<option value="${v}" ${v === addr.village ? 'selected' : ''}>${v}</option>`;
+            });
+          }
+
+          html += `
+    <div class="border-[1.5px] rounded-xl p-5" style="border: 1.5px solid var(--g200); border-radius: 12px; padding: 20px; background: ${addr.isDefault ? 'rgba(14,165,160,0.06)' : '#fff'}; border-color: ${addr.isDefault ? 'rgba(14,165,160,0.3)' : 'var(--g200)'}">
+      <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom: 8px; gap: 16px;">
+        <div style="font-weight:700; font-size:15px; color:var(--g900); display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+          ${addr.label}
+          ${addr.isDefault ? '<span class="badge badge-success" style="text-transform:uppercase; font-size:10px; padding:2px 10px; letter-spacing:0.05em">Utama</span>' : ''}
+        </div>
+        <div style="font-size:13px; font-weight:700; color:var(--g800); display:flex; align-items:center; gap:6px; white-space:nowrap">
+          <i class="fi fi-rr-phone-call text-g400" style="color:var(--g500)"></i> ${addr.phone}
+        </div>
+      </div>
+      <div style="font-size:13px; color:var(--g600); line-height:1.6; font-weight:500; margin-bottom: 12px">
+        ${addr.street}<br>
+        <span style="color:var(--g500)">${addr.village}, ${addr.district}, ${addr.city}, ${addr.province}</span>
+      </div>
+      <details class="group" style="margin-top: 16px; border-top: 1px solid var(--g100); padding-top: 12px;">
+        <summary style="cursor:pointer; font-size:13px; font-weight:700; color:var(--blue); display:flex; align-items:center; gap:6px; list-style:none">
+          <i class="fi fi-rr-edit" style="font-size:12px"></i> Edit alamat
+        </summary>
+        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--g200);">
+          <form class="location-form" onsubmit="saveInlineAddress(${addr.id}, this, event)" style="display:grid; gap:12px; margin-bottom:12px">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
+              <div>
+                <label style="font-size:11px; font-weight:700; color:var(--g500)">Label Alamat</label>
+                <input type="text" name="label" value="${addr.label}" required style="padding: 8px 12px; font-size: 13px; border-radius:8px" />
+              </div>
+              <div>
+                <label style="font-size:11px; font-weight:700; color:var(--g500)">Nomor Telepon</label>
+                <input type="text" name="phone" value="${addr.phone}" required style="padding: 8px 12px; font-size: 13px; border-radius:8px" />
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
+              <div>
+                <label style="font-size:11px; font-weight:700; color:var(--g500)">Provinsi</label>
+                <select name="province" class="prov-select" onchange="onInlineProvChange(this)" required style="padding: 8px 12px; font-size: 13px; border-radius:8px">
+                  ${provOptions}
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11px; font-weight:700; color:var(--g500)">Kota/Kabupaten</label>
+                <select name="city" class="city-select" onchange="onInlineCityChange(this)" required style="padding: 8px 12px; font-size: 13px; border-radius:8px">
+                  ${cityOptions}
+                </select>
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
+              <div>
+                <label style="font-size:11px; font-weight:700; color:var(--g500)">Kecamatan</label>
+                <select name="district" class="dist-select" onchange="onInlineDistChange(this)" required style="padding: 8px 12px; font-size: 13px; border-radius:8px">
+                  ${distOptions}
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11px; font-weight:700; color:var(--g500)">Desa/Kelurahan</label>
+                <select name="village" class="vill-select" required style="padding: 8px 12px; font-size: 13px; border-radius:8px">
+                  ${villOptions}
+                </select>
+              </div>
+            </div>
+            <div>
+              <label style="font-size:11px; font-weight:700; color:var(--g500)">Detail Alamat (Jalan, RT/RW, Patokan)</label>
+              <textarea name="street" rows="2" required style="padding: 8px 12px; font-size: 13px; border-radius:8px">${addr.street}</textarea>
+            </div>
+
+            <label style="display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; color:var(--g800); cursor:pointer; width:fit-content; margin-top:4px">
+              <input type="checkbox" name="isDefault" ${addr.isDefault ? 'checked disabled' : ''} style="width:16px; height:16px; accent-color:var(--blue)" />
+              Jadikan sebagai alamat utama
+            </label>
+            <div style="display:flex; gap:8px; margin-top:8px">
+              <button type="submit" class="btn btn-primary btn-sm" style="border-radius:8px; padding:6px 12px">Simpan Perubahan</button>
+              <button type="button" class="btn btn-sm" onclick="deleteInlineAddress(${addr.id})" style="border-radius:8px; padding:6px 12px; background:var(--dl); color:var(--danger)">Hapus Alamat</button>
+            </div>
+          </form>
+        </div>
+      </details>
+    </div>`;
+        });
+
+        if (cnt === 0) {
+          html = `
+            <div style="text-align: center; padding: 30px; color: var(--g400); border: 2px dashed var(--g200); border-radius: 12px;">
+              <div style="font-size: 36px; margin-bottom: 8px; color: var(--g300)"><i class="fi fi-rr-marker"></i></div>
+              Belum ada alamat tersimpan. Silakan tambah alamat di bawah.
+            </div>`;
+        }
+
+        grid.innerHTML = html;
+      }
+
+      function onInlineProvChange(selectEl) {
+        const prov = selectEl.value;
+        const form = selectEl.closest("form");
+        const cityEl = form.querySelector('[name="city"]');
+        const distEl = form.querySelector('[name="district"]');
+        const villEl = form.querySelector('[name="village"]');
+        
+        cityEl.innerHTML = '<option value="">-- Pilih Kota --</option>';
+        distEl.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+        villEl.innerHTML = '<option value="">-- Pilih Desa --</option>';
+        
+        cityEl.disabled = !prov;
+        distEl.disabled = true;
+        villEl.disabled = true;
+        
+        if (prov && WILAYAH[prov]) {
+          Object.keys(WILAYAH[prov]).forEach((c) => {
+            cityEl.innerHTML += `<option value="${c}">${c}</option>`;
+          });
+        }
+      }
+
+      function onInlineCityChange(selectEl) {
+        const form = selectEl.closest("form");
+        const prov = form.querySelector('[name="province"]').value;
+        const city = selectEl.value;
+        const distEl = form.querySelector('[name="district"]');
+        const villEl = form.querySelector('[name="village"]');
+        
+        distEl.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+        villEl.innerHTML = '<option value="">-- Pilih Desa --</option>';
+        
+        distEl.disabled = !city;
+        villEl.disabled = true;
+        
+        if (prov && city && WILAYAH[prov]?.[city]) {
+          Object.keys(WILAYAH[prov][city]).forEach((d) => {
+            distEl.innerHTML += `<option value="${d}">${d}</option>`;
+          });
+        }
+      }
+
+      function onInlineDistChange(selectEl) {
+        const form = selectEl.closest("form");
+        const prov = form.querySelector('[name="province"]').value;
+        const city = form.querySelector('[name="city"]').value;
+        const dist = selectEl.value;
+        const villEl = form.querySelector('[name="village"]');
+        
+        villEl.innerHTML = '<option value="">-- Pilih Desa --</option>';
+        villEl.disabled = !dist;
+        
+        if (prov && city && dist && WILAYAH[prov]?.[city]?.[dist]) {
+          WILAYAH[prov][city][dist].forEach((v) => {
+            villEl.innerHTML += `<option value="${v}">${v}</option>`;
+          });
+        }
+      }
+
+      // ===== FUNGSI SIMPAN PROFIL =====
+      function saveProfile() {
+        const newName = document.getElementById("editName").value.trim();
+        const newEmail = document.getElementById("editEmail").value.trim();
+        const newPhone = document.getElementById("editPhone").value.trim();
+
+        if (!newName || !newEmail || !newPhone) {
+          showProfileToast("Mohon lengkapi semua data profil", true);
+          return;
+        }
+
+        const u = getUser();
+        u.name = newName;
+        u.email = newEmail;
+        u.phone = newPhone;
+
+        localStorage.setItem("eh_user", JSON.stringify(u));
+        renderOverview();
+        showProfileToast("Profil berhasil diperbarui!");
+      }
+
+      function saveInlineAddress(id, form, event) {
+        event.preventDefault();
+        const label = form.querySelector('[name="label"]').value.trim();
+        const phone = form.querySelector('[name="phone"]').value.trim();
+        const street = form.querySelector('[name="street"]').value.trim();
+        const province = form.querySelector('[name="province"]').value;
+        const city = form.querySelector('[name="city"]').value;
+        const district = form.querySelector('[name="district"]').value;
+        const village = form.querySelector('[name="village"]').value;
+        const isDefault = form.querySelector('[name="isDefault"]').checked;
+
+        if (!label || !phone || !street || !province || !city) {
+          showProfileToast("Mohon lengkapi semua field wajib", true);
+          return;
+        }
+
+        const data = {
+          label,
+          name: getUser().name,
+          phone,
+          street,
+          province,
+          city,
+          district,
+          village,
+          postal: "",
+          isDefault
+        };
+
+        updateAddress(id, data);
+        showProfileToast("Alamat berhasil diperbarui!");
+        renderAddresses();
+        renderOverview();
+      }
+
+      function deleteInlineAddress(id) {
+        const addr = getAddresses().find(a => a.id === id);
+        if (!addr) return;
+        if (confirm(`Alamat "${addr.label}" akan dihapus secara permanen.`)) {
+          deleteAddress(id);
+          showProfileToast("Alamat berhasil dihapus");
+          renderAddresses();
+          renderOverview();
+        }
+      }
+
+      function saveInlineAddAddress(form, event) {
+        event.preventDefault();
+        const label = form.querySelector('[name="label"]').value.trim();
+        const phone = form.querySelector('[name="phone"]').value.trim();
+        const street = form.querySelector('[name="street"]').value.trim();
+        const province = form.querySelector('[name="province"]').value;
+        const city = form.querySelector('[name="city"]').value;
+        const district = form.querySelector('[name="district"]').value;
+        const village = form.querySelector('[name="village"]').value;
+        const isDefault = form.querySelector('[name="isDefault"]').checked;
+
+        if (!label || !phone || !street || !province || !city) {
+          showProfileToast("Mohon lengkapi semua field wajib", true);
+          return;
+        }
+
+        const data = {
+          label,
+          name: getUser().name,
+          phone,
+          street,
+          province,
+          city,
+          district,
+          village,
+          postal: "",
+          isDefault
+        };
+
+        addAddress(data);
+        showProfileToast("Alamat baru berhasil ditambahkan!");
+        
+        form.reset();
+        form.querySelector('[name="city"]').disabled = true;
+        form.querySelector('[name="district"]').disabled = true;
+        form.querySelector('[name="village"]').disabled = true;
+
+        renderAddresses();
+        renderOverview();
+      }
+
+      // ===== SET DEFAULT =====
+      function setAsDefault(id) {
+        setDefaultAddress(id);
+        renderAddresses();
+        renderOverview();
+        showProfileToast("Alamat utama berhasil diperbarui!");
+      }
+
+      // ===== TOAST =====
+      function showProfileToast(msg, isWarn = false) {
+        const t = document.getElementById("profileToast");
+        t.textContent = msg;
+        t.style.background = isWarn ? "var(--warn)" : "var(--dark)";
+        t.classList.add("show");
+        clearTimeout(t._t);
+        t._t = setTimeout(() => t.classList.remove("show"), 3000);
+      }
+
+      // ===== INIT =====
+      renderOverview();
+    </script>
+  </body>
+</html>

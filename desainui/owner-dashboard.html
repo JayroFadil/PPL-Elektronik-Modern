@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Owner Dashboard – Elektronik Modern</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  .report-form{display:flex;align-items:center;gap:8px;background:#fff;padding:6px;border-radius:12px;border:1px solid var(--g200);box-shadow:var(--sh)}
+  .report-form select{background:transparent;border:none;font-size:12px;font-weight:700;color:var(--g700);outline:none;padding:4px 8px;font-family:var(--font)}
+  .report-form button{background:var(--blue);color:#fff;padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:700;font-family:var(--font);display:flex;align-items:center;gap:6px;transition:.2s}
+  .report-form button:hover{background:var(--blue-d)}
+  .date-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:#fff;border:1px solid var(--g200);border-radius:12px;font-size:13px;font-weight:700;color:var(--g700);box-shadow:var(--sh)}
+  .rev-card{border-radius:16px;padding:28px;color:#fff;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.15)}
+  .rev-card .bubble{position:absolute;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.1);top:-80px;right:-60px}
+  .rev-card .rev-label{font-size:13px;font-weight:600;opacity:.8;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .rev-card .rev-val{font-family:var(--font-h);font-size:36px;font-weight:800;margin-bottom:4px;letter-spacing:-.5px}
+  .rev-card .rev-sub{font-size:12px;opacity:.7}
+  .rev-blue{background:linear-gradient(135deg,#1A5CFF,#3B82F6)}
+  .rev-teal{background:linear-gradient(135deg,#0d9488,#10b981)}
+  .rev-purple{background:linear-gradient(135deg,#7c3aed,#a855f7)}
+  .rev-dark{background:linear-gradient(135deg,#0f172a,#334155)}
+  .prog-row{margin-bottom:12px}
+  .prog-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+  .prog-head span{font-weight:600;color:var(--g700)}
+  .prog-head strong{color:var(--g900)}
+  .prog-bar{height:8px;background:var(--g100);border-radius:4px;overflow:hidden}
+  .prog-fill{height:100%;border-radius:4px}
+  .summary-item{display:flex;justify-content:space-between;align-items:center;padding:12px;background:var(--g50);border-radius:12px}
+  .summary-item span{font-size:13px;color:var(--g600);font-weight:500;display:flex;align-items:center;gap:8px}
+  .chart-bars{display:flex;align-items:flex-end;gap:6px;height:150px;width:100%;padding:0 4px;margin-bottom:12px}
+  .chart-bars div{flex:1;min-width:14px;border-radius:6px 6px 0 0;cursor:pointer;transition:.2s;background:linear-gradient(to top,var(--teal),var(--blue))}
+  .chart-bars div:hover{opacity:.8}
+  .chart-labels{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;text-align:center;font-size:10px;font-weight:700;color:var(--g500)}
+  .cat-item{margin-bottom:12px}
+  .cat-head{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+  .cat-head span:first-child{font-weight:700;color:var(--g800)}
+  .cat-head span:last-child{font-weight:600;color:var(--g600)}
+  .cat-sub{font-size:11px;color:var(--g500);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="admin-layout">
+  <div class="sidebar">
+    <div class="sidebar-brand"><div class="sidebar-brand-name"><i class="fi fi-rr-crown" style="color:gold;margin-right:6px"></i>Elektronik Modern</div><div class="sidebar-brand-role">Panel Owner</div></div>
+    <div class="s-group">Menu Utama</div>
+    <a href="owner-dashboard.html" class="s-item active"><span class="si"><i class="fi fi-rr-stats"></i></span> Dashboard</a>
+    <div class="s-group">Akun</div>
+    <a href="login.html" class="s-item"><span class="si"><i class="fi fi-rr-exit"></i></span> Keluar</a>
+  </div>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div>
+        <div style="font-size:13px;color:var(--g500);margin-bottom:2px">Selamat datang,</div>
+        <div class="page-title">Dashboard Owner</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <div class="report-form">
+          <select><option>January</option><option>February</option><option>March</option><option>April</option><option>May</option><option selected>June</option><option>July</option><option>August</option><option>September</option><option>October</option><option>November</option><option>December</option></select>
+          <select><option>2024</option><option>2025</option><option selected>2026</option></select>
+          <button><i class="fi fi-rr-download"></i> Laporan PDF</button>
+        </div>
+        <span class="date-badge"><i class="fi fi-rr-calendar" style="margin-right: 4px"></i> 12 Jun 2026</span>
+      </div>
+    </div>
+
+    <!-- Revenue Cards (matching blade gradient cards) -->
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin-bottom:24px">
+      <div class="rev-card rev-blue"><div class="bubble"></div>
+        <div class="rev-label"><i class="fi fi-rr-dollar" style="margin-right:6px"></i> Total Pendapatan</div>
+        <div class="rev-val">Rp 284.500.000</div>
+        <div class="rev-sub">Dari 156 pesanan selesai</div>
+      </div>
+      <div class="rev-card rev-teal"><div class="bubble"></div>
+        <div class="rev-label"><i class="fi fi-rr-chart-line-up" style="margin-right: 6px"></i> Pendapatan Bulan Ini</div>
+        <div class="rev-val">Rp 42.300.000</div>
+        <div class="rev-sub">38 pesanan bulan ini · +18% dari bulan lalu</div>
+      </div>
+      <div class="rev-card rev-purple"><div class="bubble"></div>
+        <div class="rev-label"><i class="fi fi-rr-receipt" style="margin-right: 6px"></i> Rata-rata Transaksi</div>
+        <div class="rev-val">Rp 1.823.000</div>
+        <div class="rev-sub">Dihitung dari pesanan selesai</div>
+      </div>
+      <div class="rev-card rev-dark"><div class="bubble"></div>
+        <div class="rev-label"><i class="fi fi-rr-briefcase" style="margin-right: 6px"></i> Pendapatan Bulan Lalu</div>
+        <div class="rev-val">Rp 35.800.000</div>
+        <div class="rev-sub">Pembanding performa bulan berjalan</div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-ico blue"><i class="fi fi-rr-box"></i></div><div><div class="stat-label">Total Produk</div><div class="stat-val">247</div></div></div>
+      <div class="stat-card"><div class="stat-ico green"><i class="fi fi-rr-users"></i></div><div><div class="stat-label">Total Customer</div><div class="stat-val">412</div></div></div>
+      <div class="stat-card"><div class="stat-ico teal"><i class="fi fi-rr-shield"></i></div><div><div class="stat-label">Total Admin</div><div class="stat-val">3</div></div></div>
+      <div class="stat-card"><div class="stat-ico warn"><i class="fi fi-rr-receipt"></i></div><div><div class="stat-label">Total Pesanan</div><div class="stat-val">223</div></div></div>
+    </div>
+
+    <!-- Charts Row -->
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:24px">
+      <!-- Order Status + Ringkasan -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="data-card">
+          <div class="data-card-head"><h3><i class="fi fi-rr-chart-pie" style="margin-right: 6px"></i> Status Pesanan</h3></div>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
+            <div class="prog-row"><div class="prog-head"><span>Menunggu</span><strong>14</strong></div><div class="prog-bar"><div class="prog-fill" style="width:20%;background:#7c3aed"></div></div></div>
+            <div class="prog-row"><div class="prog-head"><span>Diproses</span><strong>22</strong></div><div class="prog-bar"><div class="prog-fill" style="width:32%;background:var(--blue)"></div></div></div>
+            <div class="prog-row"><div class="prog-head"><span>Dikirim</span><strong>31</strong></div><div class="prog-bar"><div class="prog-fill" style="width:45%;background:var(--teal)"></div></div></div>
+            <div class="prog-row"><div class="prog-head"><span>Selesai</span><strong>156</strong></div><div class="prog-bar"><div class="prog-fill" style="width:85%;background:var(--success)"></div></div></div>
+          </div>
+        </div>
+        <div class="data-card">
+          <div class="data-card-head"><h3><i class="fi fi-rr-clipboard-list" style="margin-right: 6px"></i> Ringkasan</h3></div>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
+            <div class="summary-item"><span><i class="fi fi-rr-clock-three" style="margin-right: 6px"></i> Menunggu Konfirmasi</span><span class="badge badge-warn" style="font-size:13px;font-weight:800;padding:4px 12px">14</span></div>
+            <div class="summary-item"><span><i class="fi fi-rr-settings" style="margin-right: 6px"></i> Sedang Diproses</span><span class="badge badge-info" style="font-size:13px;font-weight:800;padding:4px 12px">22</span></div>
+            <div class="summary-item"><span><i class="fi fi-rr-truck" style="margin-right: 6px"></i> Dalam Pengiriman</span><span class="badge badge-info" style="font-size:13px;font-weight:800;padding:4px 12px">31</span></div>
+            <div class="summary-item"><span><i class="fi fi-rr-checkbox" style="margin-right: 6px"></i> Selesai</span><span class="badge badge-success" style="font-size:13px;font-weight:800;padding:4px 12px">156</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Monthly Revenue + Category -->
+    <div style="display:grid;grid-template-columns:3fr 2fr;gap:20px;margin-bottom:24px">
+      <div class="data-card">
+        <div class="data-card-head"><h3><i class="fi fi-rr-money-bill-wave" style="margin-right: 6px"></i> Pendapatan Bulanan</h3></div>
+        <div style="padding:20px">
+          <div class="chart-bars">
+            <div style="height:45%" title="Jan: Rp 18,5 Jt"></div>
+            <div style="height:38%" title="Feb: Rp 15,2 Jt"></div>
+            <div style="height:55%" title="Mar: Rp 22,0 Jt"></div>
+            <div style="height:42%" title="Apr: Rp 16,8 Jt"></div>
+            <div style="height:67%" title="Mei: Rp 26,8 Jt"></div>
+            <div style="height:52%" title="Jun: Rp 20,8 Jt"></div>
+            <div style="height:61%" title="Jul: Rp 24,4 Jt"></div>
+            <div style="height:74%" title="Agu: Rp 29,6 Jt"></div>
+            <div style="height:79%" title="Sep: Rp 31,6 Jt"></div>
+            <div style="height:68%" title="Okt: Rp 27,2 Jt"></div>
+            <div style="height:88%" title="Nov: Rp 35,2 Jt"></div>
+            <div style="height:100%" title="Des: Rp 42,3 Jt"></div>
+          </div>
+          <div class="chart-labels"><span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>Mei</span><span>Jun</span><span>Jul</span><span>Agu</span><span>Sep</span><span>Okt</span><span>Nov</span><span>Des</span></div>
+        </div>
+      </div>
+      <div class="data-card">
+        <div class="data-card-head"><h3><i class="fi fi-rr-tags" style="margin-right: 6px"></i> Penjualan per Kategori</h3></div>
+        <div style="padding:20px">
+          <div class="cat-item"><div class="cat-head"><span>Smart TV</span><span>45%</span></div><div class="prog-bar"><div class="prog-fill" style="width:45%;background:var(--teal)"></div></div><div class="cat-sub">54 unit · Rp 128.250.000</div></div>
+          <div class="cat-item"><div class="cat-head"><span>AC / Pendingin</span><span>23%</span></div><div class="prog-bar"><div class="prog-fill" style="width:23%;background:var(--teal)"></div></div><div class="cat-sub">89 unit · Rp 65.435.000</div></div>
+          <div class="cat-item"><div class="cat-head"><span>Kulkas</span><span>14%</span></div><div class="prog-bar"><div class="prog-fill" style="width:14%;background:var(--teal)"></div></div><div class="cat-sub">41 unit · Rp 39.830.000</div></div>
+          <div class="cat-item"><div class="cat-head"><span>Mesin Cuci</span><span>12%</span></div><div class="prog-bar"><div class="prog-fill" style="width:12%;background:var(--teal)"></div></div><div class="cat-sub">33 unit · Rp 34.100.000</div></div>
+          <div class="cat-item"><div class="cat-head"><span>Lainnya</span><span>6%</span></div><div class="prog-bar"><div class="prog-fill" style="width:6%;background:var(--teal)"></div></div><div class="cat-sub">18 unit · Rp 16.885.000</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Products -->
+    <div class="data-card" style="margin-bottom:24px">
+      <div class="data-card-head"><h3><i class="fi fi-rr-flame" style="margin-right: 6px"></i> Produk Terlaris</h3></div>
+      <table>
+        <thead><tr><th>Produk</th><th>Kategori</th><th>Unit Terjual</th><th>Pendapatan</th></tr></thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:700;font-size:13px">Daikin AC Split 1PK Inverter</td>
+            <td><span class="badge badge-info" style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px">AC / Pendingin</span></td>
+            <td style="font-weight:600;font-size:13px">89 unit</td>
+            <td style="font-weight:800;color:var(--blue);font-family:'Syne',sans-serif;font-size:15px">Rp 342.600.000</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;font-size:13px">Samsung Smart TV 43" 4K UHD</td>
+            <td><span class="badge badge-info" style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px">Smart TV</span></td>
+            <td style="font-weight:600;font-size:13px">54 unit</td>
+            <td style="font-weight:800;color:var(--blue);font-family:'Syne',sans-serif;font-size:15px">Rp 350.900.000</td>
+          </tr>
+          <tr>
+            <td style="font-weight:700;font-size:13px">LG Kulkas 2 Pintu 380L Inverter</td>
+            <td><span class="badge badge-info" style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px">Kulkas</span></td>
+            <td style="font-weight:600;font-size:13px">41 unit</td>
+            <td style="font-weight:800;color:var(--blue);font-family:'Syne',sans-serif;font-size:15px">Rp 213.200.000</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="data-card">
+      <div class="data-card-head">
+        <h3><i class="fi fi-rr-receipt" style="margin-right: 6px"></i> Pesanan Terbaru</h3>
+        <span class="badge badge-info" style="font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px">223 total</span>
+      </div>
+      <table>
+        <thead><tr><th>No. Resi</th><th>Pelanggan</th><th>Tanggal</th><th>Total</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:800;font-size:14px">#ORD-001</td>
+            <td style="font-weight:700;font-size:13px">Budi Santoso</td>
+            <td style="font-size:12px;color:var(--g500)">12 Jun 2026</td>
+            <td style="font-weight:800;color:var(--blue);font-family:'Syne',sans-serif;font-size:15px">Rp 6.499.000</td>
+            <td><span class="badge badge-warn" style="padding:4px 10px;font-size:10px;letter-spacing:.05em;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px"><i class="fi fi-rr-clock-three" style="margin-right:4px"></i> Menunggu</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:800;font-size:14px">#ORD-002</td>
+            <td style="font-weight:700;font-size:13px">Siti Rahayu</td>
+            <td style="font-size:12px;color:var(--g500)">11 Jun 2026</td>
+            <td style="font-weight:800;color:var(--blue);font-family:'Syne',sans-serif;font-size:15px">Rp 12.899.000</td>
+            <td><span class="badge badge-info" style="padding:4px 10px;font-size:10px;letter-spacing:.05em;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px"><i class="fi fi-rr-settings" style="margin-right:4px"></i> Diproses</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:800;font-size:14px">#ORD-003</td>
+            <td style="font-weight:700;font-size:13px">Ahmad Fauzi</td>
+            <td style="font-size:12px;color:var(--g500)">10 Jun 2026</td>
+            <td style="font-weight:800;color:var(--blue);font-family:'Syne',sans-serif;font-size:15px">Rp 7.700.000</td>
+            <td><span class="badge badge-pend" style="padding:4px 10px;font-size:10px;letter-spacing:.05em;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px"><i class="fi fi-rr-truck" style="margin-right:4px"></i> Dikirim</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:800;font-size:14px">#ORD-004</td>
+            <td style="font-weight:700;font-size:13px">Dewi Lestari</td>
+            <td style="font-size:12px;color:var(--g500)">09 Jun 2026</td>
+            <td style="font-weight:800;color:var(--blue);font-family:'Syne',sans-serif;font-size:15px">Rp 4.299.000</td>
+            <td><span class="badge badge-success" style="padding:4px 10px;font-size:10px;letter-spacing:.05em;text-transform:uppercase;display:inline-flex;align-items:center;gap:4px"><i class="fi fi-rr-checkbox" style="margin-right:4px"></i> Selesai</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>

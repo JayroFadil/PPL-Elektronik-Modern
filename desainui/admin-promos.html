@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Kelola Promo - Admin Elektronik Modern</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  /* Sidebar scroll support */
+  .sidebar {
+    height: 100vh;
+    position: sticky;
+    top: 0;
+  }
+</style>
+</head>
+<body>
+<div class="admin-layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-brand-name"><i class="fi fi-rr-bolt" style="color:var(--blue)"></i> Elektronik Modern</div>
+      <div class="sidebar-brand-role">Panel Admin</div>
+    </div>
+    <div class="s-group">Menu Utama</div>
+    <a href="admin-dashboard.html" class="s-item"><span class="si"><i class="fi fi-rr-chart-pie"></i></span> Dashboard</a>
+    <a href="admin-products.html" class="s-item"><span class="si"><i class="fi fi-rr-box"></i></span> Kelola Produk</a>
+    <a href="admin-categories.html" class="s-item"><span class="si"><i class="fi fi-rr-apps"></i></span> Kelola Kategori</a>
+    <a href="admin-promos.html" class="s-item active"><span class="si"><i class="fi fi-rr-ticket"></i></span> Kelola Promo</a>
+    <a href="admin-orders.html" class="s-item"><span class="si"><i class="fi fi-rr-receipt"></i></span> Kelola Pesanan</a>
+    <a href="admin-users.html" class="s-item"><span class="si"><i class="fi fi-rr-users"></i></span> Kelola Customer</a>
+    <div class="s-group">Akun</div>
+    <a href="login.html" class="s-item"><span class="si"><i class="fi fi-rr-sign-out-alt"></i></span> Keluar</a>
+  </div>
+
+  <!-- Main Content -->
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div>
+        <div class="page-title">Kelola Promo</div>
+      </div>
+    </div>
+
+    <!-- Tambah Promo -->
+    <div class="card" style="margin-bottom: 28px; border: 1px solid var(--g100)">
+      <div class="data-card-head">
+        <h3 style="display:flex;align-items:center;gap:8px"><i class="fi fi-rr-badge-percent text-primary"></i> Tambah Promo</h3>
+      </div>
+      <form onsubmit="addPromo(event)" style="padding: 24px">
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px">
+          <div>
+            <label style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:0.04em">Kode Voucher</label>
+            <input type="text" id="newPromoCode" placeholder="HEMAT50" required style="font-size: 13px; font-weight: 700; text-transform: uppercase">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:0.04em">Tipe Diskon</label>
+            <select id="newPromoType" style="font-size: 13px; font-weight: 600">
+              <option value="persen">Persen (%)</option>
+              <option value="nominal" selected>Nominal (Rp)</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:0.04em">Nilai Diskon</label>
+            <input type="number" id="newPromoValue" required min="1" style="font-size: 13px; font-weight: 600">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:0.04em">Kuota</label>
+            <input type="number" id="newPromoQuota" value="10" required min="0" style="font-size: 13px; font-weight: 600">
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr auto; gap: 16px; align-items: flex-end">
+          <div>
+            <label style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:0.04em">Tanggal Mulai</label>
+            <input type="datetime-local" id="newPromoStart" required style="font-size: 13px; font-weight: 600">
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:800;color:var(--g700);text-transform:uppercase;letter-spacing:0.04em">Tanggal Berakhir</label>
+            <input type="datetime-local" id="newPromoEnd" required style="font-size: 13px; font-weight: 600">
+          </div>
+          <button type="submit" class="btn btn-primary" style="height: 42px; border-radius: 8px"><i class="fi fi-rr-disk"></i> Simpan Promo</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Daftar Promo -->
+    <div class="card" style="border: 1px solid var(--g100)">
+      <div class="data-card-head">
+        <h3 style="display:flex;align-items:center;gap:8px"><i class="fi fi-rr-ticket text-primary"></i> Daftar Promo</h3>
+        <span class="badge badge-info" id="promoCountBadge" style="text-transform:uppercase;letter-spacing:0.04em">0 Promo</span>
+      </div>
+      <div style="overflow-x: auto">
+        <table>
+          <thead>
+            <tr>
+              <th>Kode</th>
+              <th>Diskon</th>
+              <th style="width: 280px">Periode</th>
+              <th style="width: 100px; text-align: center">Kuota</th>
+              <th>Status</th>
+              <th style="text-align: right">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="promoTableBody">
+            <!-- Dynamic Promo List -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="shared.js"></script>
+<script>
+  // Setup default datetimes for new promo inputs
+  (function() {
+    const now = new Date();
+    const nextMonth = new Date();
+    nextMonth.setMonth(now.getMonth() + 1);
+
+    document.getElementById('newPromoStart').value = now.toISOString().slice(0, 16);
+    document.getElementById('newPromoEnd').value = nextMonth.toISOString().slice(0, 16);
+  })();
+
+  let PROMOS = getPromos();
+
+  function renderPromos() {
+    PROMOS = getPromos();
+    document.getElementById('promoCountBadge').textContent = `${PROMOS.length} PROMO`;
+    const tbody = document.getElementById('promoTableBody');
+
+    if (!PROMOS.length) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--g400)">Belum ada promo terdaftar.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = PROMOS.map(p => {
+      const now = new Date();
+      const startDate = new Date(p.start);
+      const endDate = new Date(p.end);
+      const isExpired = now < startDate || now > endDate;
+      const isOutOfStock = p.quota <= 0;
+      const isActive = !isExpired && !isOutOfStock;
+
+      const statusBadge = isActive 
+        ? `<span class="badge badge-success" style="text-transform:uppercase;letter-spacing:0.04em"><span style="width:6px;height:6px;border-radius:50%;background:#22c55e;margin-right:6px;display:inline-block"></span>Aktif</span>`
+        : `<span class="badge badge-danger" style="text-transform:uppercase;letter-spacing:0.04em"><span style="width:6px;height:6px;border-radius:50%;background:#ef4444;margin-right:6px;display:inline-block"></span>Tidak Aktif</span>`;
+
+      return `
+        <tr class="group hover:bg-g50/50 transition-colors">
+          <td style="padding:16px 20px">
+            <input type="text" id="promo-code-${p.id}" value="${p.code}" style="font-size:13px;font-weight:700;padding:8px 12px;text-transform:uppercase;min-width:120px" required>
+          </td>
+          <td style="padding:16px 20px">
+            <div style="display:flex;gap:6px">
+              <select id="promo-type-${p.id}" style="font-size:13px;font-weight:600;padding:8px 10px;width:70px">
+                <option value="persen" ${p.type === 'persen' ? 'selected' : ''}>%</option>
+                <option value="nominal" ${p.type === 'nominal' ? 'selected' : ''}>Rp</option>
+              </select>
+              <input type="number" id="promo-val-${p.id}" value="${p.value}" style="font-size:13px;font-weight:700;padding:8px 12px;width:100px" required>
+            </div>
+          </td>
+          <td style="padding:16px 20px">
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <input type="datetime-local" id="promo-start-${p.id}" value="${p.start}" style="font-size:11px;padding:6px 8px" required>
+              <input type="datetime-local" id="promo-end-${p.id}" value="${p.end}" style="font-size:11px;padding:6px 8px" required>
+            </div>
+          </td>
+          <td style="padding:16px 20px;text-align:center">
+            <input type="number" id="promo-quota-${p.id}" value="${p.quota}" style="font-size:13px;font-weight:700;padding:8px 8px;width:70px;text-align:center" required min="0">
+          </td>
+          <td style="padding:16px 20px">${statusBadge}</td>
+          <td style="padding:16px 20px;text-align:right">
+            <div style="display:flex;justify-content:flex-end;gap:8px">
+              <button onclick="updatePromo(${p.id})" class="btn-edit" style="display:inline-flex;align-items:center;gap:4px"><i class="fi fi-rr-disk"></i> Simpan</button>
+              <button onclick="deletePromo(${p.id})" class="btn-del" style="display:inline-flex;align-items:center;gap:4px"><i class="fi fi-rr-trash"></i> Hapus</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function addPromo(e) {
+    e.preventDefault();
+    const code = document.getElementById('newPromoCode').value.trim().toUpperCase();
+    const type = document.getElementById('newPromoType').value;
+    const value = parseInt(document.getElementById('newPromoValue').value);
+    const quota = parseInt(document.getElementById('newPromoQuota').value);
+    const start = document.getElementById('newPromoStart').value;
+    const end = document.getElementById('newPromoEnd').value;
+
+    if(!code || isNaN(value) || isNaN(quota)) return;
+
+    const newId = PROMOS.length ? Math.max(...PROMOS.map(p => p.id)) + 1 : 1;
+
+    PROMOS.push({ id: newId, code, type, value, quota, start, end });
+    savePromos(PROMOS);
+
+    // Reset code input and value
+    document.getElementById('newPromoCode').value = '';
+    document.getElementById('newPromoValue').value = '';
+    renderPromos();
+    showToast('Promo berhasil ditambahkan!');
+  }
+
+  function updatePromo(id) {
+    const code = document.getElementById(`promo-code-${id}`).value.trim().toUpperCase();
+    const type = document.getElementById(`promo-type-${id}`).value;
+    const value = parseInt(document.getElementById(`promo-val-${id}`).value);
+    const quota = parseInt(document.getElementById(`promo-quota-${id}`).value);
+    const start = document.getElementById(`promo-start-${id}`).value;
+    const end = document.getElementById(`promo-end-${id}`).value;
+
+    if(!code || isNaN(value) || isNaN(quota)) return;
+
+    const promo = PROMOS.find(p => p.id === id);
+    if(promo) {
+      promo.code = code;
+      promo.type = type;
+      promo.value = value;
+      promo.quota = quota;
+      promo.start = start;
+      promo.end = end;
+
+      savePromos(PROMOS);
+      renderPromos();
+      showToast('Promo berhasil disimpan!');
+    }
+  }
+
+  function deletePromo(id) {
+    if (confirm('Apakah Anda yakin ingin menghapus promo ini?')) {
+      PROMOS = PROMOS.filter(p => p.id !== id);
+      savePromos(PROMOS);
+      renderPromos();
+      showToast('Promo berhasil dihapus!');
+    }
+  }
+
+  function showToast(msg) {
+    let t = document.getElementById('toast-notification');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'toast-notification';
+      t.className = 'cart-toast';
+      document.body.appendChild(t);
+    }
+    t.innerHTML = `<i class="fi fi-rr-ticket" style="margin-right:6px"></i> <strong>${msg}</strong>`;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  renderPromos();
+</script>
+</body>
+</html>

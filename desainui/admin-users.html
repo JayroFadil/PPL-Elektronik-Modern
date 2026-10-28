@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Kelola Customer – Admin Elektronik Modern</title>
+<link rel="stylesheet" href="shared.css">
+<style>
+  .add-form{background:#fff;border-radius:16px;box-shadow:var(--sh);overflow:hidden;margin-bottom:24px}
+  .add-form-head{padding:18px 20px;border-bottom:1px solid var(--g100);display:flex;align-items:center;gap:8px;font-weight:800;font-size:15px}
+  .add-form-body{padding:20px}
+  .grid-add{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:16px;align-items:end}
+  @media(max-width:768px){.grid-add{grid-template-columns:1fr}}
+  .f-label{display:block;font-size:11px;font-weight:800;color:var(--g700);letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+  .f-input{width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:10px;font-family:var(--font);font-size:13px;font-weight:600;color:var(--g800);background:var(--g50);outline:none;transition:.2s}
+  .f-input:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 4px rgba(26,92,255,.08)}
+  .btn-add{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;height:42px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;font-family:var(--font);cursor:pointer;box-shadow:0 4px 12px rgba(26,92,255,.3);transition:.2s;white-space:nowrap}
+  .btn-add:hover{background:var(--blue-d);transform:translateY(-1px)}
+  .avatar{width:36px;height:36px;border-radius:50%;background:var(--blue-l);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:var(--blue);border:1px solid rgba(26,92,255,.1);flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="admin-layout">
+  <div class="sidebar">
+    <div class="sidebar-brand"><div class="sidebar-brand-name"><i class="fi fi-rr-bolt" style="color:var(--blue)"></i> Elektronik Modern</div><div class="sidebar-brand-role">Panel Admin</div></div>
+    <div class="s-group">Menu Utama</div>
+    <a href="admin-dashboard.html" class="s-item"><span class="si"><i class="fi fi-rr-chart-pie"></i></span> Dashboard</a>
+    <a href="admin-products.html" class="s-item"><span class="si"><i class="fi fi-rr-box"></i></span> Kelola Produk</a>
+    <a href="admin-categories.html" class="s-item"><span class="si"><i class="fi fi-rr-apps"></i></span> Kelola Kategori</a>
+    <a href="admin-promos.html" class="s-item"><span class="si"><i class="fi fi-rr-ticket"></i></span> Kelola Promo</a>
+    <a href="admin-orders.html" class="s-item"><span class="si"><i class="fi fi-rr-receipt"></i></span> Kelola Pesanan</a>
+    <a href="admin-users.html" class="s-item active"><span class="si"><i class="fi fi-rr-users"></i></span> Kelola Customer</a>
+    <div class="s-group">Akun</div>
+    <a href="login.html" class="s-item"><span class="si"><i class="fi fi-rr-sign-out-alt"></i></span> Keluar</a>
+  </div>
+  <div class="admin-main">
+    <div class="admin-topbar">
+      <div class="page-title">Kelola Customer</div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat-card"><div class="stat-ico green"><i class="fi fi-rr-users"></i></div><div><div class="stat-label">Total Customer</div><div class="stat-val">412</div></div></div>
+      <div class="stat-card"><div class="stat-ico blue"><i class="fi fi-rr-shopping-cart"></i></div><div><div class="stat-label">Punya Pesanan</div><div class="stat-val">287</div></div></div>
+      <div class="stat-card"><div class="stat-ico teal"><i class="fi fi-rr-box"></i></div><div><div class="stat-label">Total Pesanan</div><div class="stat-val">1.248</div></div></div>
+    </div>
+
+    <!-- Add Customer Form -->
+    <div class="add-form">
+      <div class="add-form-head"><i class="fi fi-rr-user-add" style="margin-right:6px"></i> Tambah Customer</div>
+      <div class="add-form-body">
+        <div class="grid-add">
+          <div><label class="f-label">Nama</label><input class="f-input" placeholder="Masukkan nama..." required></div>
+          <div><label class="f-label">Email</label><input type="email" class="f-input" placeholder="email@contoh.com" required></div>
+          <div><label class="f-label">Password</label><input type="password" class="f-input" placeholder="Min. 8 karakter" required></div>
+          <button class="btn-add"><i class="fi fi-rr-plus"></i> Tambah</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Users Table -->
+    <div class="data-card">
+      <div class="data-card-head">
+        <h3><i class="fi fi-rr-users" style="margin-right:6px"></i> Daftar Customer</h3>
+      </div>
+      <table>
+        <thead><tr><th>ID</th><th>Nama</th><th>Email</th><th>Role</th><th>Jumlah Pesanan</th><th style="text-align:right">Aksi</th></tr></thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--g400);font-size:12px;font-weight:700">#1</td>
+            <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar">BS</div><span style="font-weight:700;font-size:13px">Budi Santoso</span></div></td>
+            <td style="font-size:13px;color:var(--g500)">budi@email.com</td>
+            <td><span class="badge badge-success" style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px;display:inline-flex;align-items:center;gap:4px"><i class="fi fi-rr-user"></i> Customer</span></td>
+            <td><span class="badge badge-info" style="font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px">5 pesanan</span></td>
+            <td style="text-align:right"><div style="display:flex;gap:6px;justify-content:flex-end"><button class="btn-edit" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:10px;font-size:12px"><i class="fi fi-rr-edit"></i> Edit</button><button class="btn-del" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:10px;font-size:12px"><i class="fi fi-rr-trash"></i> Hapus</button></div></td>
+          </tr>
+          <tr>
+            <td style="color:var(--g400);font-size:12px;font-weight:700">#2</td>
+            <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar">SR</div><span style="font-weight:700;font-size:13px">Siti Rahayu</span></div></td>
+            <td style="font-size:13px;color:var(--g500)">siti@email.com</td>
+            <td><span class="badge badge-success" style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px;display:inline-flex;align-items:center;gap:4px"><i class="fi fi-rr-user"></i> Customer</span></td>
+            <td><span class="badge badge-info" style="font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px">12 pesanan</span></td>
+            <td style="text-align:right"><div style="display:flex;gap:6px;justify-content:flex-end"><button class="btn-edit" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:10px;font-size:12px"><i class="fi fi-rr-edit"></i> Edit</button><button class="btn-del" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:10px;font-size:12px"><i class="fi fi-rr-trash"></i> Hapus</button></div></td>
+          </tr>
+          <tr>
+            <td style="color:var(--g400);font-size:12px;font-weight:700">#3</td>
+            <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar">AF</div><span style="font-weight:700;font-size:13px">Ahmad Fauzi</span></div></td>
+            <td style="font-size:13px;color:var(--g500)">ahmad@email.com</td>
+            <td><span class="badge badge-success" style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px;display:inline-flex;align-items:center;gap:4px"><i class="fi fi-rr-user"></i> Customer</span></td>
+            <td><span class="badge badge-info" style="font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px">3 pesanan</span></td>
+            <td style="text-align:right"><div style="display:flex;gap:6px;justify-content:flex-end"><button class="btn-edit" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:10px;font-size:12px"><i class="fi fi-rr-edit"></i> Edit</button><button class="btn-del" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:10px;font-size:12px"><i class="fi fi-rr-trash"></i> Hapus</button></div></td>
+          </tr>
+          <tr>
+            <td style="color:var(--g400);font-size:12px;font-weight:700">#4</td>
+            <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar">DL</div><span style="font-weight:700;font-size:13px">Dewi Lestari</span></div></td>
+            <td style="font-size:13px;color:var(--g500)">dewi@email.com</td>
+            <td><span class="badge badge-success" style="font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px;display:inline-flex;align-items:center;gap:4px"><i class="fi fi-rr-user"></i> Customer</span></td>
+            <td><span class="badge badge-info" style="font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:4px 10px">0 pesanan</span></td>
+            <td style="text-align:right"><div style="display:flex;gap:6px;justify-content:flex-end"><button class="btn-edit" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:10px;font-size:12px"><i class="fi fi-rr-edit"></i> Edit</button><button class="btn-del" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:10px;font-size:12px"><i class="fi fi-rr-trash"></i> Hapus</button></div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</body>
+</html>
