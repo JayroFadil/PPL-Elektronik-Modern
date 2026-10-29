@@ -91,7 +91,16 @@
                             @enderror
                         </div>
                     </div>
-                    
+                    <div>
+                        <label>Berat Produk (gram)</label>
+                        <input
+                            type="number"
+                            name="berat_gram"
+                            min="1"
+                            value="{{ old('berat_gram', $produk->berat_gram) }}"
+                            required
+                        >
+                    </div>
                     <div class="mb-6">
                         <label class="block text-[11px] font-extrabold text-g700 tracking-widest uppercase mb-1.5">Deskripsi</label>
                         <textarea name="deskripsi" rows="3" required
