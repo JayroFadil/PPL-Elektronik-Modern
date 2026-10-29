@@ -90,29 +90,41 @@
                         </x-card>
 
                         <!-- Ekspedisi -->
+                       <!-- Penghitungan Ongkos Kirim RajaOngkir -->
                         <x-card class="p-6 mb-5">
-                            <h3 class="font-heading text-lg font-extrabold text-g900 mb-5 flex items-center gap-2">
-                                <i class="fi fi-rr-truck-side text-primary"></i> Pilih Ekspedisi
+                            <h3 class="font-heading text-lg font-extrabold text-g900 mb-5">
+                                Hitung Ongkos Kirim
                             </h3>
-                            <div class="space-y-3" id="ekspedisiList">
-                            @foreach ($ekspedisis as $ekspedisi)
-                                <label class="flex items-center gap-3 p-4 bg-white rounded-xl cursor-pointer border-[1.5px] border-g200 hover:border-primary transition-all has-[:checked]:border-primary has-[:checked]:bg-primary-light/50 has-[:checked]:ring-4 has-[:checked]:ring-primary/10">
-                                    <input type="radio" name="id_ekspedisi" value="{{ $ekspedisi->id_ekspedisi }}"
-                                        data-biaya="{{ $ekspedisi->biaya_pengiriman }}"
-                                        {{ $loop->first ? 'checked' : '' }}
-                                        onchange="calculateTotal()"
-                                        class="w-4 h-4 accent-primary shrink-0 rounded-full text-primary focus:ring-primary">
-                                    <div class="flex-1">
-                                        <div class="text-[14px] font-bold text-g800">{{ $ekspedisi->nama_ekspedisi }}</div>
-                                    </div>
-                                    <div class="font-heading font-extrabold text-primary text-[15px]">
-                                        Rp {{ number_format($ekspedisi->biaya_pengiriman, 0, ',', '.') }}
-                                    </div>
-                                </label>
-                            @endforeach
-                            </div>
-                        </x-card>
 
+                            <label for="courierCode" class="block mb-2">
+                                Pilih Ekspedisi
+                            </label>
+
+                            <select id="courierCode"
+                                class="w-full py-3 px-3 border rounded-xl mb-4">
+                                <option value="jne">JNE</option>
+                                <option value="jnt">J&T (JNT)</option>
+                                <option value="pos">POS Indonesia</option>
+                                <option value="tiki">TIKI</option>
+                            </select>
+
+                            <button type="button"
+                                id="calculateShippingButton"
+                                class="py-3 px-5 bg-primary text-white rounded-xl font-bold">
+                                Hitung Ongkir
+                            </button>
+
+                            <p id="shippingMessage"
+                                class="mt-3 text-sm text-g500"></p>
+
+                            <div id="shippingRates"
+                                class="mt-4 space-y-3"></div>
+
+                            <input type="hidden"
+                                name="shipping_quote_token"
+                                id="shippingQuoteToken"
+                                value="">
+                        </x-card>
                         <!-- Midtrans Payment -->
                         <x-card class="p-6">
                             <h3 class="font-heading text-lg font-extrabold text-g900 mb-5 flex items-center gap-2">
@@ -160,7 +172,9 @@
                             formId="voucherFormCheckout" 
                         />
 
-                        <div class="flex justify-between items-center mt-8 pt-6 border-t-2 border-dashed border-g100">
+                        <div id="checkoutSummary"
+                            data-base-subtotal="{{ max(0, $subtotal - $discount) }}" 
+                            class="flex justify-between items-center mt-8 pt-6 border-t-2 border-dashed border-g100">
                             <span class="text-base font-bold text-g900">Total Pembayaran</span>
                             <span class="font-heading text-2xl font-extrabold text-primary" id="totalPayment">Rp {{ number_format(max(0, $subtotal - $discount), 0, ',', '.') }}</span>
                         </div>
@@ -181,36 +195,220 @@
 
     @push('scripts')
     <script>
-        const baseSubtotal = {{ max(0, $subtotal - $discount) }};
-        
-        function formatRupiah(amount) {
-            return 'Rp ' + amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        }
+const shippingCalculateUrl =
+    @json(route('customer.shipping.calculate'));
 
-        function calculateTotal() {
-            const selectedEkspedisi = document.querySelector('input[name="id_ekspedisi"]:checked');
-            if (selectedEkspedisi) {
-                const ongkir = parseInt(selectedEkspedisi.getAttribute('data-biaya')) || 0;
-                const total = baseSubtotal + ongkir;
-                
-                document.getElementById('shippingCost').textContent = formatRupiah(ongkir);
-                const totalEl = document.getElementById('totalPayment');
-                if (totalEl) totalEl.textContent = formatRupiah(total);
+const csrfToken = @json(csrf_token());
+
+function formatRupiah(amount) {
+    return 'Rp ' + Number(amount)
+        .toLocaleString('id-ID');
+}
+
+function calculateTotal() {
+    const selected = document.querySelector(
+        'input[name="shipping_rate_choice"]:checked'
+    );
+
+    const cost = selected
+        ? Number(selected.dataset.cost)
+        : 0;
+
+    document.getElementById(
+        'shippingQuoteToken'
+    ).value = selected
+        ? selected.dataset.token
+        : '';
+
+    document.getElementById(
+        'shippingCost'
+    ).textContent = formatRupiah(cost);
+
+    const summary = document.getElementById(
+        'checkoutSummary'
+    );
+
+    const subtotal = Number(
+        summary?.dataset.baseSubtotal || 0
+    );
+
+    document.getElementById(
+        'totalPayment'
+    ).textContent = formatRupiah(subtotal + cost);
+
+    validateCheckoutReady();
+}
+
+function validateCheckoutReady() {
+    const button = document.getElementById(
+        'btnSubmitCheckout'
+    );
+
+    const hasAddress = document.querySelector(
+        'input[name="id_alamat"]:checked'
+    ) !== null;
+
+    const hasRate = document.querySelector(
+        'input[name="shipping_rate_choice"]:checked'
+    ) !== null;
+
+    const ready = hasAddress && hasRate;
+
+    button.disabled = !ready;
+    button.classList.toggle('opacity-60', !ready);
+    button.classList.toggle('cursor-not-allowed', !ready);
+    button.classList.toggle('pointer-events-none', !ready);
+}
+
+function clearShippingRates() {
+    document.getElementById(
+        'shippingRates'
+    ).replaceChildren();
+
+    document.getElementById(
+        'shippingQuoteToken'
+    ).value = '';
+
+    document.getElementById(
+        'shippingMessage'
+    ).textContent = '';
+
+    calculateTotal();
+}
+
+// Gunakan event delegation karena konten checkout bisa
+// diperbarui kembali setelah proses voucher AJAX.
+document.addEventListener('change', function (event) {
+    if (
+        event.target.matches('input[name="id_alamat"]') ||
+        event.target.matches('#courierCode')
+    ) {
+        clearShippingRates();
+    }
+
+    if (
+        event.target.matches(
+            'input[name="shipping_rate_choice"]'
+        )
+    ) {
+        calculateTotal();
+    }
+});
+
+document.addEventListener('click', async function (event) {
+    const button = event.target.closest(
+        '#calculateShippingButton'
+    );
+
+    if (!button) return;
+
+    const alamat = document.querySelector(
+        'input[name="id_alamat"]:checked'
+    );
+
+    const courier = document.getElementById(
+        'courierCode'
+    ).value;
+
+    const message = document.getElementById(
+        'shippingMessage'
+    );
+
+    const results = document.getElementById(
+        'shippingRates'
+    );
+
+    if (!alamat) {
+        message.textContent =
+            'Pilih alamat pengiriman terlebih dahulu.';
+        return;
+    }
+
+    clearShippingRates();
+    message.textContent = 'Sedang menghitung ongkir...';
+    button.disabled = true;
+
+    try {
+        const response = await fetch(
+            shippingCalculateUrl,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({
+                    id_alamat: alamat.value,
+                    courier: courier
+                })
             }
+        );
+
+        const payload = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                payload.message || 'Gagal menghitung ongkir.'
+            );
         }
 
-        function validateCheckoutReady() {
-            const btn = document.getElementById('btnSubmitCheckout');
-            const hasAlamat = {{ $alamats->isNotEmpty() ? 'true' : 'false' }};
-            const hasEkspedisi = document.querySelector('input[name="id_ekspedisi"]:checked') !== null;
+        for (const [index, rate] of payload.data.entries()) {
+            const label = document.createElement('label');
 
-            if (hasAlamat && hasEkspedisi) {
-                btn.classList.remove('opacity-60', 'cursor-not-allowed', 'pointer-events-none');
-            } else {
-                btn.classList.add('opacity-60', 'cursor-not-allowed', 'pointer-events-none');
+            label.className =
+                'flex items-start gap-3 border rounded-xl p-4 cursor-pointer';
+
+            const radio = document.createElement('input');
+
+            radio.type = 'radio';
+            radio.name = 'shipping_rate_choice';
+            radio.value = String(index);
+            radio.dataset.token = rate.token;
+            radio.dataset.cost = String(rate.cost);
+
+            if (index === 0) {
+                radio.checked = true;
             }
+
+            const detail = document.createElement('span');
+
+            detail.className = 'text-sm font-semibold';
+
+            const service = [
+                rate.name,
+                rate.service,
+                rate.description
+            ].filter(Boolean).join(' - ');
+
+            detail.textContent =
+                service + ' | ' +
+                formatRupiah(rate.cost) +
+                ' | Estimasi: ' + (rate.etd || '-');
+
+            label.append(radio, detail);
+            results.append(label);
         }
 
+        if (payload.data.length > 0) {
+            message.textContent =
+                'Pilih layanan pengiriman yang tersedia.';
+            calculateTotal();
+        } else {
+            message.textContent =
+                'Tarif tidak tersedia untuk pilihan ini.';
+        }
+    } catch (error) {
+        message.textContent = error.message;
+    } finally {
+        button.disabled = false;
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    calculateTotal();
+    validateCheckoutReady();
+});
         // Smooth Voucher AJAX Logic
         document.addEventListener('submit', async function(e) {
             const form = e.target;
