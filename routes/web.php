@@ -95,6 +95,7 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     Route::post('/my-orders/{pesanan}/payment', [PesananController::class, 'startPayment'])->name('customer.orders.payment');
     Route::post('/my-orders/{pesanan}/complete', [PesananController::class, 'completeOrder'])->name('customer.orders.complete');
     Route::get('/checkout', [PesananController::class, 'checkout'])->name('customer.checkout');
+    Route::get('/checkout/shipping-options', [PesananController::class, 'shippingOptions'])->name('customer.shippingOptions');
     Route::post('/buy-now', [PesananController::class, 'buyNow'])->name('customer.buyNow');
     Route::post('/checkout', [PesananController::class, 'placeOrder'])->name('customer.placeOrder');
     Route::get('/notifications', [NotifikasiController::class, 'index'])->name('customer.notifications.index');

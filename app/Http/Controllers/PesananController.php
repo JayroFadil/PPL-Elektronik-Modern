@@ -12,9 +12,11 @@ use App\Models\Pembayaran;
 use App\Models\Promo;
 use App\Models\Keranjang;
 use App\Services\MidtransPaymentService;
+use App\Services\RajaOngkirShippingService;
 use App\Traits\OrderStats;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\RequestException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -43,7 +45,7 @@ class PesananController extends Controller
                 'promo',
             ])
             ->select('id_pesanan','id_users','id_ekspedisi','id_promo','id_alamat','no_resi','tanggal_pesan',
-                     'status_pesanan','total_bayar','subtotal','diskon','ongkos_kirim')
+                     'status_pesanan','total_bayar','subtotal','diskon','ongkos_kirim','estimasi_pengiriman')
             ->latest('tanggal_pesan')
             ->paginate(20);
 
@@ -148,7 +150,7 @@ class PesananController extends Controller
                 'promo',
             ])
             ->select('id_pesanan','id_users','id_ekspedisi','id_promo','id_alamat','no_resi','tanggal_pesan',
-                     'status_pesanan','total_bayar','subtotal','diskon','ongkos_kirim')
+                     'status_pesanan','total_bayar','subtotal','diskon','ongkos_kirim','estimasi_pengiriman')
             ->where('id_users', Auth::id())
             ->latest('tanggal_pesan')
             ->paginate(10);
@@ -225,18 +227,52 @@ class PesananController extends Controller
 
         $appliedPromo = $this->appliedPromo();
         $discount     = $appliedPromo ? $this->calculateDiscount($appliedPromo, $subtotal) : 0;
-        $alamats    = AlamatUser::where('id_users', Auth::id())
+        $alamats      = AlamatUser::where('id_users', Auth::id())
             ->select('id_alamat','id_users','id_desa','label_alamat','nomor_telepon','detail_alamat','is_utama')
             ->with(['desa.kecamatan.kota.provinsi'])
             ->get();
-        $ekspedisis = Ekspedisi::select('id_ekspedisi','nama_ekspedisi','biaya_pengiriman')->get();
-        
+
+        $shippingService = app(RajaOngkirShippingService::class);
+        $shippingOptions = [];
+        $defaultAlamat = $alamats->first();
+        if ($defaultAlamat) {
+            $shippingOptions = $shippingService->getOptionsForAlamat($defaultAlamat, collect($items)->sum('qty'));
+        }
+
+        $ekspedisis = collect($shippingOptions)->map(fn ($option) => (object) [
+            'id_ekspedisi' => $option['id_ekspedisi'],
+            'nama_ekspedisi' => $option['nama_ekspedisi'],
+            'service' => $option['service'],
+            'biaya_pengiriman' => (int) $option['biaya_pengiriman'],
+            'etd' => $option['etd'],
+        ]);
+
         $promos = Promo::where('tanggal_mulai', '<=', now())
             ->where('tanggal_berakhir', '>=', now())
             ->where('kuota', '>', 0)
             ->get();
-        
+
         return view('customer.checkout', compact('items', 'subtotal', 'discount', 'appliedPromo', 'alamats', 'ekspedisis', 'promos'));
+    }
+
+    public function shippingOptions(Request $request, RajaOngkirShippingService $shippingService): JsonResponse
+    {
+        $data = $request->validate([
+            'id_alamat' => ['required', 'integer', 'exists:alamat_users,id_alamat'],
+        ]);
+
+        $alamat = AlamatUser::where('id_users', Auth::id())
+            ->with(['desa.kecamatan.kota.provinsi'])
+            ->findOrFail($data['id_alamat']);
+
+        $options = $shippingService->getOptionsForAlamat($alamat, $this->checkoutTotalQty());
+        if ($options === []) {
+            return response()->json([
+                'message' => 'Tarif RajaOngkir tidak tersedia untuk alamat ini. Periksa konfigurasi dan ID wilayah tujuan.',
+            ], 422);
+        }
+
+        return response()->json(['options' => $options]);
     }
 
     /**
@@ -269,6 +305,7 @@ class PesananController extends Controller
         $ekspedisi  = Ekspedisi::findOrFail($request->id_ekspedisi);
         $subtotal   = 0;
         $orderItems = [];
+        $totalQty   = 0;
 
         if ($buyNowItem) {
             $produk = Produk::find($buyNowItem['id_produk']);
@@ -279,6 +316,7 @@ class PesananController extends Controller
             if ($produk->stok < $qty) {
                 return back()->with('error', 'Stok ' . $produk->nama_produk . ' tidak mencukupi.')->withInput();
             }
+            $totalQty   += $qty;
             $lineTotal  = $produk->harga * $qty;
             $subtotal  += $lineTotal;
             $orderItems[] = [
@@ -304,6 +342,7 @@ class PesananController extends Controller
                             ->with('error', 'Stok ' . $produk->nama_produk . ' tidak mencukupi.')
                             ->withInput();
                     }
+                    $totalQty  += $qty;
                     $lineTotal  = $produk->harga * $qty;
                     $subtotal  += $lineTotal;
                     $orderItems[] = [
@@ -315,6 +354,20 @@ class PesananController extends Controller
             }
         }
 
+        $alamatOrder = AlamatUser::with(['desa.kecamatan.kota.provinsi'])->findOrFail($request->id_alamat);
+        $shippingService = app(RajaOngkirShippingService::class);
+        $dynamicShipping = $shippingService->getOptionsForAlamat($alamatOrder, $totalQty);
+        $selectedShipping = collect($dynamicShipping)->firstWhere('id_ekspedisi', (int) $request->id_ekspedisi);
+
+        if (!$selectedShipping) {
+            return back()
+                ->with('error', 'Tarif pengiriman tidak tersedia lagi. Silakan pilih ulang ekspedisi.')
+                ->withInput();
+        }
+
+        $ekspedisi->nama_ekspedisi = $selectedShipping['nama_ekspedisi'];
+        $ekspedisi->biaya_pengiriman = (int) $selectedShipping['biaya_pengiriman'];
+        $estimasiPengiriman = $selectedShipping['etd'] ?? null;
         $ongkir = $ekspedisi->biaya_pengiriman ?? 0;
         $appliedPromo = $this->appliedPromo();
         $discount = $appliedPromo ? $this->calculateDiscount($appliedPromo, $subtotal) : 0;
@@ -324,7 +377,7 @@ class PesananController extends Controller
             return back()->with('error', 'Total pembayaran harus lebih dari Rp0 untuk diproses oleh Midtrans.');
         }
 
-        $createdPesanan = DB::transaction(function () use ($request, $subtotal, $discount, $ongkir, $totalBayar, $orderItems, $promo, $appliedPromo) {
+        $createdPesanan = DB::transaction(function () use ($request, $subtotal, $discount, $ongkir, $estimasiPengiriman, $totalBayar, $orderItems, $promo, $appliedPromo) {
             $pesanan = Pesanan::create([
                 'id_users' => Auth::id(),
                 'id_alamat' => $request->id_alamat,
@@ -335,6 +388,7 @@ class PesananController extends Controller
                 'diskon' => $discount,
                 'no_resi' => '', // diupdate setelah id didapat
                 'ongkos_kirim' => $ongkir,
+                'estimasi_pengiriman' => $estimasiPengiriman,
                 'total_bayar' => $totalBayar,
                 'status_pesanan' => 'menunggu',
             ]);
@@ -403,6 +457,18 @@ class PesananController extends Controller
             ->route('customer.orders')
             ->with('status', 'Pesanan berhasil dibuat. Selesaikan pembayaran melalui Midtrans.')
             ->with('snap_token', $snapToken);
+    }
+
+    private function checkoutTotalQty(): int
+    {
+        $buyNowItem = session('buy_now_item');
+        if ($buyNowItem) {
+            return max(0, (int) ($buyNowItem['qty'] ?? 0));
+        }
+
+        $keranjang = Keranjang::where('id_users', Auth::id())->first();
+
+        return $keranjang ? (int) $keranjang->detailKeranjangs()->sum('qty') : 0;
     }
 
     public function startPayment(Pesanan $pesanan, MidtransPaymentService $midtrans)

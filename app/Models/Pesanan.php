@@ -29,6 +29,7 @@ class Pesanan extends Model
         'diskon',
         'no_resi',
         'ongkos_kirim',
+        'estimasi_pengiriman',
         'total_bayar',
         'status_pesanan',
     ];
