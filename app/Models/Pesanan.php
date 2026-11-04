@@ -31,6 +31,7 @@ class Pesanan extends Model
         'ongkos_kirim',
         'total_bayar',
         'status_pesanan',
+        'layanan_ekspedisi',
     ];
 
     protected $casts = [

@@ -72,6 +72,16 @@
                             @enderror
                         </div>
                         <div>
+                            <label>Berat Produk (gram)</label>
+                            <input
+                                type="number"
+                                name="berat_gram"
+                                min="1"
+                                value="{{ old('berat_gram') }}"
+                                required
+                            >
+                        </div>
+                        <div>
                             <label class="block text-[11px] font-extrabold text-g700 tracking-widest uppercase mb-1.5">Gambar Produk</label>
                             <input type="file" name="gambar" accept="image/*" required
                                 class="w-full py-2 px-3 border-[1.5px] {{ $errors->has('gambar') ? 'border-red-500' : 'border-g200' }} rounded-lg outline-none text-[12px] font-semibold text-g800 bg-g50 transition-all focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/10 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-[11px] file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20">
