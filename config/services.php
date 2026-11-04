@@ -41,12 +41,13 @@ return [
         'is_production' => env('MIDTRANS_IS_PRODUCTION', false),
     ],
 
+    // rajaongkir
     'rajaongkir' => [
-        'api_key' => env('RAJAONGKIR_API_KEY'),
-        'origin_id' => env('RAJAONGKIR_ORIGIN_ID'),
-        'origin_name' => env('RAJAONGKIR_ORIGIN_NAME', 'Kecamatan Bangkalan'),
-        'couriers' => env('RAJAONGKIR_COURIERS', 'jne:pos:tiki:jnt'),
-        'base_url' => env('RAJAONGKIR_BASE_URL', 'https://rajaongkir.komerce.id/api/v1'),
-    ],
-
+    'base_url' => env(
+        'RAJAONGKIR_BASE_URL',
+        'https://rajaongkir.komerce.id/api/v1'
+    ),
+    'key' => env('RAJAONGKIR_API_KEY'),
+    'origin_id' => env('RAJAONGKIR_ORIGIN_ID'),
+],
 ];

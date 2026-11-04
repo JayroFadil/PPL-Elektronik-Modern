@@ -22,6 +22,7 @@ class Produk extends Model
         'deskripsi',
         'harga',
         'stok',
+        'berat_gram',
     ];
 
     public function kategori(): BelongsTo
