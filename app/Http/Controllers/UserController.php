@@ -304,9 +304,11 @@ class UserController extends Controller
     {
         $data = $request->validate([
             'label_alamat' => ['required', 'string', 'max:50'],
+            'nama_penerima' => ['required', 'string', 'max:100'],
             'nomor_telepon' => ['required', 'string', 'max:20'],
             'detail_alamat' => ['required', 'string'],
             'id_desa' => ['required', 'exists:desas,id_desa'],
+            'redirect_to' => ['nullable', 'in:checkout'],
         ]);
 
         $data['id_users'] = Auth::id();
@@ -318,6 +320,10 @@ class UserController extends Controller
 
         \App\Models\AlamatUser::create($data);
 
+        if ($request->redirect_to === 'checkout') {
+            return redirect()->route('customer.checkout')->with('status', 'Alamat berhasil ditambahkan!');
+        }
+
         return redirect()->route('customer.profile')->with('status', 'Alamat berhasil ditambahkan!');
     }
 
@@ -327,9 +333,11 @@ class UserController extends Controller
 
         $data = $request->validate([
             'label_alamat' => ['required', 'string', 'max:50'],
+            'nama_penerima' => ['required', 'string', 'max:100'],
             'nomor_telepon' => ['required', 'string', 'max:20'],
             'detail_alamat' => ['required', 'string'],
             'id_desa' => ['required', 'exists:desas,id_desa'],
+            'redirect_to' => ['nullable', 'in:checkout'],
         ]);
 
         $data['is_utama'] = $request->has('is_utama') ? 1 : 0;
@@ -341,6 +349,10 @@ class UserController extends Controller
         }
 
         $alamatUser->update($data);
+
+        if ($request->redirect_to === 'checkout') {
+            return redirect()->route('customer.checkout')->with('status', 'Alamat berhasil diperbarui!');
+        }
 
         return redirect()->route('customer.profile', ['tab' => 'alamat'])->with('status', 'Alamat berhasil diperbarui!');
     }

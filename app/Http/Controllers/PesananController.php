@@ -11,6 +11,7 @@ use App\Models\Notifikasi;
 use App\Models\Pembayaran;
 use App\Models\Promo;
 use App\Models\Keranjang;
+use App\Models\Provinsi;
 use App\Services\MidtransPaymentService;
 use App\Traits\OrderStats;
 use Illuminate\Http\Client\ConnectionException;
@@ -252,8 +253,13 @@ class PesananController extends Controller
         $appliedPromo = $this->appliedPromo();
         $discount     = $appliedPromo ? $this->calculateDiscount($appliedPromo, $subtotal) : 0;
         $alamats    = AlamatUser::where('id_users', Auth::id())
-            ->select('id_alamat','id_users','id_desa','label_alamat','nomor_telepon','detail_alamat','is_utama')
+            ->select('id_alamat','id_users','id_desa','label_alamat','nama_penerima','nomor_telepon','detail_alamat','is_utama')
             ->with(['desa.kecamatan.kota.provinsi'])
+            ->orderByDesc('is_utama')
+            ->orderBy('id_alamat')
+            ->get();
+        $provinsis = Provinsi::select('id_provinsi', 'nama_provinsi')
+            ->orderBy('nama_provinsi')
             ->get();
         $ekspedisis = Ekspedisi::select('id_ekspedisi','nama_ekspedisi','biaya_pengiriman')->get();
         
@@ -262,7 +268,7 @@ class PesananController extends Controller
             ->where('kuota', '>', 0)
             ->get();
         
-        return view('customer.checkout', compact('items', 'subtotal', 'discount', 'appliedPromo', 'alamats', 'ekspedisis', 'promos'));
+        return view('customer.checkout', compact('items', 'subtotal', 'discount', 'appliedPromo', 'alamats', 'provinsis', 'ekspedisis', 'promos'));
     }
 
     /**

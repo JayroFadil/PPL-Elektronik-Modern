@@ -48,6 +48,31 @@ class ProdukSeeder extends Seeder
         'tv-sony' => 7999000,   // Sony Bravia Smart TV 43"
     ];
 
+    private const BERAT_PRODUK = [
+        'infinix-smart-20' => 1500,
+        'iphone-13' => 500,
+        'iphone-17' => 500,
+        'realme-c35' => 500,
+        'redmi-note-10-pro' => 500,
+        'redmi-note-13-pro' => 500,
+        'kabel-vga-to-hdmi' => 300,
+        'kabel-hdmi' => 250,
+        'kabel-tembaga' => 1000,
+        'kabel-vga' => 300,
+        'canon' => 1000,
+        'sony' => 1000,
+        'kulkas-sony' => 40000,
+        'asus-ideaped' => 2500,
+        'asus-rog' => 3000,
+        'asus-tuf' => 3000,
+        'asus-vivobook' => 2500,
+        'hp-victus' => 3000,
+        'lenovo-loq' => 3000,
+        'tv-polytron' => 8000,
+        'tv-sharp' => 8000,
+        'tv-sony' => 10000,
+    ];
+
     /**
      * Deskripsi spesifik per produk.
      */
@@ -131,6 +156,8 @@ class ProdukSeeder extends Seeder
                     // Ambil deskripsi spesifik, fallback ke deskripsi generik
                     $deskripsi = self::DESKRIPSI_PRODUK[$nameWithoutExt]
                         ?? 'Produk unggulan ' . $namaProduk . ' dengan kualitas terbaik dan garansi resmi.';
+                    $beratGram = self::BERAT_PRODUK[$nameWithoutExt]
+                        ?? $this->beratFallback($kategoriId);
 
                     $rows[] = [
                         'id_produk' => $id++,
@@ -140,6 +167,7 @@ class ProdukSeeder extends Seeder
                         'deskripsi' => $deskripsi,
                         'harga' => $harga,
                         'stok' => rand(10, 100),
+                        'berat_gram' => $beratGram,
                     ];
                 }
             }
@@ -164,6 +192,19 @@ class ProdukSeeder extends Seeder
             5       => rand(50, 250) * 100000,  // Laptop: 5jt - 25jt
             6       => rand(20, 100) * 100000,  // TV: 2jt - 10jt
             default => rand(10, 50) * 100000,
+        };
+    }
+
+    private function beratFallback(int $kategoriId): int
+    {
+        return match ($kategoriId) {
+            1 => 1500,
+            2 => 500,
+            3 => 1000,
+            4 => 40000,
+            5 => 2500,
+            6 => 8000,
+            default => 1000,
         };
     }
 }
