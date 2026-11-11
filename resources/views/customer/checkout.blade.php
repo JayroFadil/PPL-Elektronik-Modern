@@ -67,30 +67,106 @@
                             @if ($alamats->count())
                                 <div class="space-y-3">
                                 @foreach ($alamats as $alamat)
-                                    <label class="flex items-start gap-3 p-4 bg-white rounded-xl cursor-pointer border-[1.5px] border-g200 hover:border-primary transition-all has-[:checked]:border-primary has-[:checked]:bg-primary-light/50 has-[:checked]:ring-4 has-[:checked]:ring-primary/10">
-                                        <input type="radio" name="id_alamat" value="{{ $alamat->id_alamat }}"
-                                            {{ $loop->first ? 'checked' : '' }}
-                                            class="w-4 h-4 mt-0.5 accent-primary shrink-0 rounded-full text-primary focus:ring-primary">
-                                        <div>
-                                            <div class="text-[14px] font-bold text-g800 mb-0.5">{{ $alamat->label_alamat }}</div>
-                                            <div class="text-[13px] text-g600 leading-relaxed mb-1">{{ $alamat->detail_alamat }}</div>
-                                            <div class="text-[12px] font-semibold text-g500 flex items-center gap-1.5"><i class="fi fi-rr-phone-call"></i> {{ $alamat->nomor_telepon }}</div>
-                                        </div>
-                                    </label>
+                                    <div class="relative">
+                                                                                    <summary class="absolute top-3 right-3 z-10 list-none cursor-pointer inline-flex items-center gap-1.5 py-1.5 px-2.5 text-[12px] font-bold text-primary rounded-lg hover:bg-primary-light transition-colors">
+                                                 Edit
+                                            </summary>
+                                        <label class="flex items-start gap-3 p-4 pr-32 bg-white rounded-xl cursor-pointer border-[1.5px] border-g200 hover:border-primary transition-all has-[:checked]:border-primary has-[:checked]:bg-primary-light/50 has-[:checked]:ring-4 has-[:checked]:ring-primary/10">
+                                            <input type="radio" name="id_alamat" value="{{ $alamat->id_alamat }}"
+                                                {{ $alamat->is_utama || (!$alamats->contains(fn ($item) => $item->is_utama) && $loop->first) ? 'checked' : '' }}
+                                                class="w-4 h-4 mt-0.5 accent-primary shrink-0 rounded-full text-primary focus:ring-primary">
+                                            <div>
+                                                <div class="text-[13px] text-g700 font-semibold mb-0.5">{{ $alamat->nama_penerima }} <span class="text-[12px] text-g500">|{{ $alamat->nomor_telepon }}</span></div>
+                                                <div class="text-[13px] text-g700 leading-relaxed mb-1">
+                                                    {{ $alamat->detail_alamat }}<br>
+                                                    <span class="text-g700">{{ $alamat->desa->kecamatan->nama_kecamatan }}, {{ $alamat->desa->kecamatan->kota->nama_kota }}, {{ $alamat->desa->kecamatan->kota->provinsi->nama_provinsi }}</span>
+                                                </div>
+                                                <div class="text-[12px] font-bold text-g700 mb-0.5">{{ $alamat->label_alamat }}</div>
+                                            </div>
+                                        </label>
+                                    </div>
                                 @endforeach
+                                </div>
+                                <div class="mt-4 flex flex-wrap items-center gap-3">
+                                    <a href="{{ route('customer.profile', ['tab' => 'alamat']) }}" class="inline-flex items-center gap-2 py-2.5 px-4 border border-primary text-primary rounded-xl font-bold text-[12px] hover:bg-primary-light transition-colors">
+                                        <i class="fi fi-rr-plus"></i> Tambah alamat baru
+                                    </a>
                                 </div>
                             @else
                                 <x-alert type="warning" class="mb-4">
-                                    Anda belum memiliki alamat pengiriman. Tambahkan alamat terlebih dahulu melalui halaman profil.
+                                    Anda belum memiliki alamat pengiriman. Tambahkan alamat terlebih dahulu untuk menghitung ongkos kirim.
                                 </x-alert>
-                                <x-button variant="outline" onclick="window.location='{{ route('customer.profile') }}?tab=alamat'">
+                                <button type="button" id="showCheckoutAddressForm" class="py-3 px-5 border border-primary text-primary rounded-xl font-bold hover:bg-primary-light transition-colors">
                                     <i class="fi fi-rr-plus"></i> Tambah Alamat
-                                </x-button>
+                                </button>
+                                <form method="POST" action="{{ route('customer.alamat.store') }}" id="checkoutAddressForm" class="hidden mt-5 border-t border-g100 pt-5 checkout-location-form">
+                                    @csrf
+                                    <input type="hidden" name="redirect_to" value="checkout">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <x-label>Label Alamat</x-label>
+                                            <x-input type="text" name="label_alamat" required placeholder="Rumah" />
+                                        </div>
+                                        <div>
+                                            <x-label>Nama Penerima</x-label>
+                                            <x-input type="text" name="nama_penerima" required placeholder="Nama penerima" />
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <x-label>Nomor Telepon</x-label>
+                                            <x-input type="text" name="nomor_telepon" required placeholder="08..." />
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <x-label>Provinsi</x-label>
+                                            <x-select name="id_provinsi" class="provinsi-select" required>
+                                                <option value="">-- Pilih Provinsi --</option>
+                                                @foreach($provinsis as $provinsi)
+                                                    <option value="{{ $provinsi->id_provinsi }}">{{ $provinsi->nama_provinsi }}</option>
+                                                @endforeach
+                                            </x-select>
+                                        </div>
+                                        <div>
+                                            <x-label>Kota/Kabupaten</x-label>
+                                            <x-select name="id_kota" class="kota-select" required disabled>
+                                                <option value="">-- Pilih Kota --</option>
+                                            </x-select>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <x-label>Kecamatan</x-label>
+                                            <x-select name="id_kecamatan" class="kecamatan-select" required disabled>
+                                                <option value="">-- Pilih Kecamatan --</option>
+                                            </x-select>
+                                        </div>
+                                        <div>
+                                            <x-label>Desa/Kelurahan</x-label>
+                                            <x-select name="id_desa" class="desa-select" required disabled>
+                                                <option value="">-- Pilih Desa --</option>
+                                            </x-select>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <x-label>Detail Alamat</x-label>
+                                        <x-textarea name="detail_alamat" rows="3" required placeholder="Jalan, RT/RW, patokan"></x-textarea>
+                                    </div>
+                                    <label class="flex items-center gap-2 text-[13px] font-bold text-g800 cursor-pointer mb-5">
+                                        <input type="checkbox" name="is_utama" value="1" checked class="w-4 h-4 accent-primary rounded text-primary focus:ring-primary">
+                                        Jadikan sebagai alamat utama
+                                    </label>
+                                    <x-button type="submit" class="py-3 px-6">
+                                        <i class="fi fi-rr-disk"></i> Simpan Alamat
+                                    </x-button>
+                                </form>
                             @endif
                         </x-card>
 
                         <!-- Ekspedisi -->
                        <!-- Penghitungan Ongkos Kirim RajaOngkir -->
+                       @if ($alamats->count())
                         <x-card class="p-6 mb-5">
                             <h3 class="font-heading text-lg font-extrabold text-g900 mb-5">
                                 Hitung Ongkos Kirim
@@ -125,6 +201,7 @@
                                 id="shippingQuoteToken"
                                 value="">
                         </x-card>
+                        @endif
                         <!-- Midtrans Payment -->
                         <x-card class="p-6">
                             <h3 class="font-heading text-lg font-extrabold text-g900 mb-5 flex items-center gap-2">
@@ -199,6 +276,63 @@ const shippingCalculateUrl =
     @json(route('customer.shipping.calculate'));
 
 const csrfToken = @json(csrf_token());
+
+function initializeLocationForms() {
+    document.querySelectorAll('.location-form').forEach(form => {
+        const provinsi = form.querySelector('.provinsi-select');
+        const kota = form.querySelector('.kota-select');
+        const kecamatan = form.querySelector('.kecamatan-select');
+        const desa = form.querySelector('.desa-select');
+
+        if (!provinsi || !kota || !kecamatan || !desa || form.dataset.locationReady) {
+            return;
+        }
+
+        form.dataset.locationReady = '1';
+
+        const reset = (select, label) => {
+            select.innerHTML = `<option value="">-- Pilih ${label} --</option>`;
+            select.disabled = true;
+        };
+
+        const load = async (url, select, valueKey, nameKey, label) => {
+            reset(select, label);
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`Gagal memuat data ${label.toLowerCase()}.`);
+            }
+            const data = await response.json();
+            data.forEach(item => {
+                select.add(new Option(item[nameKey], item[valueKey]));
+            });
+            select.disabled = false;
+        };
+
+        provinsi.addEventListener('change', async () => {
+            reset(kota, 'Kota');
+            reset(kecamatan, 'Kecamatan');
+            reset(desa, 'Desa');
+            if (provinsi.value) {
+                await load(`/locations/kotas/${provinsi.value}`, kota, 'id_kota', 'nama_kota', 'Kota');
+            }
+        });
+
+        kota.addEventListener('change', async () => {
+            reset(kecamatan, 'Kecamatan');
+            reset(desa, 'Desa');
+            if (kota.value) {
+                await load(`/locations/kecamatans/${kota.value}`, kecamatan, 'id_kecamatan', 'nama_kecamatan', 'Kecamatan');
+            }
+        });
+
+        kecamatan.addEventListener('change', async () => {
+            reset(desa, 'Desa');
+            if (kecamatan.value) {
+                await load(`/locations/desas/${kecamatan.value}`, desa, 'id_desa', 'nama_desa', 'Desa');
+            }
+        });
+    });
+}
 
 function formatRupiah(amount) {
     return 'Rp ' + Number(amount)
@@ -406,6 +540,7 @@ document.addEventListener('click', async function (event) {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
+    initializeLocationForms();
     calculateTotal();
     validateCheckoutReady();
 });
@@ -460,6 +595,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         document.addEventListener('DOMContentLoaded', () => {
+            initializeLocationForms();
             calculateTotal();
             validateCheckoutReady();
         });
