@@ -196,12 +196,45 @@
                 : 'https://app.sandbox.midtrans.com';
         @endphp
         @push('scripts')
+            <style>
+                @keyframes intro_anim{
+                    0%{
+                        transform: scale(10) rotate(-20deg);
+                        opacity: 0;
+                    }
+                    70% {
+                        transform: scale(3) rotate(0deg);
+                        opacity: 1;
+                    }
+                }
+                .intro{
+                    animation: intro_anim 0.7s
+                    cubic-bezier(0.34, 1.56, 0.64,1) forwards!important;
+                }
+            </style>
+                <script src="{{ $snapScriptHost }}/snap/snap.js"
+                data-client-key="{{config('services.midtrans.client_key') }}">
+            </script>
             <script src="{{ $snapScriptHost }}/snap/snap.js?client-key={{ urlencode(config('services.midtrans.client_key')) }}"></script>
             @if (session('snap_token'))
                 <script>
                     document.addEventListener('DOMContentLoaded', () => {
                         window.snap.pay(@json(session('snap_token')), {
-                            onSuccess: () => window.location.reload(),
+                            onSuccess: function(result){
+                                Swal.fire({
+                                    title: 'Pembayaran Berhasil!',
+                                    text: 'Terima kasih, pembayaran Anda telah berhasil kami terima.',
+                                    imageUrl: "{{ asset('image/wokee-danamasuk.png') }}",
+                                    imageWidth: 150,
+                                    imageHeight: 150,
+                                    imageAlt: 'Sukses',
+                                    customClass:{image:'intro'},
+                                    confirmButtonColor: '#1A5CFF',
+                                    confirmButtonText: 'Selesai'
+                                }).then(()=>{
+                                    window.location.reload();
+                                });
+                            },
                             onPending: () => window.location.reload(),
                             onError: () => window.location.reload()
                         });

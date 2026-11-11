@@ -34,3 +34,15 @@
         });
     </script>
 @endif
+
+@if (session('payment_success'))
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof window.showPaymentSuccessAlert === 'function') 
+            {
+                window.showPaymentSuccessAlert('Pembayaran Berhasil!',
+                "{!!addslashes(session('payment_success')) !!}");
+            }
+        });
+    </script>
+@endif

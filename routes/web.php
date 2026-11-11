@@ -167,3 +167,28 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->grou
     Route::get('/', [UserController::class, 'ownerDashboard'])->name('index');
     Route::get('/report/download', [UserController::class, 'downloadReport'])->name('report.download');
 });
+
+// Rute sementara untuk testing: Reset status pesanan terakhir
+Route::get('/dev/reset-order', function () {
+    $pesanan = App\Models\Pesanan::with('pembayaran')->latest('id_pesanan')->first();
+
+    if (!$pesanan) {
+        return 'Tidak ada pesanan di database.';
+    }
+
+    $pesanan->update(['status_pesanan' => 'menunggu']);
+
+    if ($pesanan->pembayaran) {
+        $pesanan->pembayaran->update([
+            'status_konfirmasi' => 0,
+            'transaction_status' => null,
+            'snap_token' => null,
+            'midtrans_order_id' => $pesanan->no_resi . '-' . strtoupper(Illuminate\Support\Str::random(6)),
+            'paid_at' => null,
+            'transaction_id' => null,
+            'payment_type' => null,
+        ]);
+    }
+
+    return redirect()->route('customer.orders')->with('status', 'Pesanan ' . $pesanan->no_resi . ' berhasil di-reset ke Menunggu!');
+});

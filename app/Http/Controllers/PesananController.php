@@ -493,7 +493,7 @@ class PesananController extends Controller
 
         return redirect()
             ->route('customer.orders')
-            ->with('status', 'Pesanan berhasil dibuat. Selesaikan pembayaran melalui Midtrans.')
+            ->with('status', 'Pesanan berhasil dibuat. Silahkan Melakukan Pembayaran.')
             ->with('snap_token', $snapToken);
     }
 
