@@ -15,6 +15,7 @@ class AlamatUser extends Model
         'id_users',
         'id_desa',
         'label_alamat',
+        'nama_penerima',
         'nomor_telepon',
         'detail_alamat',
         'is_utama',

@@ -11,6 +11,7 @@ use App\Models\Notifikasi;
 use App\Models\Pembayaran;
 use App\Models\Promo;
 use App\Models\Keranjang;
+use App\Models\Provinsi;
 use App\Services\MidtransPaymentService;
 use App\Traits\OrderStats;
 use Illuminate\Http\Client\ConnectionException;
@@ -42,8 +43,21 @@ class PesananController extends Controller
                 'detailPesanans.produk:id_produk,nama_produk,gambar,harga',
                 'promo',
             ])
-            ->select('id_pesanan','id_users','id_ekspedisi','id_promo','id_alamat','no_resi','tanggal_pesan',
-                     'status_pesanan','total_bayar','subtotal','diskon','ongkos_kirim')
+            ->select(
+    'id_pesanan',
+    'id_users',
+    'id_ekspedisi',
+    'layanan_ekspedisi',
+    'id_promo',
+    'id_alamat',
+    'no_resi',
+    'tanggal_pesan',
+    'status_pesanan',
+    'total_bayar',
+    'subtotal',
+    'diskon',
+    'ongkos_kirim'
+)
             ->latest('tanggal_pesan')
             ->paginate(20);
 
@@ -147,8 +161,21 @@ class PesananController extends Controller
                 'pembayaran:id_pembayaran,id_pesanan,metode_pembayaran,status_konfirmasi,transaction_status,payment_type',
                 'promo',
             ])
-            ->select('id_pesanan','id_users','id_ekspedisi','id_promo','id_alamat','no_resi','tanggal_pesan',
-                     'status_pesanan','total_bayar','subtotal','diskon','ongkos_kirim')
+            ->select(
+    'id_pesanan',
+    'id_users',
+    'id_ekspedisi',
+    'layanan_ekspedisi',
+    'id_promo',
+    'id_alamat',
+    'no_resi',
+    'tanggal_pesan',
+    'status_pesanan',
+    'total_bayar',
+    'subtotal',
+    'diskon',
+    'ongkos_kirim'
+)
             ->where('id_users', Auth::id())
             ->latest('tanggal_pesan')
             ->paginate(10);
@@ -226,8 +253,13 @@ class PesananController extends Controller
         $appliedPromo = $this->appliedPromo();
         $discount     = $appliedPromo ? $this->calculateDiscount($appliedPromo, $subtotal) : 0;
         $alamats    = AlamatUser::where('id_users', Auth::id())
-            ->select('id_alamat','id_users','id_desa','label_alamat','nomor_telepon','detail_alamat','is_utama')
+            ->select('id_alamat','id_users','id_desa','label_alamat','nama_penerima','nomor_telepon','detail_alamat','is_utama')
             ->with(['desa.kecamatan.kota.provinsi'])
+            ->orderByDesc('is_utama')
+            ->orderBy('id_alamat')
+            ->get();
+        $provinsis = Provinsi::select('id_provinsi', 'nama_provinsi')
+            ->orderBy('nama_provinsi')
             ->get();
         $ekspedisis = Ekspedisi::select('id_ekspedisi','nama_ekspedisi','biaya_pengiriman')->get();
         
@@ -236,7 +268,7 @@ class PesananController extends Controller
             ->where('kuota', '>', 0)
             ->get();
         
-        return view('customer.checkout', compact('items', 'subtotal', 'discount', 'appliedPromo', 'alamats', 'ekspedisis', 'promos'));
+        return view('customer.checkout', compact('items', 'subtotal', 'discount', 'appliedPromo', 'alamats', 'provinsis', 'ekspedisis', 'promos'));
     }
 
     /**
@@ -245,12 +277,63 @@ class PesananController extends Controller
     public function placeOrder(Request $request, MidtransPaymentService $midtrans)
     {
         $request->validate([
-            'id_alamat' => ['required', 'exists:alamat_users,id_alamat'],
-            'id_ekspedisi' => ['required', 'exists:ekspedisis,id_ekspedisi'],
+            'id_alamat' => [
+                'required',
+                'exists:alamat_users,id_alamat',
+            ],
+            'shipping_quote_token' => [
+                'required',
+                'string',
+                'max:64',
+            ],
         ], [
-            'id_alamat.required' => 'Silakan pilih alamat pengiriman.',
-            'id_ekspedisi.required' => 'Silakan pilih ekspedisi pengiriman.',
+            'id_alamat.required' =>
+                'Silakan pilih alamat pengiriman.',
+            'shipping_quote_token.required' =>
+                'Silakan hitung dan pilih ongkos kirim terlebih dahulu.',
         ]);
+
+        // Ambil tarif yang disimpan di session oleh server.
+        $quote = session(
+            'shipping_quotes.' . $request->shipping_quote_token
+        );
+
+        // Tolak token yang tidak ditemukan, alamat yang berbeda,
+        // atau tarif yang sudah kedaluwarsa (15 menit).
+        if (
+            !is_array($quote) ||
+            (int) ($quote['id_alamat'] ?? 0)
+                !== (int) $request->id_alamat ||
+            now()->timestamp - (int) ($quote['created_at'] ?? 0)
+                > 900
+        ) {
+            return back()
+                ->with(
+                    'error',
+                    'Tarif ongkir tidak tersedia atau sudah kedaluwarsa. '
+                    . 'Silakan hitung ulang.'
+                )
+                ->withInput();
+        }
+
+        $ekspedisi = Ekspedisi::find(
+            (int) ($quote['id_ekspedisi'] ?? 0)
+        );
+
+        if (!$ekspedisi) {
+            return back()
+                ->with('error', 'Data ekspedisi tidak valid.')
+                ->withInput();
+        }
+
+        $ongkir = (int) ($quote['cost'] ?? -1);
+        $layananEkspedisi = $quote['service'] ?? '';
+
+        if ($ongkir < 0) {
+            return back()
+                ->with('error', 'Tarif pengiriman tidak valid.')
+                ->withInput();
+        }
 
         if (!$midtrans->isConfigured()) {
             return back()->with('error', 'Konfigurasi Midtrans belum lengkap. Silakan hubungi administrator.');
@@ -266,8 +349,8 @@ class PesananController extends Controller
 
         $buyNowItem = session('buy_now_item');
         $keranjang = null;
-        $ekspedisi  = Ekspedisi::findOrFail($request->id_ekspedisi);
         $subtotal   = 0;
+        $orderWeight = 0;
         $orderItems = [];
 
         if ($buyNowItem) {
@@ -276,9 +359,13 @@ class PesananController extends Controller
                 return redirect()->route('index')->with('error', 'Produk tidak ditemukan.');
             }
             $qty = $buyNowItem['qty'];
+            if (!$produk->berat_gram || (int) $produk->berat_gram < 1) {
+                return back()->with('error', 'Berat produk tidak valid. Silakan hitung ulang ongkos kirim.');
+            }
             if ($produk->stok < $qty) {
                 return back()->with('error', 'Stok ' . $produk->nama_produk . ' tidak mencukupi.')->withInput();
             }
+            $orderWeight += (int) $produk->berat_gram * $qty;
             $lineTotal  = $produk->harga * $qty;
             $subtotal  += $lineTotal;
             $orderItems[] = [
@@ -299,11 +386,15 @@ class PesananController extends Controller
                 if ($detail->produk) {
                     $produk = $detail->produk;
                     $qty    = $detail->qty;
+                    if (!$produk->berat_gram || (int) $produk->berat_gram < 1) {
+                        return back()->with('error', 'Berat produk tidak valid. Silakan hitung ulang ongkos kirim.');
+                    }
                     if ($produk->stok < $qty) {
                         return back()
                             ->with('error', 'Stok ' . $produk->nama_produk . ' tidak mencukupi.')
                             ->withInput();
                     }
+                    $orderWeight += (int) $produk->berat_gram * $qty;
                     $lineTotal  = $produk->harga * $qty;
                     $subtotal  += $lineTotal;
                     $orderItems[] = [
@@ -315,7 +406,12 @@ class PesananController extends Controller
             }
         }
 
-        $ongkir = $ekspedisi->biaya_pengiriman ?? 0;
+        if ((int) ($quote['weight_gram'] ?? 0) !== $orderWeight) {
+            return back()
+                ->with('error', 'Isi atau berat produk berubah. Silakan hitung ulang ongkos kirim.')
+                ->withInput();
+        }
+
         $appliedPromo = $this->appliedPromo();
         $discount = $appliedPromo ? $this->calculateDiscount($appliedPromo, $subtotal) : 0;
         $promo = $appliedPromo ?: $this->defaultPromo();
@@ -324,12 +420,14 @@ class PesananController extends Controller
             return back()->with('error', 'Total pembayaran harus lebih dari Rp0 untuk diproses oleh Midtrans.');
         }
 
-        $createdPesanan = DB::transaction(function () use ($request, $subtotal, $discount, $ongkir, $totalBayar, $orderItems, $promo, $appliedPromo) {
+        $createdPesanan = DB::transaction(function () use ($request, $subtotal, $discount, $ongkir, $totalBayar, $orderItems, $promo, $appliedPromo,    $ekspedisi,
+    $layananEkspedisi) {
             $pesanan = Pesanan::create([
                 'id_users' => Auth::id(),
                 'id_alamat' => $request->id_alamat,
                 'id_promo' => $promo->id_promo,
-                'id_ekspedisi' => $request->id_ekspedisi,
+                'id_ekspedisi' => $ekspedisi->id_ekspedisi,
+                'layanan_ekspedisi' => $layananEkspedisi,
                 'tanggal_pesan' => now(),
                 'subtotal' => $subtotal,
                 'diskon' => $discount,

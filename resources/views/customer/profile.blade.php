@@ -108,6 +108,7 @@
                                             </div>
                                             <div class="text-[13px] font-bold text-g800 flex items-center gap-1.5 whitespace-nowrap"><i class="fi fi-rr-phone-call text-g400"></i> {{ $alamat->nomor_telepon }}</div>
                                         </div>
+                                        <div class="text-[13px] text-g700 font-semibold mb-1">Penerima: {{ $alamat->nama_penerima }}</div>
                                         <div class="text-[13px] text-g600 leading-relaxed font-medium">
                                             {{ $alamat->detail_alamat }}<br>
                                             <span class="text-g500">{{ $alamat->desa->nama_desa }}, {{ $alamat->desa->kecamatan->nama_kecamatan }}, {{ $alamat->desa->kecamatan->kota->nama_kota }}, {{ $alamat->desa->kecamatan->kota->provinsi->nama_provinsi }}</span>
@@ -124,6 +125,12 @@
                                                             <x-label>Label Alamat</x-label>
                                                             <x-input name="label_alamat" :value="old('label_alamat', $alamat->label_alamat)" required />
                                                         </div>
+                                                        <div>
+                                                            <x-label>Nama Penerima</x-label>
+                                                            <x-input name="nama_penerima" :value="old('nama_penerima', $alamat->nama_penerima)" required />
+                                                        </div>
+                                                    </div>
+                                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                         <div>
                                                             <x-label>Nomor Telepon</x-label>
                                                             <x-input name="nomor_telepon" :value="old('nomor_telepon', $alamat->nomor_telepon)" required />
@@ -203,6 +210,12 @@
                                             <x-label>Label Alamat (Cth: Rumah, Kantor)</x-label>
                                             <x-input type="text" name="label_alamat" required placeholder="Rumah" />
                                         </div>
+                                        <div>
+                                            <x-label>Nama Penerima</x-label>
+                                            <x-input type="text" name="nama_penerima" required placeholder="Nama penerima" />
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                         <div>
                                             <x-label>Nomor Telepon</x-label>
                                             <x-input type="text" name="nomor_telepon" required placeholder="08..." />

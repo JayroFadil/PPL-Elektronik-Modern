@@ -13,7 +13,7 @@ use App\Http\Controllers\PromoController;
 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WishlistController;
-
+use App\Http\Controllers\OngkirController;
 /*
 |--------------------------------------------------------------------------
 | Public Routes (Guest)
@@ -112,6 +112,7 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     Route::get('/locations/kecamatans/{id_kota}', [\App\Http\Controllers\LocationController::class, 'getKecamatans']);
     Route::get('/locations/desas/{id_kecamatan}', [\App\Http\Controllers\LocationController::class, 'getDesas']);
 
+    Route::post('/shipping/calculate',[OngkirController::class, 'calculate'])->name('customer.shipping.calculate');
 });
 
 /*
