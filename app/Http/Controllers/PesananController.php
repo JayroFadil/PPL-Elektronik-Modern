@@ -510,23 +510,31 @@ class PesananController extends Controller
         }
 
         $pembayaran = $pesanan->pembayaran;
+
         if (!$pembayaran) {
-            return redirect()->route('customer.orders')->with('error', 'Data pembayaran pesanan tidak ditemukan.');
+            return redirect()->route('customer.orders')
+                ->with('error', 'Data pembayaran pesanan tidak ditemukan.');
         }
 
         if ((int) $pembayaran->status_konfirmasi === 1) {
-            return redirect()->route('customer.orders')->with('error', 'Pesanan ini sudah dibayar.');
+            return redirect()->route('customer.orders')
+                ->with('error', 'Pesanan ini sudah dibayar.');
         }
 
         if (!$midtrans->isConfigured()) {
-            return redirect()->route('customer.orders')->with('error', 'Konfigurasi Midtrans belum lengkap.');
+            return redirect()->route('customer.orders')
+                ->with('error', 'Konfigurasi Midtrans belum lengkap.');
         }
 
         try {
             $snapToken = $midtrans->createSnapToken(
                 $pesanan->load('user'),
                 $pembayaran,
-                in_array($pembayaran->transaction_status, ['deny', 'cancel', 'expire', 'failure'], true)
+                in_array(
+                    $pembayaran->transaction_status,
+                    ['deny', 'cancel', 'expire', 'failure'],
+                    true
+                )
             );
         } catch (ConnectionException|RequestException|RuntimeException $exception) {
             Log::error('Midtrans Snap retry request failed.', [
@@ -534,7 +542,8 @@ class PesananController extends Controller
                 'message' => $exception->getMessage(),
             ]);
 
-            return redirect()->route('customer.orders')->with('error', 'Pembayaran belum dapat dibuka. Silakan coba kembali.');
+            return redirect()->route('customer.orders')
+                ->with('error', 'Pembayaran belum dapat dibuka. Silakan coba kembali.');
         }
 
         return redirect()->route('customer.orders')->with('snap_token', $snapToken);

@@ -7,15 +7,28 @@ use App\Models\Kota;
 use App\Models\Kecamatan;
 use App\Models\Desa;
 use Illuminate\Http\Request;
-
 class LocationController extends Controller
 {
+    // Mengambil seluruh data provinsi
+    public function getProvinsis()
+    {
+        $provinsis = Provinsi::select(
+            'id_provinsi',
+            'nama_provinsi'
+        )
+        ->orderBy('nama_provinsi')
+        ->get();
+
+        return response()->json($provinsis);
+    }
+
     public function getKotas($id_provinsi)
     {
         $kotas = Kota::where('id_provinsi', $id_provinsi)
             ->select('id_kota', 'nama_kota')
             ->orderBy('nama_kota')
             ->get();
+
         return response()->json($kotas);
     }
 
@@ -25,6 +38,7 @@ class LocationController extends Controller
             ->select('id_kecamatan', 'nama_kecamatan')
             ->orderBy('nama_kecamatan')
             ->get();
+
         return response()->json($kecamatans);
     }
 
@@ -34,6 +48,7 @@ class LocationController extends Controller
             ->select('id_desa', 'nama_desa')
             ->orderBy('nama_desa')
             ->get();
+
         return response()->json($desas);
     }
 }
