@@ -242,8 +242,8 @@ class PesananController extends Controller
         $request->validate([
             'id_alamat' => ['required', 'exists:alamat_users,id_alamat'],
             'id_ekspedisi' => ['required', 'exists:ekspedisis,id_ekspedisi'],
-            'metode_pembayaran' => ['required', 'string', 'in:Transfer Bank,E-Wallet'],
-            'bukti_bayar' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
+            'metode_pembayaran' => ['required', 'string', 'in:Transfer Bank,E-Wallet,Midtrans'],
+            'bukti_bayar' => ['required_unless:metode_pembayaran,Midtrans', 'nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ], [
             'id_alamat.required' => 'Silakan pilih alamat pengiriman.',
             'id_ekspedisi.required' => 'Silakan pilih ekspedisi pengiriman.',
@@ -383,6 +383,10 @@ class PesananController extends Controller
             $keranjang->detailKeranjangs()->delete();
         }
         session()->forget('applied_promo_id');
+
+        if ($request->metode_pembayaran === 'Midtrans') {
+            return redirect()->route('customer.orders.pay', $createdPesanan->id_pesanan);
+        }
 
         return redirect()->route('customer.orders')->with('status', 'Pesanan berhasil dibuat! Pembayaran Anda akan segera diverifikasi oleh admin.');
     }

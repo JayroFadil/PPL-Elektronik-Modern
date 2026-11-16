@@ -136,6 +136,14 @@
                                         <div class="text-[11px] font-medium text-g500 uppercase tracking-wider">DANA · ShopeePay · GoPay</div>
                                     </div>
                                 </label>
+                                <label class="pay-opt sm:col-span-2 flex items-center gap-3.5 p-4 bg-white rounded-xl cursor-pointer border-[1.5px] border-g200 transition-all hover:border-g300" onclick="selectPay(this, 'midtrans')">
+                                    <input type="radio" name="metode_pembayaran" value="Midtrans" class="w-4 h-4 accent-primary shrink-0" />
+                                    <div class="text-[28px] text-primary flex items-center justify-center bg-white w-12 h-12 rounded-full shadow-sm"><i class="fi fi-rr-credit-card"></i></div>
+                                    <div>
+                                        <div class="font-bold text-[14px] text-g800 mb-0.5">Bayar Online (Midtrans)</div>
+                                        <div class="text-[11px] font-medium text-g500 uppercase tracking-wider">VA · Kartu · E-Wallet · QRIS</div>
+                                    </div>
+                                </label>
                             </div>
                             
                             <div id="bankDetail" class="mt-4 bg-primary-light/50 border border-primary/20 rounded-xl p-5 border-l-4 border-l-primary">
@@ -150,7 +158,7 @@
                                 <div class="text-[13px] font-medium text-g500">a.n. Elektronik Modern Admin</div>
                             </div>
 
-                            <div class="mt-8">
+                            <div class="mt-8" id="buktiSection">
                                 <x-label class="mb-3">Upload Bukti Pembayaran</x-label>
                                 <div class="border-2 border-dashed border-g300 rounded-2xl p-8 text-center text-g500 cursor-pointer transition-all hover:border-primary hover:bg-primary-light group" onclick="document.getElementById('bukti_bayar').click()">
                                     <div class="text-[40px] mb-3 text-g300 group-hover:text-primary transition-colors inline-flex"><i class="fi fi-rr-cloud-upload"></i></div>
@@ -246,7 +254,9 @@
             const fileInput = document.getElementById('bukti_bayar');
             const hasAlamat = {{ $alamats->isNotEmpty() ? 'true' : 'false' }};
             
-            if (hasAlamat && fileInput && fileInput.files.length > 0) {
+            const isMidtrans = document.querySelector('input[name="metode_pembayaran"]:checked')?.value === 'Midtrans';
+
+            if (hasAlamat && (isMidtrans || (fileInput && fileInput.files.length > 0))) {
                 btn.classList.remove('opacity-60', 'cursor-not-allowed', 'pointer-events-none');
             } else {
                 btn.classList.add('opacity-60', 'cursor-not-allowed', 'pointer-events-none');
@@ -261,13 +271,16 @@
             el.classList.add('border-primary', 'bg-primary-light', 'shadow-[0_0_0_4px_rgba(26,92,255,0.1)]');
             el.classList.remove('border-g200');
 
-            if (type === 'bank') {
-                document.getElementById('bankDetail').classList.remove('hidden');
-                document.getElementById('ewalletDetail').classList.add('hidden');
-            } else {
-                document.getElementById('bankDetail').classList.add('hidden');
-                document.getElementById('ewalletDetail').classList.remove('hidden');
-            }
+            document.getElementById('bankDetail').classList.toggle('hidden', type !== 'bank');
+            document.getElementById('ewalletDetail').classList.toggle('hidden', type !== 'ewallet');
+
+            const bukti = document.getElementById('buktiSection');
+            const fileInput = document.getElementById('bukti_bayar');
+            const isMidtrans = type === 'midtrans';
+            bukti.classList.toggle('hidden', isMidtrans);
+            fileInput.required = !isMidtrans;
+            document.getElementById('btnSubmitCheckout').firstChild.textContent = isMidtrans ? 'Lanjut ke Pembayaran ' : 'Buat Pesanan ';
+            setTimeout(validateCheckoutReady, 0);
         }
 
         function handleUpload(input) {

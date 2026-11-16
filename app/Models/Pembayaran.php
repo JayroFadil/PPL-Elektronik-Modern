@@ -15,6 +15,8 @@ class Pembayaran extends Model
         'metode_pembayaran',
         'bukti_bayar',
         'status_konfirmasi',
+        'midtrans_order_id',
+        'snap_token',
     ];
 
     public function pesanan(): BelongsTo
