@@ -121,8 +121,6 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     Route::post('/shipping/calculate',[OngkirController::class, 'calculate'])->name('customer.shipping.calculate');
 });
 
-// Webhook Midtrans (publik, dikecualikan dari CSRF di bootstrap/app.php)
-Route::post('/midtrans/notification', [MidtransController::class, 'notification'])->name('midtrans.notification');
 
 /*
 |--------------------------------------------------------------------------

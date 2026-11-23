@@ -20,6 +20,8 @@ class Pembayaran extends Model
         'transaction_id',
         'transaction_status',
         'payment_type',
+	'va_bank',
+	'va_number',
         'fraud_status',
         'paid_at',
     ];

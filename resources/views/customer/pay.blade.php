@@ -35,8 +35,13 @@
                 onClose:   () => {}
             });
         }
-        document.getElementById('payButton').addEventListener('click', openSnap);
-        window.addEventListener('load', openSnap);
+        document.getElementById('payButton').addEventListener('click', function () {
+    if (window.snap) {
+        openSnap();
+    } else {
+        alert('Layanan pembayaran belum siap. Silakan muat ulang halaman.');
+    }
+});
     </script>
     @endpush
 @endsection
