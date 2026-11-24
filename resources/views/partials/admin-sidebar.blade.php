@@ -47,6 +47,13 @@
             class="flex items-center gap-3 py-3 px-5 text-[13px] font-medium transition-all border-l-[3px] border-transparent no-underline w-full text-left {{ request()->routeIs('admin.users.*') ? 'text-primary bg-primary/10 border-primary' : 'text-g500 hover:text-white hover:bg-white/5' }}">
             <span class="w-[18px] text-center text-base"><i class="fi fi-rr-users"></i></span> Kelola Customer
         </a>
+        <a href="{{ route('admin.pengaturan-pengiriman.index') }}"
+            class="flex items-center gap-3 py-3 px-5 text-[13px] font-medium transition-all border-l-[3px] border-transparent no-underline w-full text-left {{ request()->routeIs('admin.pengaturan-pengiriman.*') ? 'text-primary bg-primary/10 border-primary' : 'text-g500 hover:text-white hover:bg-white/5' }}">
+            <span class="w-[18px] text-center text-base">
+                <i class="fi fi-rr-truck-side"></i>
+            </span>
+            Pengaturan Pengiriman
+        </a>
     </div>
 
     <div class="px-5 pt-5 pb-2 text-[10px] font-bold text-g600 tracking-wider uppercase border-t border-white/5">Akun

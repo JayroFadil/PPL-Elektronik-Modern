@@ -16,7 +16,7 @@ class RajaOngkirService
 
     private function apiKey(): string
     {
-        $key = config('services.rajaongkir.key');
+        $key = config('services.rajaongkir.api_key');
 
         if (!$key) {
             throw new RuntimeException(
