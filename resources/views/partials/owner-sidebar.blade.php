@@ -19,13 +19,21 @@
         </div>
     </div>
 
-    <div class="px-5 pt-6 pb-2 text-[10px] font-bold text-g600 tracking-wider uppercase">Menu Utama</div>
+    
     <div class="flex-1">
         <a href="{{ route('owner.index') }}"
             class="flex items-center gap-3 py-3 px-5 text-[13px] font-medium transition-all border-l-[3px] border-transparent no-underline w-full text-left {{ request()->routeIs('owner.index') ? 'text-primary bg-primary/10 border-primary' : 'text-g500 hover:text-white hover:bg-white/5' }}">
             <span class="w-[18px] text-center text-base"><i class="fi fi-rr-chart-histogram"></i></span> Dashboard
         </a>
+
+        {{-- Menu Pengaturan Pengiriman --}}
+        <a href="{{ route('owner.pengaturan-pengiriman.index') }}"
+            class="flex items-center gap-3 py-3 px-5 text-[13px] font-medium transition-all border-l-[3px] border-transparent no-underline w-full text-left {{ request()->routeIs('owner.pengaturan-pengiriman.*') ? 'text-primary bg-primary/10 border-primary' : 'text-g500 hover:text-white hover:bg-white/5' }}">
+            <span class="w-[18px] text-center text-base"><i class="fi fi-rr-truck-side"></i></span>
+            Pengaturan Pengiriman
+        </a>
     </div>
+
 
     <div class="px-5 pt-5 pb-2 text-[10px] font-bold text-g600 tracking-wider uppercase border-t border-white/5">Akun</div>
     <form method="POST" action="{{ route('logout') }}" class="m-0 mb-6">

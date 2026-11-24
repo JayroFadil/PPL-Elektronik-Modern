@@ -151,10 +151,53 @@
                             </div>
 
                             @if ($paymentStatus !== 1 && $pesanan->status_pesanan === 'menunggu')
+	
+                            @if ($pesanan->pembayaran?->va_number)
+                                @php
+                                    $vaBank = strtolower($pesanan->pembayaran->va_bank ?? '');
+
+                                    $simulatorUrl = match ($vaBank) {
+                                        'bca' => 'https://simulator.sandbox.midtrans.com/bca/va/index',
+                                        'bni' => 'https://simulator.sandbox.midtrans.com/bni/va/index',
+                                        'bri' => 'https://simulator.sandbox.midtrans.com/openapi/va/index?bank=bri',
+                                        default => null,
+                                    };
+                                @endphp
+
+                                <div class="mb-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-left">
+                                    <div class="mb-2 text-sm font-bold text-blue-800">
+                                        Virtual Account {{ strtoupper($vaBank) }}
+                                    </div>
+
+                                    <div class="flex items-center justify-between gap-2">
+                                        <span class="font-bold tracking-wide text-gray-800">
+                                            {{ $pesanan->pembayaran->va_number }}
+                                        </span>
+
+                                        <button
+                                            type="button"
+                                            onclick="navigator.clipboard.writeText('{{ $pesanan->pembayaran->va_number }}').then(() => alert('Nomor VA berhasil disalin.'))"
+                                            class="rounded-lg bg-white px-3 py-2 text-xs font-bold text-blue-700 border border-blue-200">
+                                            Salin
+                                        </button>
+                                    </div>
+
+                                    @if ($simulatorUrl && !config('services.midtrans.is_production'))
+                                        <a
+                                            href="{{ $simulatorUrl }}"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700">
+                                            Buka Simulator {{ strtoupper($vaBank) }}
+                                        </a>
+                                    @endif
+                                </div>
+                            @endif
+
                                 <form action="{{ route('customer.orders.payment', $pesanan) }}" method="POST" class="mb-3">
                                     @csrf
                                     <button type="submit" class="inline-flex items-center gap-2 py-2 px-4 rounded-xl font-bold text-[13px] bg-primary text-white shadow-sm hover:bg-primary-dark transition-all">
-                                        <i class="fi fi-rr-credit-card"></i> Pilih Metode Pembayaran
+                                        <i class="fi fi-rr-credit-card"></i> Bayar Sekarang
                                     </button>
                                 </form>
                             @endif

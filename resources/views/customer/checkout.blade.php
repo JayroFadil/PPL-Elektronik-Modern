@@ -13,13 +13,13 @@
     <section class="py-8 md:py-[72px] bg-g50 min-h-screen px-4 md:px-8">
         <div class="max-w-[1280px] mx-auto" id="checkoutPageContainer">
             <div class="flex items-center gap-1.5 mb-6 text-[13px]">
-                <a href="{{ route('index') }}" class="text-g500 hover:text-primary transition-colors flex items-center gap-1.5"><i class="fi fi-rr-home"></i> Beranda</a> 
-                <i class="fi fi-rr-angle-small-right text-g400"></i> 
+                <a href="{{ route('index') }}" class="text-g500 hover:text-primary transition-colors flex items-center gap-1.5"><i class="fi fi-rr-home"></i> Beranda</a>
+                <i class="fi fi-rr-angle-small-right text-g400"></i>
                 <a href="{{ route('cart.index') }}" class="text-g500 hover:text-primary transition-colors">Keranjang</a>
                 <i class="fi fi-rr-angle-small-right text-g400"></i>
                 <span class="text-g800 font-semibold">Checkout</span>
             </div>
-            
+
             <div class="mb-8">
                 <h1 class="font-heading text-[28px] md:text-[32px] font-extrabold text-g900 mb-2 flex items-center gap-3">
                     <i class="fi fi-rr-shopping-bag text-primary"></i> Checkout
@@ -67,30 +67,106 @@
                             @if ($alamats->count())
                                 <div class="space-y-3">
                                 @foreach ($alamats as $alamat)
-                                    <label class="flex items-start gap-3 p-4 bg-white rounded-xl cursor-pointer border-[1.5px] border-g200 hover:border-primary transition-all has-[:checked]:border-primary has-[:checked]:bg-primary-light/50 has-[:checked]:ring-4 has-[:checked]:ring-primary/10">
-                                        <input type="radio" name="id_alamat" value="{{ $alamat->id_alamat }}"
-                                            {{ $loop->first ? 'checked' : '' }}
-                                            class="w-4 h-4 mt-0.5 accent-primary shrink-0 rounded-full text-primary focus:ring-primary">
-                                        <div>
-                                            <div class="text-[14px] font-bold text-g800 mb-0.5">{{ $alamat->label_alamat }}</div>
-                                            <div class="text-[13px] text-g600 leading-relaxed mb-1">{{ $alamat->detail_alamat }}</div>
-                                            <div class="text-[12px] font-semibold text-g500 flex items-center gap-1.5"><i class="fi fi-rr-phone-call"></i> {{ $alamat->nomor_telepon }}</div>
-                                        </div>
-                                    </label>
+                                    <div class="relative">
+                                                                                    <summary class="absolute top-3 right-3 z-10 list-none cursor-pointer inline-flex items-center gap-1.5 py-1.5 px-2.5 text-[12px] font-bold text-primary rounded-lg hover:bg-primary-light transition-colors">
+                                                 Edit
+                                            </summary>
+                                        <label class="flex items-start gap-3 p-4 pr-32 bg-white rounded-xl cursor-pointer border-[1.5px] border-g200 hover:border-primary transition-all has-[:checked]:border-primary has-[:checked]:bg-primary-light/50 has-[:checked]:ring-4 has-[:checked]:ring-primary/10">
+                                            <input type="radio" name="id_alamat" value="{{ $alamat->id_alamat }}"
+                                                {{ $alamat->is_utama || (!$alamats->contains(fn ($item) => $item->is_utama) && $loop->first) ? 'checked' : '' }}
+                                                class="w-4 h-4 mt-0.5 accent-primary shrink-0 rounded-full text-primary focus:ring-primary">
+                                            <div>
+                                                <div class="text-[13px] text-g700 font-semibold mb-0.5">{{ $alamat->nama_penerima }} <span class="text-[12px] text-g500">|{{ $alamat->nomor_telepon }}</span></div>
+                                                <div class="text-[13px] text-g700 leading-relaxed mb-1">
+                                                    {{ $alamat->detail_alamat }}<br>
+                                                    <span class="text-g700">{{ $alamat->desa->kecamatan->nama_kecamatan }}, {{ $alamat->desa->kecamatan->kota->nama_kota }}, {{ $alamat->desa->kecamatan->kota->provinsi->nama_provinsi }}</span>
+                                                </div>
+                                                <div class="text-[12px] font-bold text-g700 mb-0.5">{{ $alamat->label_alamat }}</div>
+                                            </div>
+                                        </label>
+                                    </div>
                                 @endforeach
+                                </div>
+                                <div class="mt-4 flex flex-wrap items-center gap-3">
+                                    <a href="{{ route('customer.profile', ['tab' => 'alamat']) }}" class="inline-flex items-center gap-2 py-2.5 px-4 border border-primary text-primary rounded-xl font-bold text-[12px] hover:bg-primary-light transition-colors">
+                                        <i class="fi fi-rr-plus"></i> Tambah alamat baru
+                                    </a>
                                 </div>
                             @else
                                 <x-alert type="warning" class="mb-4">
-                                    Anda belum memiliki alamat pengiriman. Tambahkan alamat terlebih dahulu melalui halaman profil.
+                                    Anda belum memiliki alamat pengiriman. Tambahkan alamat terlebih dahulu untuk menghitung ongkos kirim.
                                 </x-alert>
-                                <x-button variant="outline" onclick="window.location='{{ route('customer.profile') }}?tab=alamat'">
+                                <button type="button" id="showCheckoutAddressForm" class="py-3 px-5 border border-primary text-primary rounded-xl font-bold hover:bg-primary-light transition-colors">
                                     <i class="fi fi-rr-plus"></i> Tambah Alamat
-                                </x-button>
+                                </button>
+                                <form method="POST" action="{{ route('customer.alamat.store') }}" id="checkoutAddressForm" class="hidden mt-5 border-t border-g100 pt-5 checkout-location-form">
+                                    @csrf
+                                    <input type="hidden" name="redirect_to" value="checkout">
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <x-label>Label Alamat</x-label>
+                                            <x-input type="text" name="label_alamat" required placeholder="Rumah" />
+                                        </div>
+                                        <div>
+                                            <x-label>Nama Penerima</x-label>
+                                            <x-input type="text" name="nama_penerima" required placeholder="Nama penerima" />
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <x-label>Nomor Telepon</x-label>
+                                            <x-input type="text" name="nomor_telepon" required placeholder="08..." />
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <x-label>Provinsi</x-label>
+                                            <x-select name="id_provinsi" class="provinsi-select" required>
+                                                <option value="">-- Pilih Provinsi --</option>
+                                                @foreach($provinsis as $provinsi)
+                                                    <option value="{{ $provinsi->id_provinsi }}">{{ $provinsi->nama_provinsi }}</option>
+                                                @endforeach
+                                            </x-select>
+                                        </div>
+                                        <div>
+                                            <x-label>Kota/Kabupaten</x-label>
+                                            <x-select name="id_kota" class="kota-select" required disabled>
+                                                <option value="">-- Pilih Kota --</option>
+                                            </x-select>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                        <div>
+                                            <x-label>Kecamatan</x-label>
+                                            <x-select name="id_kecamatan" class="kecamatan-select" required disabled>
+                                                <option value="">-- Pilih Kecamatan --</option>
+                                            </x-select>
+                                        </div>
+                                        <div>
+                                            <x-label>Desa/Kelurahan</x-label>
+                                            <x-select name="id_desa" class="desa-select" required disabled>
+                                                <option value="">-- Pilih Desa --</option>
+                                            </x-select>
+                                        </div>
+                                    </div>
+                                    <div class="mb-4">
+                                        <x-label>Detail Alamat</x-label>
+                                        <x-textarea name="detail_alamat" rows="3" required placeholder="Jalan, RT/RW, patokan"></x-textarea>
+                                    </div>
+                                    <label class="flex items-center gap-2 text-[13px] font-bold text-g800 cursor-pointer mb-5">
+                                        <input type="checkbox" name="is_utama" value="1" checked class="w-4 h-4 accent-primary rounded text-primary focus:ring-primary">
+                                        Jadikan sebagai alamat utama
+                                    </label>
+                                    <x-button type="submit" class="py-3 px-6">
+                                        <i class="fi fi-rr-disk"></i> Simpan Alamat
+                                    </x-button>
+                                </form>
                             @endif
                         </x-card>
 
                         <!-- Ekspedisi -->
                        <!-- Penghitungan Ongkos Kirim RajaOngkir -->
+                       @if ($alamats->count())
                         <x-card class="p-6 mb-5">
                             <h3 class="font-heading text-lg font-extrabold text-g900 mb-5">
                                 Hitung Ongkos Kirim
@@ -124,16 +200,24 @@
                                 id="shippingQuoteToken"
                                 value="">
                         </x-card>
-                        <!-- Midtrans Payment -->
-                        <x-card class="p-6">
-                            <h3 class="font-heading text-lg font-extrabold text-g900 mb-5 flex items-center gap-2">
-                                <i class="fi fi-rr-credit-card text-primary"></i> Pembayaran Aman dengan Midtrans
-                            </h3>
-                            <p class="text-sm text-g500 leading-relaxed">
-                                Setelah pesanan dibuat, pilih metode pembayaran yang tersedia di jendela Midtrans.
-                                Pembayaran akan diverifikasi otomatis; Anda tidak perlu mengunggah bukti pembayaran.
-                            </p>
-                        </x-card>
+                        @endif
+
+		<!-- Midtrans Payment -->
+		<!-- Midtrans Payment -->
+<x-card class="p-6">
+    <h3 class="font-heading text-lg font-extrabold text-g900 mb-5 flex items-center gap-2">
+        <i class="fi fi-rr-credit-card text-primary"></i>
+        Pembayaran Aman dengan Midtrans
+    </h3>
+
+    <input type="hidden" name="metode_pembayaran" value="Midtrans">
+
+    <p class="text-sm text-g500 leading-relaxed">
+        Setelah pesanan dibuat, pilih metode pembayaran yang tersedia
+        di jendela Midtrans. Pembayaran akan diverifikasi secara otomatis.
+        Anda tidak perlu mengunggah bukti pembayaran.
+    </p>
+</x-card>
                     </form>
                 </div>
 
@@ -164,15 +248,15 @@
                         </div>
 
                         <!-- Voucher Form -->
-                        <x-voucher-panel 
-                            :appliedPromo="$appliedPromo" 
-                            :promos="$promos" 
-                            inputId="checkout_voucher_input" 
-                            formId="voucherFormCheckout" 
+                        <x-voucher-panel
+                            :appliedPromo="$appliedPromo"
+                            :promos="$promos"
+                            inputId="checkout_voucher_input"
+                            formId="voucherFormCheckout"
                         />
 
                         <div id="checkoutSummary"
-                            data-base-subtotal="{{ max(0, $subtotal - $discount) }}" 
+                            data-base-subtotal="{{ max(0, $subtotal - $discount) }}"
                             class="flex justify-between items-center mt-8 pt-6 border-t-2 border-dashed border-g100">
                             <span class="text-base font-bold text-g900">Total Pembayaran</span>
                             <span class="font-heading text-2xl font-extrabold text-primary" id="totalPayment">Rp {{ number_format(max(0, $subtotal - $discount), 0, ',', '.') }}</span>
@@ -194,270 +278,279 @@
 
     @push('scripts')
     <script>
-const shippingCalculateUrl =
-    @json(route('customer.shipping.calculate'));
+        const shippingCalculateUrl = @json(route('customer.shipping.calculate'));
+        const csrfToken = @json(csrf_token());
 
-const csrfToken = @json(csrf_token());
+        function initializeLocationForms() {
+            document.querySelectorAll('.checkout-location-form, .location-form').forEach(form => {
+                const provinsi = form.querySelector('.provinsi-select');
+                const kota = form.querySelector('.kota-select');
+                const kecamatan = form.querySelector('.kecamatan-select');
+                const desa = form.querySelector('.desa-select');
 
-function formatRupiah(amount) {
-    return 'Rp ' + Number(amount)
-        .toLocaleString('id-ID');
-}
+                if (!provinsi || !kota || !kecamatan || !desa || form.dataset.locationReady) {
+                    return;
+                }
 
-function calculateTotal() {
-    const selected = document.querySelector(
-        'input[name="shipping_rate_choice"]:checked'
-    );
+                form.dataset.locationReady = '1';
 
-    const cost = selected
-        ? Number(selected.dataset.cost)
-        : 0;
+                const reset = (select, label) => {
+                    select.innerHTML = `<option value="">-- Pilih ${label} --</option>`;
+                    select.disabled = true;
+                };
 
-    document.getElementById(
-        'shippingQuoteToken'
-    ).value = selected
-        ? selected.dataset.token
-        : '';
+                const load = async (url, select, valueKey, nameKey, label) => {
+                    reset(select, label);
+                    const response = await fetch(url, {
+                        headers: { 'Accept': 'application/json' }
+                    });
 
-    document.getElementById(
-        'shippingCost'
-    ).textContent = formatRupiah(cost);
+                    if (!response.ok) {
+                        throw new Error(`Gagal memuat data ${label.toLowerCase()}.`);
+                    }
 
-    const summary = document.getElementById(
-        'checkoutSummary'
-    );
+                    const data = await response.json();
+                    data.forEach(item => {
+                        select.add(new Option(item[nameKey], item[valueKey]));
+                    });
+                    select.disabled = false;
+                };
 
-    const subtotal = Number(
-        summary?.dataset.baseSubtotal || 0
-    );
+                provinsi.addEventListener('change', async () => {
+                    reset(kota, 'Kota');
+                    reset(kecamatan, 'Kecamatan');
+                    reset(desa, 'Desa');
 
-    document.getElementById(
-        'totalPayment'
-    ).textContent = formatRupiah(subtotal + cost);
+                    if (provinsi.value) {
+                        try {
+                            await load(`/locations/kotas/${provinsi.value}`, kota, 'id_kota', 'nama_kota', 'Kota');
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    }
+                });
 
-    validateCheckoutReady();
-}
+                kota.addEventListener('change', async () => {
+                    reset(kecamatan, 'Kecamatan');
+                    reset(desa, 'Desa');
 
-function validateCheckoutReady() {
-    const button = document.getElementById(
-        'btnSubmitCheckout'
-    );
+                    if (kota.value) {
+                        try {
+                            await load(`/locations/kecamatans/${kota.value}`, kecamatan, 'id_kecamatan', 'nama_kecamatan', 'Kecamatan');
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    }
+                });
 
-    const hasAddress = document.querySelector(
-        'input[name="id_alamat"]:checked'
-    ) !== null;
+                kecamatan.addEventListener('change', async () => {
+                    reset(desa, 'Desa');
 
-    const hasRate = document.querySelector(
-        'input[name="shipping_rate_choice"]:checked'
-    ) !== null;
-
-    const ready = hasAddress && hasRate;
-
-    button.disabled = !ready;
-    button.classList.toggle('opacity-60', !ready);
-    button.classList.toggle('cursor-not-allowed', !ready);
-    button.classList.toggle('pointer-events-none', !ready);
-}
-
-function clearShippingRates() {
-    document.getElementById(
-        'shippingRates'
-    ).replaceChildren();
-
-    document.getElementById(
-        'shippingQuoteToken'
-    ).value = '';
-
-    document.getElementById(
-        'shippingMessage'
-    ).textContent = '';
-
-    calculateTotal();
-}
-
-// Gunakan event delegation karena konten checkout bisa
-// diperbarui kembali setelah proses voucher AJAX.
-document.addEventListener('change', function (event) {
-    if (
-        event.target.matches('input[name="id_alamat"]') ||
-        event.target.matches('#courierCode')
-    ) {
-        clearShippingRates();
-    }
-
-    if (
-        event.target.matches(
-            'input[name="shipping_rate_choice"]'
-        )
-    ) {
-        calculateTotal();
-    }
-});
-
-document.addEventListener('click', async function (event) {
-    const button = event.target.closest(
-        '#calculateShippingButton'
-    );
-
-    if (!button) return;
-
-    const alamat = document.querySelector(
-        'input[name="id_alamat"]:checked'
-    );
-
-    const courier = document.getElementById(
-        'courierCode'
-    ).value;
-
-    const message = document.getElementById(
-        'shippingMessage'
-    );
-
-    const results = document.getElementById(
-        'shippingRates'
-    );
-
-    if (!alamat) {
-        message.textContent =
-            'Pilih alamat pengiriman terlebih dahulu.';
-        return;
-    }
-
-    clearShippingRates();
-    message.textContent = 'Sedang menghitung ongkir...';
-    button.disabled = true;
-
-    try {
-        const response = await fetch(
-            shippingCalculateUrl,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken
-                },
-                body: JSON.stringify({
-                    id_alamat: alamat.value,
-                    courier: courier
-                })
-            }
-        );
-
-        const payload = await response.json();
-
-        if (!response.ok) {
-            throw new Error(
-                payload.message || 'Gagal menghitung ongkir.'
-            );
+                    if (kecamatan.value) {
+                        try {
+                            await load(`/locations/desas/${kecamatan.value}`, desa, 'id_desa', 'nama_desa', 'Desa');
+                        } catch (error) {
+                            console.error(error);
+                        }
+                    }
+                });
+            });
         }
 
-        for (const [index, rate] of payload.data.entries()) {
-            const label = document.createElement('label');
-
-            label.className =
-                'flex items-start gap-3 border rounded-xl p-4 cursor-pointer';
-
-            const radio = document.createElement('input');
-
-            radio.type = 'radio';
-            radio.name = 'shipping_rate_choice';
-            radio.value = String(index);
-            radio.dataset.token = rate.token;
-            radio.dataset.cost = String(rate.cost);
-
-            if (index === 0) {
-                radio.checked = true;
-            }
-
-            const detail = document.createElement('span');
-
-            detail.className = 'text-sm font-semibold';
-
-            const service = [
-                rate.name,
-                rate.service,
-                rate.description
-            ].filter(Boolean).join(' - ');
-
-            detail.textContent =
-                service + ' | ' +
-                formatRupiah(rate.cost) +
-                ' | Estimasi: ' + (rate.etd || '-');
-
-            label.append(radio, detail);
-            results.append(label);
+        function formatRupiah(amount) {
+            return 'Rp ' + Number(amount || 0).toLocaleString('id-ID');
         }
 
-        if (payload.data.length > 0) {
-            message.textContent =
-                'Pilih layanan pengiriman yang tersedia.';
+        function validateCheckoutReady() {
+            const button = document.getElementById('btnSubmitCheckout');
+            if (!button) return;
+
+            const hasAddress = document.querySelector('input[name="id_alamat"]:checked') !== null;
+            const hasRate = document.querySelector('input[name="shipping_rate_choice"]:checked') !== null;
+            const ready = hasAddress && hasRate;
+
+            button.disabled = !ready;
+            button.classList.toggle('opacity-60', !ready);
+            button.classList.toggle('cursor-not-allowed', !ready);
+            button.classList.toggle('pointer-events-none', !ready);
+        }
+        function calculateTotal() {
+            const selected = document.querySelector('input[name="shipping_rate_choice"]:checked');
+            const cost = selected ? Number(selected.dataset.cost || 0) : 0;
+            const tokenInput = document.getElementById('shippingQuoteToken');
+
+            if (tokenInput) {
+                tokenInput.value = selected ? (selected.dataset.token || '') : '';
+            }
+
+            const shippingCost = document.getElementById('shippingCost');
+            if (shippingCost) shippingCost.textContent = formatRupiah(cost);
+
+            const summary = document.getElementById('checkoutSummary');
+            const subtotal = Number(summary?.dataset.baseSubtotal || 0);
+            const totalPayment = document.getElementById('totalPayment');
+            if (totalPayment) totalPayment.textContent = formatRupiah(subtotal + cost);
+
+            validateCheckoutReady();
+        }
+
+        function clearShippingRates() {
+            const results = document.getElementById('shippingRates');
+            const tokenInput = document.getElementById('shippingQuoteToken');
+            const message = document.getElementById('shippingMessage');
+
+            if (results) results.replaceChildren();
+            if (tokenInput) tokenInput.value = '';
+            if (message) message.textContent = '';
+
             calculateTotal();
-        } else {
-            message.textContent =
-                'Tarif tidak tersedia untuk pilihan ini.';
         }
-    } catch (error) {
-        message.textContent = error.message;
-    } finally {
-        button.disabled = false;
-    }
-});
 
-document.addEventListener('DOMContentLoaded', function () {
-    calculateTotal();
-    validateCheckoutReady();
-});
-        // Smooth Voucher AJAX Logic
-        document.addEventListener('submit', async function(e) {
-            const form = e.target;
+        document.addEventListener('change', event => {
+            if (
+                event.target.matches('input[name="id_alamat"]') ||
+                event.target.matches('#courierCode')
+            ) {
+                clearShippingRates();
+            }
+
+            if (event.target.matches('input[name="shipping_rate_choice"]')) {
+                calculateTotal();
+            }
+        });
+        document.addEventListener('click', async event => {
+            const button = event.target.closest('#calculateShippingButton');
+            if (!button) return;
+
+            const address = document.querySelector('input[name="id_alamat"]:checked');
+            const courierInput = document.getElementById('courierCode');
+            const message = document.getElementById('shippingMessage');
+            const results = document.getElementById('shippingRates');
+
+            if (!address) {
+                if (message) message.textContent = 'Pilih alamat pengiriman terlebih dahulu.';
+                return;
+            }
+
+            clearShippingRates();
+            if (message) message.textContent = 'Sedang menghitung ongkir...';
+            button.disabled = true;
+
+            try {
+                const response = await fetch(shippingCalculateUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({
+                        id_alamat: address.value,
+                        courier: courierInput?.value || ''
+                    })
+                });
+
+                const payload = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(payload.message || 'Gagal menghitung ongkir.');
+                }
+
+                if (!Array.isArray(payload.data) || payload.data.length === 0) {
+                    if (message) message.textContent = 'Tarif tidak tersedia untuk pilihan ekspedisi ini.';
+                    return;
+                }
+
+                payload.data.forEach((rate, index) => {
+                    const label = document.createElement('label');
+                    label.className = 'flex items-start gap-3 border rounded-xl p-4 cursor-pointer';
+
+                    const radio = document.createElement('input');
+                    radio.type = 'radio';
+                    radio.name = 'shipping_rate_choice';
+                    radio.value = String(index);
+                    radio.dataset.token = rate.token || '';
+                    radio.dataset.cost = String(rate.cost || 0);
+                    radio.checked = index === 0;
+
+                    const detail = document.createElement('span');
+                    detail.className = 'text-sm font-semibold';
+
+                    const service = [rate.name, rate.service, rate.description]
+                        .filter(Boolean)
+                        .join(' - ');
+
+                    detail.textContent = `${service} | ${formatRupiah(rate.cost)} | Estimasi: ${rate.etd || '-'}`;
+                    label.append(radio, detail);
+                    results.append(label);
+                });
+
+                if (message) message.textContent = 'Pilih layanan pengiriman yang tersedia.';
+                calculateTotal();
+            } catch (error) {
+                if (message) message.textContent = error.message;
+            } finally {
+                button.disabled = false;
+            }
+        });
+
+        document.addEventListener('submit', async event => {
+            const form = event.target;
             if (!form.classList.contains('voucher-form-ajax')) return;
-            
-            e.preventDefault();
+
+            event.preventDefault();
+
             const container = document.getElementById('checkoutPageContainer');
+            if (!container) return;
+
             container.style.opacity = '0.5';
             container.style.pointerEvents = 'none';
 
             try {
-                const formData = new FormData(form);
                 const response = await fetch(form.action, {
                     method: 'POST',
-                    body: formData,
+                    body: new FormData(form),
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 });
 
                 const html = await response.text();
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-
+                const doc = new DOMParser().parseFromString(html, 'text/html');
                 const newContent = doc.getElementById('checkoutPageContainer');
+
                 if (newContent) {
                     container.innerHTML = newContent.innerHTML;
-                    
-                    // Trigger SweetAlert based on redirected session data in the new HTML
+
                     const flash = doc.getElementById('flash-messages');
-                    if (flash) {
+                    if (flash && window.showAlert) {
                         const status = flash.getAttribute('data-status');
                         const error = flash.getAttribute('data-error');
                         const errors = flash.getAttribute('data-errors');
-                        
+
                         if (status) window.showAlert('success', 'Berhasil!', status);
                         if (error) window.showAlert('error', 'Gagal!', error);
                         if (errors) window.showAlert('error', 'Ups!', errors.replace(/\\n/g, '<br>'));
                     }
 
+                    initializeLocationForms();
                     calculateTotal();
                     validateCheckoutReady();
+                } else {
+                    window.location.reload();
                 }
-            } catch (err) {
-                console.error(err);
-                location.reload();
+            } catch (error) {
+                console.error(error);
+                window.location.reload();
             } finally {
                 container.style.opacity = '1';
                 container.style.pointerEvents = 'auto';
             }
         });
 
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeLocationForms();
+            calculateTotal();
+            validateCheckoutReady();
+        });
     </script>
     @endpush
 @endsection

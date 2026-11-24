@@ -11,6 +11,7 @@ use App\Models\Notifikasi;
 use App\Models\Pembayaran;
 use App\Models\Promo;
 use App\Models\Keranjang;
+use App\Models\Provinsi;
 use App\Services\MidtransPaymentService;
 use App\Services\RajaOngkirShippingService;
 use App\Traits\OrderStats;
@@ -253,9 +254,14 @@ class PesananController extends Controller
 
         $appliedPromo = $this->appliedPromo();
         $discount     = $appliedPromo ? $this->calculateDiscount($appliedPromo, $subtotal) : 0;
-        $alamats      = AlamatUser::where('id_users', Auth::id())
-            ->select('id_alamat','id_users','id_desa','label_alamat','nomor_telepon','detail_alamat','is_utama')
+        $alamats    = AlamatUser::where('id_users', Auth::id())
+            ->select('id_alamat','id_users','id_desa','label_alamat','nama_penerima','nomor_telepon','detail_alamat','is_utama')
             ->with(['desa.kecamatan.kota.provinsi'])
+            ->orderByDesc('is_utama')
+            ->orderBy('id_alamat')
+            ->get();
+        $provinsis = Provinsi::select('id_provinsi', 'nama_provinsi')
+            ->orderBy('nama_provinsi')
             ->get();
 
         $shippingService = app(RajaOngkirShippingService::class);
@@ -277,8 +283,8 @@ class PesananController extends Controller
             ->where('tanggal_berakhir', '>=', now())
             ->where('kuota', '>', 0)
             ->get();
-
-        return view('customer.checkout', compact('items', 'subtotal', 'discount', 'appliedPromo', 'alamats', 'ekspedisis', 'promos'));
+        
+        return view('customer.checkout', compact('items', 'subtotal', 'discount', 'appliedPromo', 'alamats', 'provinsis', 'ekspedisis', 'promos'));
     }
 
     public function shippingOptions(Request $request, RajaOngkirShippingService $shippingService): JsonResponse
@@ -554,23 +560,31 @@ class PesananController extends Controller
         }
 
         $pembayaran = $pesanan->pembayaran;
+
         if (!$pembayaran) {
-            return redirect()->route('customer.orders')->with('error', 'Data pembayaran pesanan tidak ditemukan.');
+            return redirect()->route('customer.orders')
+                ->with('error', 'Data pembayaran pesanan tidak ditemukan.');
         }
 
         if ((int) $pembayaran->status_konfirmasi === 1) {
-            return redirect()->route('customer.orders')->with('error', 'Pesanan ini sudah dibayar.');
+            return redirect()->route('customer.orders')
+                ->with('error', 'Pesanan ini sudah dibayar.');
         }
 
         if (!$midtrans->isConfigured()) {
-            return redirect()->route('customer.orders')->with('error', 'Konfigurasi Midtrans belum lengkap.');
+            return redirect()->route('customer.orders')
+                ->with('error', 'Konfigurasi Midtrans belum lengkap.');
         }
 
         try {
             $snapToken = $midtrans->createSnapToken(
                 $pesanan->load('user'),
                 $pembayaran,
-                in_array($pembayaran->transaction_status, ['deny', 'cancel', 'expire', 'failure'], true)
+                in_array(
+                    $pembayaran->transaction_status,
+                    ['deny', 'cancel', 'expire', 'failure'],
+                    true
+                )
             );
         } catch (ConnectionException|RequestException|RuntimeException $exception) {
             Log::error('Midtrans Snap retry request failed.', [
@@ -578,7 +592,8 @@ class PesananController extends Controller
                 'message' => $exception->getMessage(),
             ]);
 
-            return redirect()->route('customer.orders')->with('error', 'Pembayaran belum dapat dibuka. Silakan coba kembali.');
+            return redirect()->route('customer.orders')
+                ->with('error', 'Pembayaran belum dapat dibuka. Silakan coba kembali.');
         }
 
         return redirect()->route('customer.orders')->with('snap_token', $snapToken);

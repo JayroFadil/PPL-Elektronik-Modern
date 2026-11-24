@@ -2,14 +2,19 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\LocationController;
+use App\Http\Controllers\RajaOngkirController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\MidtransNotificationController;
+use App\Http\Controllers\MidtransController;
+
 use App\Http\Controllers\NotifikasiController;
 use App\Http\Controllers\PesananController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\PromoController;
+use App\Http\Controllers\PengaturanPengirimanController;
 
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WishlistController;
@@ -94,6 +99,7 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
     Route::get('/my-orders', [PesananController::class, 'customerOrders'])->name('customer.orders');
     Route::post('/my-orders/{pesanan}/payment', [PesananController::class, 'startPayment'])->name('customer.orders.payment');
     Route::post('/my-orders/{pesanan}/complete', [PesananController::class, 'completeOrder'])->name('customer.orders.complete');
+    Route::get('/my-orders/{pesanan}/pay', [MidtransController::class, 'pay'])->name('customer.orders.pay');
     Route::get('/checkout', [PesananController::class, 'checkout'])->name('customer.checkout');
     Route::get('/checkout/shipping-options', [PesananController::class, 'shippingOptions'])->name('customer.shippingOptions');
     Route::post('/buy-now', [PesananController::class, 'buyNow'])->name('customer.buyNow');
@@ -115,6 +121,7 @@ Route::middleware(['auth', 'role:customer'])->group(function () {
 
     Route::post('/shipping/calculate',[OngkirController::class, 'calculate'])->name('customer.shipping.calculate');
 });
+
 
 /*
 |--------------------------------------------------------------------------
@@ -150,6 +157,35 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::patch('/orders/{pesanan}/payment', [PesananController::class, 'updatePayment'])->name('orders.updatePayment');
     Route::get('/report/download', [UserController::class, 'downloadReport'])->name('report.download');
 
+    // Pengaturan Pengiriman
+    Route::get('/pengaturan-pengiriman', [PengaturanPengirimanController::class, 'index'])
+        ->name('pengaturan-pengiriman.index');
+
+    Route::put('/pengaturan-pengiriman', [PengaturanPengirimanController::class, 'update'])
+        ->name('pengaturan-pengiriman.update');
+
+    // Tes koneksi RajaOngkir
+    Route::get('/rajaongkir-test', [RajaOngkirController::class, 'test'])
+        ->name('rajaongkir.test');
+
+    // Pencarian lokasi RajaOngkir
+    Route::get('/rajaongkir-search', [RajaOngkirController::class, 'search'])
+        ->name('rajaongkir.search');
+
+    //data wilayah
+    // Route data wilayah untuk Admin
+    Route::get('/wilayah/provinsi', [LocationController::class, 'getProvinsis'])
+        ->name('wilayah.provinsi');
+
+    Route::get('/wilayah/kota/{id_provinsi}', [LocationController::class, 'getKotas'])
+        ->name('wilayah.kota');
+
+    Route::get('/wilayah/kecamatan/{id_kota}', [LocationController::class, 'getKecamatans'])
+        ->name('wilayah.kecamatan');
+
+    Route::get('/wilayah/desa/{id_kecamatan}', [LocationController::class, 'getDesas'])
+        ->name('wilayah.desa');
+
     // Kelola User (customer saja)
     Route::get('/users', [UserController::class, 'userList'])->name('users.index');
     Route::post('/users', [UserController::class, 'storeUser'])->name('users.store');
@@ -164,7 +200,41 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 |--------------------------------------------------------------------------
 */
 
+/*
+|--------------------------------------------------------------------------
+| Owner Routes (auth + owner only)
+|--------------------------------------------------------------------------
+*/
+
 Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->group(function () {
+
+    // Dashboard Owner
     Route::get('/', [UserController::class, 'ownerDashboard'])->name('index');
+
+    // Pengaturan Pengiriman
+    Route::get('/pengaturan-pengiriman', [PengaturanPengirimanController::class, 'index'])
+        ->name('pengaturan-pengiriman.index');
+
+    Route::put('/pengaturan-pengiriman', [PengaturanPengirimanController::class, 'update'])
+        ->name('pengaturan-pengiriman.update');
+
+    //data wilayah
+    // Route data wilayah untuk Owner
+    Route::get('/wilayah/provinsi', [LocationController::class, 'getProvinsis'])
+        ->name('wilayah.provinsi');
+
+    Route::get('/wilayah/kota/{id_provinsi}', [LocationController::class, 'getKotas'])
+        ->name('wilayah.kota');
+
+    Route::get('/wilayah/kecamatan/{id_kota}', [LocationController::class, 'getKecamatans'])
+        ->name('wilayah.kecamatan');
+
+    Route::get('/wilayah/desa/{id_kecamatan}', [LocationController::class, 'getDesas'])
+        ->name('wilayah.desa');
+    //test Raja ongkir
+    Route::get('/rajaongkir-search', [RajaOngkirController::class, 'search'])
+        ->name('rajaongkir.search');
+    // Download Laporan
     Route::get('/report/download', [UserController::class, 'downloadReport'])->name('report.download');
+
 });
