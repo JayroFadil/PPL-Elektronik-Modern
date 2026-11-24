@@ -6,6 +6,7 @@ use App\Models\AlamatUser;
 use App\Models\Ekspedisi;
 use App\Models\Keranjang;
 use App\Models\Produk;
+use App\Models\PengaturanPengiriman;
 use App\Services\RajaOngkirService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -43,20 +44,20 @@ class OngkirController extends Controller
             ], 422);
         }
 
-        $origin = (int) config(
-            'services.rajaongkir.origin_id'
-        );
+        $pengaturan = PengaturanPengiriman::find(1);
+        $origin = (int) ($pengaturan?->origin_id ?? 0);
 
-        if (
-            !$origin ||
-            !config('services.rajaongkir.key')
-        ) {
+        if (!$origin) {
             return response()->json([
-                'message' =>
-                    'Konfigurasi RajaOngkir belum lengkap.',
+                'message' => 'Alamat asal pengiriman belum diatur oleh Admin atau Owner.',
             ], 422);
         }
 
+        if (!config('services.rajaongkir.api_key')) {
+            return response()->json([
+                'message' => 'API Key RajaOngkir belum dikonfigurasi.',
+            ], 422);
+        }
         $carrierNames = [
             'jne' => 'JNE',
             'jnt' => 'JNT',

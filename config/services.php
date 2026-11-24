@@ -1,17 +1,10 @@
 <?php
-
 return [
 
     /*
     |--------------------------------------------------------------------------
     | Third Party Services
     |--------------------------------------------------------------------------
-    |
-    | This file is for storing the credentials for third party services such
-    | as Mailgun, Postmark, AWS and more. This file provides the de facto
-    | location for this type of information, allowing packages to have
-    | a conventional file to locate the various service credentials.
-    |
     */
 
     'postmark' => [
@@ -36,18 +29,18 @@ return [
     ],
 
     'midtrans' => [
-        'server_key' => env('MIDTRANS_SERVER_KEY'),
-        'client_key' => env('MIDTRANS_CLIENT_KEY'),
-        'is_production' => env('MIDTRANS_IS_PRODUCTION', false),
+    	'server_key' => env('MIDTRANS_SERVER_KEY'),
+    	'client_key' => env('MIDTRANS_CLIENT_KEY'),
+    	'signature_key' => env('MIDTRANS_SIGNATURE_KEY'),
+    	'is_production' => env('MIDTRANS_IS_PRODUCTION', false),
     ],
 
-    // rajaongkir
     'rajaongkir' => [
-    'base_url' => env(
-        'RAJAONGKIR_BASE_URL',
-        'https://rajaongkir.komerce.id/api/v1'
-    ),
-    'key' => env('RAJAONGKIR_API_KEY'),
-    'origin_id' => env('RAJAONGKIR_ORIGIN_ID'),
-],
+        'api_key' => env('RAJAONGKIR_API_KEY'),
+        'base_url' => env(
+            'RAJAONGKIR_BASE_URL',
+            'https://rajaongkir.komerce.id/api/v1'
+        ),
+    ],
+
 ];

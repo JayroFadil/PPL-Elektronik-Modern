@@ -41,13 +41,32 @@ class MidtransNotificationController extends Controller
             return response()->json(['message' => 'Notification amount does not match the order.'], 422);
         }
 
+	        // Ambil detail Virtual Account dari Midtrans.
+        $vaBank = null;
+        $vaNumber = null;
+
+        try {
+            $transactionDetails = $midtrans->getTransactionStatus(
+                $notification['order_id']
+            );
+
+            $vaNumbers = $transactionDetails['va_numbers'] ?? [];
+
+            if (!empty($vaNumbers)) {
+                $vaBank = $vaNumbers[0]['bank'] ?? null;
+                $vaNumber = $vaNumbers[0]['va_number'] ?? null;
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+
         $transactionStatus = $notification['transaction_status'];
         $fraudStatus = $notification['fraud_status'] ?? null;
         $isPaid = $transactionStatus === 'settlement'
             || ($transactionStatus === 'capture' && $fraudStatus === 'accept');
         $isFailed = in_array($transactionStatus, ['deny', 'cancel', 'expire', 'failure'], true);
 
-        DB::transaction(function () use ($notification, $pembayaran, $transactionStatus, $fraudStatus, $isPaid, $isFailed) {
+        DB::transaction(function () use ($notification, $pembayaran, $transactionStatus, $fraudStatus, $isPaid, $isFailed, $vaBank, $vaNumber) {
             $lockedPayment = Pembayaran::query()
                 ->whereKey($pembayaran->getKey())
                 ->lockForUpdate()
@@ -60,13 +79,15 @@ class MidtransNotificationController extends Controller
             $previousPaymentStatus = (int) $lockedPayment->status_konfirmasi;
             if ($previousPaymentStatus !== 1) {
                 $lockedPayment->update([
-                    'transaction_id' => $notification['transaction_id'] ?? $lockedPayment->transaction_id,
-                    'transaction_status' => $transactionStatus,
-                    'payment_type' => $notification['payment_type'] ?? $lockedPayment->payment_type,
-                    'fraud_status' => $fraudStatus,
-                    'status_konfirmasi' => $isPaid ? 1 : ($isFailed ? 2 : 0),
-                    'paid_at' => $isPaid ? ($lockedPayment->paid_at ?? now()) : null,
-                ]);
+    'transaction_id' => $notification['transaction_id'] ?? $lockedPayment->transaction_id,
+    'transaction_status' => $transactionStatus,
+    'payment_type' => $notification['payment_type'] ?? $lockedPayment->payment_type,
+    'va_bank' => $vaBank ?? $lockedPayment->va_bank,
+    'va_number' => $vaNumber ?? $lockedPayment->va_number,
+    'fraud_status' => $fraudStatus,
+    'status_konfirmasi' => $isPaid ? 1 : ($isFailed ? 2 : 0),
+    'paid_at' => $isPaid ? ($lockedPayment->paid_at ?? now()) : null,
+]);
 
                 if ($isPaid && $pesanan->status_pesanan === 'menunggu') {
                     $pesanan->update(['status_pesanan' => 'diproses']);

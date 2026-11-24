@@ -80,24 +80,49 @@ class MidtransPaymentService
 
         return $token;
     }
-
-    public function isValidNotificationSignature(array $notification): bool
+	
+    /**
+     * Mengambil detail transaksi dari Midtrans Status API.
+     */
+    public function getTransactionStatus(string $orderId): array
     {
-        $serverKey = config('services.midtrans.server_key');
-        if (!is_string($serverKey) || $serverKey === '') {
-            return false;
+        $baseUrl = config('services.midtrans.is_production')
+            ? 'https://api.midtrans.com'
+            : 'https://api.sandbox.midtrans.com';
+
+        $response = Http::timeout(15)
+            ->withBasicAuth(config('services.midtrans.server_key'), '')
+            ->acceptJson()
+            ->get($baseUrl . '/v2/' . rawurlencode($orderId) . '/status')
+            ->throw();
+
+        $data = $response->json();
+
+        if (!is_array($data)) {
+            throw new RuntimeException('Invalid Midtrans transaction response.');
         }
 
-        $expected = hash(
-            'sha512',
-            $notification['order_id']
-                . $notification['status_code']
-                . $notification['gross_amount']
-                . $serverKey
-        );
-
-        return hash_equals($expected, $notification['signature_key']);
+        return $data;
     }
+
+     public function isValidNotificationSignature(array $notification): bool
+{
+    $signatureKey = config('services.midtrans.signature_key');
+
+    if (!is_string($signatureKey) || $signatureKey === '') {
+        return false;
+    }
+
+    $expected = hash(
+        'sha512',
+        $notification['order_id']
+            . $notification['status_code']
+            . $notification['gross_amount']
+            . $signatureKey
+    );
+
+    return hash_equals($expected, $notification['signature_key']);
+}
 
     public function isMatchingAmount(string $grossAmount, int $expectedAmount): bool
     {
