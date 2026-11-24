@@ -358,6 +358,7 @@ class PesananController extends Controller
 
         $ongkir = (int) ($quote['cost'] ?? -1);
         $layananEkspedisi = $quote['service'] ?? '';
+        $estimasiPengiriman = (string) ($quote['etd'] ?? '-');
 
         if ($ongkir < 0) {
             return back()
@@ -451,8 +452,7 @@ class PesananController extends Controller
             return back()->with('error', 'Total pembayaran harus lebih dari Rp0 untuk diproses oleh Midtrans.');
         }
 
-        $createdPesanan = DB::transaction(function () use ($request, $subtotal, $discount, $ongkir, $totalBayar, $orderItems, $promo, $appliedPromo,    $ekspedisi,
-    $layananEkspedisi) {
+        $createdPesanan = DB::transaction(function () use ($request, $subtotal, $discount, $ongkir, $totalBayar, $orderItems, $promo, $appliedPromo, $ekspedisi, $layananEkspedisi, $estimasiPengiriman) {
             $pesanan = Pesanan::create([
                 'id_users' => Auth::id(),
                 'id_alamat' => $request->id_alamat,

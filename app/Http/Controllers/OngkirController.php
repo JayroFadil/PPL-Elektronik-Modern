@@ -120,6 +120,7 @@ class OngkirController extends Controller
                             (int) $ekspedisi->id_ekspedisi,
                         'service' => $service,
                         'cost' => $cost,
+                        'etd' => (string) ($rate['etd'] ?? '-'),
                         'weight_gram' => $weight,
                         'created_at' => now()->timestamp,
                     ]

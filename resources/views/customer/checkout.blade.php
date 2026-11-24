@@ -95,36 +95,6 @@
                             <h3 class="font-heading text-lg font-extrabold text-g900 mb-5">
                                 Hitung Ongkos Kirim
                             </h3>
-<<<<<<< HEAD
-                            <div class="space-y-3" id="ekspedisiList" data-shipping-url="{{ route('customer.shippingOptions') }}">
-                            @foreach ($ekspedisis as $ekspedisi)
-                                <label class="flex items-center gap-3 p-4 bg-white rounded-xl cursor-pointer border-[1.5px] border-g200 hover:border-primary transition-all has-[:checked]:border-primary has-[:checked]:bg-primary-light/50 has-[:checked]:ring-4 has-[:checked]:ring-primary/10">
-                                    <input type="radio" name="id_ekspedisi" value="{{ $ekspedisi->id_ekspedisi }}"
-                                        data-biaya="{{ $ekspedisi->biaya_pengiriman }}"
-                                        {{ $loop->first ? 'checked' : '' }}
-                                        onchange="calculateTotal()"
-                                        class="w-4 h-4 accent-primary shrink-0 rounded-full text-primary focus:ring-primary">
-                                    <div class="flex-1">
-                                        <div class="text-[14px] font-bold text-g800">
-                                            {{ $ekspedisi->nama_ekspedisi }}@if($ekspedisi->service) - {{ $ekspedisi->service }}@endif
-                                        </div>
-                                        @if($ekspedisi->etd)
-                                            <div class="text-xs text-g500 mt-1">Estimasi tiba: {{ $ekspedisi->etd }}</div>
-                                        @endif
-                                    </div>
-                                    <div class="font-heading font-extrabold text-primary text-[15px]">
-                                        Rp {{ number_format($ekspedisi->biaya_pengiriman, 0, ',', '.') }}
-                                    </div>
-                                </label>
-                            @endforeach
-                            @if ($ekspedisis->isEmpty())
-                                <div class="text-sm text-g500" data-shipping-message>Pilih alamat untuk memuat tarif pengiriman.</div>
-                            @endif
-                            </div>
-                        </x-card>
-=======
->>>>>>> origin/main
-
                             <label for="courierCode" class="block mb-2">
                                 Pilih Ekspedisi
                             </label>
@@ -419,82 +389,6 @@ document.addEventListener('click', async function (event) {
             results.append(label);
         }
 
-<<<<<<< HEAD
-        async function updateShippingOptions(alamatId) {
-            const list = document.getElementById('ekspedisiList');
-            const url = list?.dataset.shippingUrl;
-            if (!list || !url || !alamatId) return;
-
-            list.innerHTML = '<div class="text-sm text-g500">Menghitung ongkir...</div>';
-            validateCheckoutReady();
-
-            try {
-                const response = await fetch(`${url}?id_alamat=${encodeURIComponent(alamatId)}`, {
-                    headers: { 'Accept': 'application/json' }
-                });
-                const payload = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(payload.message || 'Tarif pengiriman tidak tersedia.');
-                }
-
-                list.replaceChildren();
-                payload.options.forEach((option, index) => {
-                    const label = document.createElement('label');
-                    label.className = 'flex items-center gap-3 p-4 bg-white rounded-xl cursor-pointer border-[1.5px] border-g200 hover:border-primary transition-all has-[:checked]:border-primary has-[:checked]:bg-primary-light/50 has-[:checked]:ring-4 has-[:checked]:ring-primary/10';
-
-                    const input = document.createElement('input');
-                    input.type = 'radio';
-                    input.name = 'id_ekspedisi';
-                    input.value = option.id_ekspedisi;
-                    input.dataset.biaya = option.biaya_pengiriman;
-                    input.checked = index === 0;
-                    input.className = 'w-4 h-4 accent-primary shrink-0 rounded-full text-primary focus:ring-primary';
-                    input.addEventListener('change', calculateTotal);
-
-                    const details = document.createElement('div');
-                    details.className = 'flex-1';
-                    const title = document.createElement('div');
-                    title.className = 'text-[14px] font-bold text-g800';
-                    title.textContent = `${option.nama_ekspedisi} - ${option.service}`;
-                    details.appendChild(title);
-
-                    if (option.etd) {
-                        const eta = document.createElement('div');
-                        eta.className = 'text-xs text-g500 mt-1';
-                        eta.textContent = `Estimasi tiba: ${option.etd}`;
-                        details.appendChild(eta);
-                    }
-
-                    const cost = document.createElement('div');
-                    cost.className = 'font-heading font-extrabold text-primary text-[15px]';
-                    cost.textContent = formatRupiah(Number(option.biaya_pengiriman));
-
-                    label.append(input, details, cost);
-                    list.appendChild(label);
-                });
-
-                calculateTotal();
-            } catch (error) {
-                list.replaceChildren();
-                const message = document.createElement('div');
-                message.className = 'text-sm text-red-600';
-                message.textContent = error.message;
-                list.appendChild(message);
-                document.getElementById('shippingCost').textContent = formatRupiah(0);
-                document.getElementById('totalPayment').textContent = formatRupiah(baseSubtotal);
-            } finally {
-                validateCheckoutReady();
-            }
-        }
-
-        document.addEventListener('change', (event) => {
-            if (event.target.matches('input[name="id_alamat"]')) {
-                updateShippingOptions(event.target.value);
-            }
-        });
-
-=======
         if (payload.data.length > 0) {
             message.textContent =
                 'Pilih layanan pengiriman yang tersedia.';
@@ -514,7 +408,6 @@ document.addEventListener('DOMContentLoaded', function () {
     calculateTotal();
     validateCheckoutReady();
 });
->>>>>>> origin/main
         // Smooth Voucher AJAX Logic
         document.addEventListener('submit', async function(e) {
             const form = e.target;
@@ -565,15 +458,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        document.addEventListener('DOMContentLoaded', () => {
-            calculateTotal();
-            validateCheckoutReady();
-
-            if (!document.querySelector('input[name="id_ekspedisi"]:checked')) {
-                const selectedAddress = document.querySelector('input[name="id_alamat"]:checked');
-                if (selectedAddress) updateShippingOptions(selectedAddress.value);
-            }
-        });
     </script>
     @endpush
 @endsection
