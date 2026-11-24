@@ -59,6 +59,9 @@ class MidtransPaymentService
                     'first_name' => $pesanan->user->nama,
                     'email' => $pesanan->user->email,
                 ],
+                'callbacks' =>[
+                    'finish' => route('customer.orders')
+                ],
             ])
             ->throw();
 

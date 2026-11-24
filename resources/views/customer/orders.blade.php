@@ -259,7 +259,27 @@
                 data-client-key="{{config('services.midtrans.client_key') }}">
             </script>
             <script src="{{ $snapScriptHost }}/snap/snap.js?client-key={{ urlencode(config('services.midtrans.client_key')) }}"></script>
-            @if (session('snap_token'))
+            @if (request()->query('transaction_status') === 'settlement' || request()->query('status_code') == 200 || session('snap_token'))
+                <script>
+                    document.addEventListener('DOMContentLoaded', () =>
+                    {
+                        Swal.fire({
+                            title: 'Pembayaran Berhasil!',
+                            text: 'Terima kasih, pembayaran Anda telah berhasil kami terima.',
+                            imageUrl: "{{ asset('image/wokee-danamasuk.png') }}",
+                            imageWidth: 150,
+                            imageHeight: 150,
+                            imageAlt: 'Sukses',
+                            customClass: { image: 'intro' },
+                            confirmButtonColor: '#1A5CFF',
+                            confirmButtonText: 'Selesai'
+                        }).then(() => {
+                            window.history.replaceState({},document.title, "{{ route('customer.orders')}}");
+                        });
+                    });
+                </script>
+            @endif
+            <!-- @if (session('snap_token'))
                 <script>
                     document.addEventListener('DOMContentLoaded', () => {
                         window.snap.pay(@json(session('snap_token')), {
@@ -271,11 +291,11 @@
                                     imageWidth: 150,
                                     imageHeight: 150,
                                     imageAlt: 'Sukses',
-                                    customClass:{image:'intro'},
+                                    customClass: { image: 'intro' },
                                     confirmButtonColor: '#1A5CFF',
                                     confirmButtonText: 'Selesai'
-                                }).then(()=>{
-                                    window.location.reload();
+                                }).then(() => {
+                                    window.history.replaceState({},document.title, "{{ route('customer.orders')}}");
                                 });
                             },
                             onPending: () => window.location.reload(),
@@ -283,7 +303,7 @@
                         });
                     });
                 </script>
-            @endif
+            @endif -->
         @endpush
     @endif
 @endsection
