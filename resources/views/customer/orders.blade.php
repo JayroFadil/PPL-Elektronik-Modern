@@ -254,15 +254,61 @@
                     animation: intro_anim 0.7s
                     cubic-bezier(0.34, 1.56, 0.64,1) forwards!important;
                 }
+    @endif
+    @if (config('services.midtrans.client_key'))
+        @php
+            $snapScriptHost = config('services.midtrans.is_production')
+                ? 'https://app.midtrans.com'
+                : 'https://app.sandbox.midtrans.com';
+        @endphp
+        @push('scripts')
+            <style>
+                @keyframes intro_anim {
+                    0% {
+                        transform: scale(10) rotate(-20deg);
+                        opacity: 0;
+                    }
+                    70% {
+                        transform: scale(3) rotate(0deg);
+                        opacity: 1;
+                    }
+                }
+                .intro {
+                    animation: intro_anim 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+                }
             </style>
-                <script src="{{ $snapScriptHost }}/snap/snap.js"
-                data-client-key="{{config('services.midtrans.client_key') }}">
+
+            {{-- Muat snap.js cukup SATU KALI saja --}}
+            <script src="{{ $snapScriptHost }}/snap/snap.js"
+                    data-client-key="{{ config('services.midtrans.client_key') }}">
             </script>
-            <script src="{{ $snapScriptHost }}/snap/snap.js?client-key={{ urlencode(config('services.midtrans.client_key')) }}"></script>
-            @if (request()->query('transaction_status') === 'settlement' || request()->query('status_code') == 200 || session('snap_token'))
+
+            {{-- 1. Trigger Snap jika ada session snap_token --}}
+            @if (session('snap_token'))
                 <script>
-                    document.addEventListener('DOMContentLoaded', () =>
-                    {
+                    document.addEventListener('DOMContentLoaded', () => {
+                        window.snap.pay(@json(session('snap_token')), {
+                            onSuccess: function (result) {
+                                const orderId = (result && result.order_id) ? encodeURIComponent(result.order_id): '';
+                                window.location.href = "{{ route('customer.orders') }}?order_id=" + orderId + "&transaction_status=settlement&status_code=200";
+                            },
+                            onPending: function (result) {
+                                window.location.href = "{{ route('customer.orders') }}";
+                            },
+                            onError: function (result) {
+                                window.location.href = "{{ route('customer.orders') }}";
+                            },
+                            onClose: function () {
+                            }
+                        });
+                    });
+                </script>
+            @endif
+
+            {{-- 2. Tampilkan Popup Sukses dengan Gambar HANYA SEKALI setelah redirect/selesai --}}
+            @if (request()->query('transaction_status') === 'settlement' || request()->query('status_code') == 200)
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
                         Swal.fire({
                             title: 'Pembayaran Berhasil!',
                             text: 'Terima kasih, pembayaran Anda telah berhasil kami terima.',
@@ -274,36 +320,11 @@
                             confirmButtonColor: '#1A5CFF',
                             confirmButtonText: 'Selesai'
                         }).then(() => {
-                            window.history.replaceState({},document.title, "{{ route('customer.orders')}}");
+                            window.history.replaceState({}, document.title, "{{ route('customer.orders') }}");
                         });
                     });
                 </script>
             @endif
-            <!-- @if (session('snap_token'))
-                <script>
-                    document.addEventListener('DOMContentLoaded', () => {
-                        window.snap.pay(@json(session('snap_token')), {
-                            onSuccess: function(result){
-                                Swal.fire({
-                                    title: 'Pembayaran Berhasil!',
-                                    text: 'Terima kasih, pembayaran Anda telah berhasil kami terima.',
-                                    imageUrl: "{{ asset('image/wokee-danamasuk.png') }}",
-                                    imageWidth: 150,
-                                    imageHeight: 150,
-                                    imageAlt: 'Sukses',
-                                    customClass: { image: 'intro' },
-                                    confirmButtonColor: '#1A5CFF',
-                                    confirmButtonText: 'Selesai'
-                                }).then(() => {
-                                    window.history.replaceState({},document.title, "{{ route('customer.orders')}}");
-                                });
-                            },
-                            onPending: () => window.location.reload(),
-                            onError: () => window.location.reload()
-                        });
-                    });
-                </script>
-            @endif -->
         @endpush
     @endif
 @endsection

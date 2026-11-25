@@ -153,8 +153,40 @@ class PesananController extends Controller
     /**
      * Customer: riwayat pesanan.
      */
-    public function customerOrders()
+    public function customerOrders(Request $request, MidtransPaymentService $midtrans)
     {
+        $orderId = $request->query('order_id');
+            $transactionStatus = $request->query('transaction_status');
+
+            if ($orderId && ($transactionStatus === 'settlement' || $request->query('status_code') == 200)) {
+                try {
+                    $statusData = $midtrans->getTransactionStatus($orderId);
+                    $status = $statusData['transaction_status'] ?? '';
+                    $fraud = $statusData['fraud_status'] ?? null;
+
+                    $isPaid = $status === 'settlement' || ($status === 'capture' && in_array($fraud, [null, 'accept'], true));
+
+                    if ($isPaid) {
+                        $pembayaran = Pembayaran::where('midtrans_order_id', $orderId)->first();
+                        if ($pembayaran && (int) $pembayaran->status_konfirmasi !== 1) {
+                            $pembayaran->update([
+                                'status_konfirmasi' => 1,
+                                'transaction_status' => $status,
+                                'transaction_id' => $statusData['transaction_id'] ?? $pembayaran->transaction_id,
+                                'payment_type' => $statusData['payment_type'] ?? $pembayaran->payment_type,
+                                'paid_at' => now(),
+                            ]);
+
+                            $pesanan = $pembayaran->pesanan;
+                            if ($pesanan && $pesanan->status_pesanan === 'menunggu') {
+                                $pesanan->update(['status_pesanan' => 'diproses']);
+                            }
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning('Gagal auto-sync status Midtrans: ' . $e->getMessage());
+                }
+            }
         $pesanans = Pesanan::with([
                 'detailPesanans.produk:id_produk,nama_produk,gambar,harga',
                 'ekspedisi:id_ekspedisi,nama_ekspedisi,biaya_pengiriman',

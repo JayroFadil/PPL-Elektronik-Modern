@@ -1,10 +1,20 @@
-@if (session('status'))
+@if (session('status') && !(request()->query('transaction_status') === 'settlement' || request()->query('status_code') == 200))
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             if (typeof window.showAlert === 'function') {
                 window.showAlert('success', 'Berhasil!', "{!! addslashes(session('status')) !!}");
             } else {
                 console.log("Status: {{ session('status') }}");
+            }
+        });
+    </script>
+@endif
+
+@if (session('status') && !(request()->query('transaction_status') === 'settlement' || request()->query('status_code') == 200))
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof window.showAlert === 'function') {
+                window.showAlert('success', 'Berhasil!', "{!! addslashes(session('status')) !!}");
             }
         });
     </script>
@@ -42,16 +52,6 @@
             {
                 window.showPaymentSuccessAlert('Pembayaran Berhasil!',
                 "{!!addslashes(session('payment_success')) !!}");
-            }
-        });
-    </script>
-@endif
-
-@if (session('status') && !(request()->query('transaction_status') === 'settlement' || request()->query('status_code') == 200))
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof window.showAlert === 'function') {
-                window.showAlert('success', 'Berhasil!', "{!! addslashes(session('status')) !!}");
             }
         });
     </script>

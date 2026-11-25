@@ -124,7 +124,7 @@ class MidtransPaymentService
             . $signatureKey
     );
 
-    return hash_equals($expected, $notification['signature_key']);
+    return hash_equals($expected, $notification['signature_key'] ?? '');
 }
 
     public function isMatchingAmount(string $grossAmount, int $expectedAmount): bool
