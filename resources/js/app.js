@@ -58,6 +58,20 @@ const initSweetAlert = () => {
             title: title
         });
     };
+
+    window.showPaymentSuccessAlert = (title, text, callback) =>{
+        Swal.fire({
+            title: title||'Pembayaran Berhasil!',
+            html: text||'Terima kasih, pembayaran pesanan Anda telah kami terima.',
+            imageUrl:'./public/image/wokee-danamasuk.png',
+            imageWidth: 150,
+            imageHeight: 150,
+            imageAlt: 'Pembayaran Berhasil',
+            confirmButtonColor:'#1A5CFF',
+            confirmButtonText:'Lihat Pesanan',
+        }).then(()=>{if (callback)callback();
+        });
+    };
 };
 
 // Initialize immediately so global functions are available

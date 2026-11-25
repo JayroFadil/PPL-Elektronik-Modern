@@ -59,6 +59,9 @@ class MidtransPaymentService
                     'first_name' => $pesanan->user->nama,
                     'email' => $pesanan->user->email,
                 ],
+                'callbacks' =>[
+                    'finish' => route('customer.orders')
+                ],
             ])
             ->throw();
 
@@ -121,7 +124,7 @@ class MidtransPaymentService
             . $signatureKey
     );
 
-    return hash_equals($expected, $notification['signature_key']);
+    return hash_equals($expected, $notification['signature_key'] ?? '');
 }
 
     public function isMatchingAmount(string $grossAmount, int $expectedAmount): bool
