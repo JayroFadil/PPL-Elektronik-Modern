@@ -104,7 +104,14 @@
                         <div class="flex flex-col gap-4">
                             <div>
                                 <span class="text-xs font-bold text-g500 uppercase tracking-widest mb-1 block">Pengiriman</span>
-                                <span class="text-[13px] font-semibold text-g800 flex items-center gap-1.5"><i class="fi fi-rr-truck-side text-g400"></i> {{ $pesanan->ekspedisi->nama_ekspedisi ?? '-' }} <span class="text-g400 mx-1">•</span> Rp {{ number_format($pesanan->ongkos_kirim, 0, ',', '.') }}</span>
+                                <span class="text-[13px] font-semibold text-g800 flex items-center gap-1.5 flex-wrap">
+                                    <i class="fi fi-rr-truck-side text-g400"></i> 
+                                    {{ $pesanan->ekspedisi->nama_ekspedisi ?? '-' }}
+                                    @if(!empty($pesanan->layanan_ekspedisi))
+                                        <span class="text-xs font-medium text-g500 bg-g100 px-1.5 py-0.5 rounded">({{ $pesanan->layanan_ekspedisi }})</span>
+                                    @endif
+                                    <span class="text-g400 mx-1">•</span> Rp {{ number_format($pesanan->ongkos_kirim, 0, ',', '.') }}
+                                </span>
                             </div>
                             
                             <div class="space-y-1">
