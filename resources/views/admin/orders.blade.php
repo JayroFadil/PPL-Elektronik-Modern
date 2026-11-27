@@ -96,6 +96,14 @@
                                 <tr class="group hover:bg-g50/50 transition-colors">
                                     <td class="py-4 px-6 border-b border-g100 group-last:border-none">
                                         <div class="font-extrabold text-g900 text-[14px]">{{ $pesanan->no_resi }}</div>
+                                        <div class="text-[11px] font-semibold text-g700 flex items-center gap-1 mt-1">
+                                            <i class="fi fi-rr-truck-side text-g400"></i>
+                                            <span>{{ $pesanan->ekspedisi->nama_ekspedisi ?? '-' }}</span>
+                                            @if(!empty($pesanan->layanan_ekspedisi))
+                                                <span class="text-g500 text-[10px] font-medium bg-g100 px-1 py-0.5 rounded">({{ $pesanan->layanan_ekspedisi }})</span>
+                                            @endif
+                                        </div>
+                                        <div class="text-[10px] text-g400 font-medium">Ongkir: Rp {{ number_format($pesanan->ongkos_kirim, 0, ',', '.') }}</div>
                                     </td>
                                     <td class="py-4 px-6 border-b border-g100 group-last:border-none">
                                         <div class="font-bold text-g800 text-[13px] mb-1">{{ $pesanan->user->nama ?? '-' }}</div>
